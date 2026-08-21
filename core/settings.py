@@ -149,3 +149,11 @@ JAZZMIN_SETTINGS = {
     # Allows you to change the colors of the admin panel instantly
     "show_ui_builder": True,
 }
+
+STATIC_URL = 'static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Add this line so Vercel can compile your static assets
+STATIC_ROOT = BASE_DIR / 'staticfiles'
