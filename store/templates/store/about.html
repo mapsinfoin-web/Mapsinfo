@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Heritage | MAPSCART</title>
+    <!-- Loaded Cinzel for headers, Cormorant for body text, Jost for UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-navy: #0a1118; /* Deeper, richer navy */
+            --brand-accent: #c5a059; /* A softer, more expensive-looking gold */
+            --text-dark: #1c1c1c;
+            --text-gray: #4a4a4a;
+            --bg-classic: #fcfbf8; /* True alabaster cream */
+            --hairline: #e3ddd5;
+        }
+        
+        * { box-sizing: border-box; }
+        body { font-family: 'Cormorant Garamond', serif; margin: 0; padding: 0; background-color: var(--bg-classic); color: var(--text-gray); overflow-x: hidden; }
+        
+        /* Navbar (Jost font for clean UI) */
+        .navbar { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background-color: var(--brand-navy); font-family: 'Jost', sans-serif; }
+        .brand-logo img { height: 60px; }
+        .nav-links a { color: #fff; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 20px; transition: color 0.4s ease;}
+        .nav-links a:hover { color: var(--brand-accent); }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.3s; }
+        .delay-2 { animation-delay: 0.6s; }
+
+        /* Cinematic Hero */
+        .hero-section { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; position: relative; }
+        .hero-eyebrow { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--brand-accent); margin-bottom: 30px; }
+        .hero-title { font-family: 'Cinzel', serif; font-size: 72px; color: var(--text-dark); margin: 0; font-weight: 400; line-height: 1.1; letter-spacing: -1px; }
+        .hero-title span { display: block; font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 64px; color: var(--brand-accent); font-weight: 300; letter-spacing: 1px; }
+        .hero-line { width: 1px; height: 100px; background-color: var(--brand-accent); margin-top: 50px; }
+
+        /* The Story Layout */
+        .story-section { max-width: 1200px; margin: 0 auto; padding: 80px 20px 120px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        
+        .story-content { padding-right: 40px; }
+        .drop-cap { float: left; font-size: 90px; line-height: 70px; padding-top: 4px; padding-right: 15px; font-family: 'Cinzel', serif; color: var(--brand-accent); }
+        .story-content p { font-size: 21px; line-height: 1.8; color: var(--text-dark); text-align: justify; margin-bottom: 30px; }
+        .story-content .sub-text { font-size: 16px; color: var(--text-gray); font-family: 'Jost', sans-serif; font-weight: 300; line-height: 1.9; margin-top: 40px; }
+
+        /* Asymmetric Image Gallery */
+        .image-gallery { position: relative; height: 700px; width: 100%; }
+        .img-primary { position: absolute; top: 0; right: 0; width: 75%; height: 80%; object-fit: cover; z-index: 1; filter: grayscale(10%); }
+        .img-secondary { position: absolute; bottom: 0; left: 0; width: 55%; height: 50%; object-fit: cover; z-index: 2; border: 12px solid var(--bg-classic); box-shadow: -10px 10px 30px rgba(0,0,0,0.05); }
+
+        /* Dramatic Pull-Quote */
+        .quote-section { background-color: var(--brand-navy); padding: 120px 20px; text-align: center; color: #fff; }
+        .quote-wrapper { max-width: 800px; margin: 0 auto; }
+        .quote-mark { font-family: 'Cinzel', serif; font-size: 80px; color: var(--brand-accent); opacity: 0.5; line-height: 0; margin-bottom: 20px; display: block; }
+        .quote-text { font-size: 40px; font-style: italic; font-weight: 300; line-height: 1.4; margin: 0; }
+        .quote-author { font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-top: 40px; color: var(--brand-accent); }
+
+        /* The Pillars */
+        .pillars-section { max-width: 1200px; margin: 0 auto; padding: 120px 20px; }
+        .pillars-header { text-align: center; margin-bottom: 80px; }
+        .pillars-header h2 { font-family: 'Cinzel', serif; font-size: 42px; color: var(--text-dark); font-weight: 400; margin: 0; }
+        
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+        .pillar-card { padding: 40px; text-align: center; border: 1px solid transparent; transition: all 0.5s ease; cursor: default; }
+        .pillar-card:hover { border-color: var(--hairline); background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
+        .pillar-number { font-family: 'Cinzel', serif; font-size: 16px; color: var(--brand-accent); margin-bottom: 20px; display: block; }
+        .pillar-card h3 { font-size: 26px; color: var(--text-dark); margin: 0 0 20px 0; font-weight: 400; }
+        .pillar-card p { font-family: 'Jost', sans-serif; font-size: 14px; line-height: 1.8; color: var(--text-gray); font-weight: 300; }
+
+        @media (max-width: 992px) {
+            .story-section { grid-template-columns: 1fr; }
+            .image-gallery { height: 500px; margin-top: 40px; }
+            .pillars-grid { grid-template-columns: 1fr; gap: 30px; }
+            .hero-title { font-size: 50px; }
+            .hero-title span { font-size: 42px; }
+            .quote-text { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:collections' %}">Collections</a>
+            <a href="{% url 'store:about' %}" style="color: var(--brand-accent);">About</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-section">
+        <span class="hero-eyebrow animate-up">Since Inception</span>
+        <h1 class="hero-title animate-up delay-1">The Art of <br><span>Fine Jewelry</span></h1>
+        <div class="hero-line animate-up delay-2"></div>
+    </header>
+
+    <!-- Story -->
+    <section class="story-section">
+        <div class="story-content animate-up">
+            <p>
+                <span class="drop-cap">W</span>e believe that true elegance is never rushed. In a world increasingly driven by mass production, we have chosen a different path—one that honors the heritage of master craftsmanship and the enduring allure of precious materials.
+            </p>
+            <p class="sub-text">
+                Every piece in our collection is conceived as a wearable decision. We partner exclusively with independent ateliers where artisans still finish metals under a loupe and set stones entirely by hand. This meticulous attention to detail ensures that no two pieces are exactly alike, each bearing the subtle, irreplaceable signature of its maker.
+            </p>
+        </div>
+        <div class="image-gallery animate-up delay-1">
+            <img src="https://images.unsplash.com/photo-1589128777073-263566ae5e4d?q=80&w=800&auto=format&fit=crop" class="img-primary" alt="Jeweler working">
+            <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop" class="img-secondary" alt="Finished jewelry detail">
+        </div>
+    </section>
+
+    <!-- Dramatic Quote -->
+    <section class="quote-section">
+        <div class="quote-wrapper animate-up">
+            <span class="quote-mark">"</span>
+            <h2 class="quote-text">We reject passing trends in favor of enduring style. It is a commitment to the art of fine jewelry.</h2>
+            <div class="quote-author">The Manifesto</div>
+        </div>
+    </section>
+
+    <!-- The Pillars -->
+    <section class="pillars-section">
+        <div class="pillars-header animate-up">
+            <h2>Our Foundation</h2>
+        </div>
+        <div class="pillars-grid">
+            <div class="pillar-card animate-up">
+                <span class="pillar-number">I</span>
+                <h3>Enduring Craft</h3>
+                <p>Pieces cast, polished, and assembled using time-honored techniques, designed to withstand the rigors of daily wear and transcend generations.</p>
+            </div>
+            <div class="pillar-card animate-up delay-1">
+                <span class="pillar-number">II</span>
+                <h3>Atelier Direct</h3>
+                <p>By skipping traditional supply chains, we guarantee fair compensation for our jewelers while delivering an uncompromising standard of luxury to you.</p>
+            </div>
+            <div class="pillar-card animate-up delay-2">
+                <span class="pillar-number">III</span>
+                <h3>Noble Materials</h3>
+                <p>Utilizing exclusively conflict-free stones and proprietary, ethically sourced metal alloys, adhering strictly to the highest environmental standards.</p>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

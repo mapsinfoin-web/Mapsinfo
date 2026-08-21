@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmed | MAPSCART</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-accent: #a3702f; --heading: #241a0f; --bg-page: #f7f0e1; }
+        body { font-family: 'Jost', sans-serif; background-color: var(--bg-page); color: var(--heading); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .success-box { max-width: 500px; padding: 40px; }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: 48px; margin-bottom: 10px; font-weight: 500; }
+        p { font-size: 16px; color: #4a3c2c; line-height: 1.6; margin-bottom: 30px; }
+        .btn-primary { background: var(--brand-accent); color: #fff; padding: 15px 30px; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; border-radius: 30px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="success-box">
+        <h1>Thank You!</h1>
+        <p>Your order has been placed successfully. We are preparing your considered jewellery for shipment and will send you an email confirmation shortly.</p>
+        <a href="{% url 'store:all_products' %}" class="btn-primary">Return to Boutique</a>
+    </div>
+</body>
+</html>

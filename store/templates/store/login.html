@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | MAPSCART</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Exact same styles as register.html */
+        :root { --brand-accent: #a3702f; --heading: #241a0f; --bg-page: #f7f0e1; --bg-panel: #efe3c8; --hairline: rgba(163, 112, 47, 0.28); }
+        body { font-family: 'Jost', sans-serif; background-color: var(--bg-page); color: var(--heading); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-container { background: var(--bg-panel); padding: 50px; border-radius: 8px; border: 1px solid var(--hairline); width: 100%; max-width: 400px; text-align: center; }
+        .auth-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; margin: 0 0 20px 0; font-weight: 500; }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #cfc09a; background: transparent; border-radius: 4px; box-sizing: border-box; }
+        .btn-primary { width: 100%; background: var(--brand-accent); color: #fff; padding: 15px; border: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border-radius: 30px; margin-top: 10px; }
+        .auth-links { margin-top: 20px; font-size: 13px; }
+        .auth-links a { color: var(--brand-accent); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Welcome Back</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary">Log In</button>
+        </form>
+        <div class="auth-links">
+            <p>Don't have an account? <a href="{% url 'store:register_user' %}">Register here</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

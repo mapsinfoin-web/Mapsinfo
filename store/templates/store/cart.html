@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | MAPSCART</title>
+
+    <!-- Import Google Fonts & FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
+            --brand-accent: #b1832e;
+            --brand-accent-light: #ddb35e;
+            --heading: #0e1b32;
+            --text-main: #33455e;
+            --text-muted: #7a8aa3;
+            --bg-page: #f7f9fc;
+            --bg-panel: #eef2f8;
+            --bg-footer: #081428;
+            --hairline: rgba(15, 34, 71, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+            box-sizing: border-box;
+        }
+        .brand-logo img { height: 88px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s ease; }
+        .nav-links a:hover { color: var(--brand-accent); }
+        .nav-icons { display: flex; gap: 20px; color: #fff; font-size: 16px; align-items: center; }
+        .nav-icons i { cursor: pointer; transition: color 0.3s ease; }
+        .nav-icons i:hover { color: var(--brand-accent); }
+
+        /* Cart Badge */
+        .cart-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent);
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Cart Layout */
+        .cart-wrapper {
+            flex: 1;
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .cart-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            color: var(--heading);
+            font-weight: 500;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 0;
+        }
+        .empty-cart p { font-size: 18px; color: var(--text-muted); margin-bottom: 30px; }
+        
+        .btn-primary {
+            background: linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-navy-light) 100%);
+            color: #fff;
+            border: 1px solid var(--brand-accent-light);
+            padding: 15px 35px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(120deg, var(--brand-accent) 0%, var(--brand-accent-light) 100%);
+            border-color: var(--brand-accent-light);
+            color: var(--brand-navy);
+        }
+
+        /* Cart Table */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .cart-table th {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--heading);
+            text-align: left;
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--hairline);
+        }
+
+        .cart-table td {
+            padding: 30px 10px;
+            border-bottom: 1px solid var(--hairline);
+            vertical-align: middle;
+        }
+
+        .product-col {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--hairline);
+        }
+
+        .product-details h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: var(--heading);
+            margin: 0 0 8px 0;
+            font-weight: 500;
+        }
+
+        .remove-link {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #c95252;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .remove-link:hover { color: #8a3333; }
+
+        /* Quantity Controls */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg-panel);
+            padding: 8px 15px;
+            border-radius: 30px;
+            width: max-content;
+            border: 1px solid var(--hairline);
+        }
+
+        .qty-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        .qty-btn:hover { color: var(--brand-accent); }
+        
+        .qty-num {
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--heading);
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Cart Summary */
+        .cart-summary {
+            background-color: var(--bg-panel);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--hairline);
+            max-width: 400px;
+            margin-left: auto;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--hairline);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--heading);
+        }
+
+        /* Footer */
+        .site-footer {
+            background-color: var(--bg-page);
+            border-top: 1px solid var(--hairline);
+            padding: 0 20px;
+            margin-top: auto;
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; padding: 70px 0 30px 0; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 50px; padding-bottom: 50px; border-bottom: 1px solid var(--hairline); }
+        .footer-brand img { height: 54px; margin-bottom: 18px; }
+        .footer-brand p { font-size: 13px; line-height: 1.9; margin: 0 0 22px 0; font-weight: 300; }
+        .footer-brand .tagline { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: var(--brand-accent); margin: -8px 0 18px 0; }
+        .footer-col h4 { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--brand-accent); margin: 0 0 22px 0; }
+        .footer-col a { display: block; color: var(--text-main); text-decoration: none; font-size: 13px; margin-bottom: 14px; transition: color 0.3s ease; }
+        .footer-col a:hover { color: var(--brand-accent); }
+        .footer-bottom { padding-top: 30px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; gap: 10px; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .cart-summary { max-width: 100%; margin-left: 0; }
+        }
+        @media (max-width: 600px) {
+            .navbar { padding: 16px 20px; }
+            .nav-links { display: none; }
+            .cart-table th, .cart-table td { display: block; text-align: left; }
+            .cart-table tr { display: block; margin-bottom: 30px; border-bottom: 2px solid var(--hairline); }
+            .cart-table td { border-bottom: none; padding: 10px; }
+            .cart-table th { display: none; }
+            .product-col { flex-wrap: wrap; }
+            .qty-controls { margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="#">Collections</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <!-- Cart with badge -->
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}" style="color: inherit;">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+    <!-- ===== END NAVBAR ===== -->
+
+    <!-- ===== CART CONTENT ===== -->
+    <div class="cart-wrapper">
+        <h1 class="cart-title">Your Mapscart Collection</h1>
+        
+        {% if not cart_items %}
+            <div class="empty-cart">
+                <p>Your collection is currently empty.</p>
+                <a href="{% url 'store:all_products' %}" class="btn-primary">Continue Shopping</a>
+            </div>
+        {% else %}
+            <table class="cart-table">
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+                {% for item in cart_items %}
+                <tr>
+                    <td>
+                        <div class="product-col">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="product-img">
+                            {% else %}
+                                <div class="product-img" style="display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted);">No Image</div>
+                            {% endif %}
+                            <div class="product-details">
+                                <h3>{{ item.product.title }}</h3>
+                                <a href="{% url 'store:remove_cart_item' item.product.id %}" class="remove-link">Remove</a>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size: 18px;">${{ item.product.price }}</td>
+                    <td>
+                        <div class="qty-controls">
+                            <a href="{% url 'store:remove_cart' item.product.id %}" class="qty-btn"><i class="fas fa-minus"></i></a>
+                            <span class="qty-num">{{ item.quantity }}</span>
+                            <a href="{% url 'store:add_cart' item.product.id %}" class="qty-btn"><i class="fas fa-plus"></i></a>
+                        </div>
+                    </td>
+                    <td style="font-size: 18px; font-weight: 500; text-align: right;">${{ item.sub_total }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>${{ total }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Complimentary</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>${{ total }}</span>
+                </div>
+                <a href="{% url 'store:checkout' %}" class="btn-primary" style="width: 100%; text-align: center; padding: 18px 0;">Proceed to Checkout</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+                    <p class="tagline">— a think trend, not a passing one —</p>
+                    <p>Considered jewellery for people who choose once and wear often.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <a href="#">Earrings</a>
+                    <a href="#">Necklaces</a>
+                    <a href="#">Rings</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Help</h4>
+                    <a href="#">Shipping &amp; Returns</a>
+                    <a href="#">FAQs</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#">Our Story</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mapscart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

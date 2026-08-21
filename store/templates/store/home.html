@@ -1,0 +1,1242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAPSCART | A Think Trend</title>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
+            --brand-navy-pale: #7fa8cf;
+            --brand-accent: #b1832e;
+            --brand-accent-light: #ddb35e;
+            --brand-accent-glow: rgba(221, 179, 94, 0.18);
+            --brand-gradient: linear-gradient(120deg, var(--brand-navy-light) 0%, var(--brand-accent-light) 55%, var(--brand-accent) 100%);
+            --heading: #0e1b32;
+            --text-main: #33455e;
+            --text-muted: #7a8aa3;
+            --bg-page: #f7f9fc;
+            --bg-panel: #eef2f8;
+            --bg-panel-2: #e2e8f2;
+            --bg-footer: #081428;
+            --bg-footer-alt: #0f2247;
+            --hairline: rgba(15, 34, 71, 0.16);
+            --hairline-dark: rgba(221, 179, 94, 0.3);
+            --footer-text: #aebbd0;
+            --footer-heading: #d9c791;
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+        }
+
+        a {
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+        }
+
+        ::selection {
+            background: var(--brand-accent);
+            color: #fff;
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 1px solid var(--brand-accent);
+            outline-offset: 3px;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo img {
+            height: 92px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .brand-logo .brand-wordmark {
+            font-family: 'Cinzel', serif;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .brand-wordmark .word-maps {
+            background: linear-gradient(160deg, #6f9dc9 0%, var(--brand-navy-light) 45%, var(--brand-navy) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-wordmark .word-kart {
+            background: linear-gradient(160deg, var(--brand-accent-light) 0%, var(--brand-accent) 55%, #8a611f 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            color: #fff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: var(--brand-accent);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            color: #fff;
+            font-size: 16px;
+            align-items: center;
+        }
+        .nav-icons i {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-icons i:hover {
+            color: var(--brand-accent);
+        }
+
+        /* Cart Badge */
+        .cart-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent);
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background-image: url('{% static 'hero.png' %}');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(8, 20, 40, 0.85) 0%, rgba(8, 20, 40, 0.35) 50%, rgba(8, 20, 40, 0.92) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--brand-accent-light);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 72px;
+            font-weight: 500;
+            color: #fff;
+            margin: 0 0 20px 0;
+            line-height: 1.15;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-title .italic-gold {
+            font-style: italic;
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 14px;
+            color: #c3ccdc;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 15px 30px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-navy-light) 100%);
+            color: #fff;
+            border: 1px solid var(--brand-accent-light);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(120deg, var(--brand-accent) 0%, var(--brand-accent-light) 100%);
+            border-color: var(--brand-accent-light);
+            color: var(--brand-navy);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #fff;
+            border: 1px solid rgba(221, 179, 94, 0.5);
+        }
+        .btn-secondary:hover {
+            border-color: var(--brand-accent-light);
+            background-color: rgba(221, 179, 94, 0.14);
+        }
+
+        /* ===== CATEGORIES ===== */
+        .categories-section {
+            padding: 100px 20px 80px 20px;
+            background: radial-gradient(circle at 50% 15%, rgba(61, 110, 165, 0.10) 0%, transparent 50%),
+                var(--bg-page);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-subtitle {
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--brand-accent);
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 46px;
+            font-weight: 500;
+            color: var(--heading);
+            margin: 10px 0 0 0;
+        }
+
+        .section-header::after {
+            content: '';
+            display: block;
+            width: 90px;
+            height: 1px;
+            margin: 22px auto 0 auto;
+            background: linear-gradient(90deg, transparent 0%, var(--brand-navy-light) 35%, var(--brand-accent) 50%, var(--brand-navy-light) 65%, transparent 100%);
+            position: relative;
+        }
+
+        .section-header {
+            position: relative;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 60px;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            display: block;
+            aspect-ratio: 3 / 4;
+            background-color: #081428;
+        }
+
+        .category-card::before,
+        .category-card::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .category-card::before {
+            top: 14px;
+            left: 14px;
+            border-top: 1.5px solid var(--brand-accent-light);
+            border-left: 1.5px solid var(--brand-accent-light);
+            transform: translate(6px, 6px);
+        }
+        .category-card::after {
+            bottom: 14px;
+            right: 14px;
+            border-bottom: 1.5px solid var(--brand-accent-light);
+            border-right: 1.5px solid var(--brand-accent-light);
+            transform: translate(-6px, -6px);
+        }
+        .category-card:hover::before,
+        .category-card:hover::after {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        .category-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s ease;
+        }
+
+        .category-card:hover .category-image {
+            transform: scale(1.08);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(to top, rgba(8, 20, 40, 0.95) 0%, rgba(8, 20, 40, 0) 100%);
+            z-index: 1;
+        }
+
+        .category-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+        }
+
+        .category-info h3 {
+            font-family: 'Cormorant Garamond', serif;
+            color: #fff;
+            font-size: 20px;
+            margin: 0 0 6px 0;
+            font-weight: 400;
+        }
+
+        .category-info p {
+            font-family: 'Jost', sans-serif;
+            color: #c3ccdc;
+            font-size: 10px;
+            margin: 0;
+        }
+
+        /* ===== MARQUEE ===== */
+        .marquee-strip {
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+            padding: 22px 0;
+            overflow: hidden;
+            background-color: var(--bg-panel);
+            white-space: nowrap;
+        }
+        .marquee-track {
+            display: inline-flex;
+            animation: scroll-left 28s linear infinite;
+        }
+        .marquee-track span {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 20px;
+            color: rgba(15, 34, 71, 0.4);
+            padding: 0 28px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .marquee-track span::after {
+            content: '\2726';
+            font-style: normal;
+            color: var(--brand-accent);
+            margin-left: 28px;
+            font-size: 12px;
+        }
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .marquee-track {
+                animation: none;
+            }
+        }
+
+        /* ===== STORY ===== */
+        .story-section {
+            padding: 110px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 80px;
+            align-items: center;
+        }
+        .story-image-wrap {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            border-radius: 4px 60px 4px 4px;
+            overflow: hidden;
+        }
+        .story-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .story-image-frame {
+            position: absolute;
+            top: 22px;
+            left: 22px;
+            right: -22px;
+            bottom: -22px;
+            border: 1px solid var(--brand-navy-light);
+            border-radius: 4px 60px 4px 4px;
+            z-index: -1;
+        }
+        .story-content .section-subtitle {
+            display: block;
+            margin-bottom: 16px;
+        }
+        .story-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 40px;
+            font-weight: 500;
+            color: var(--heading);
+            line-height: 1.25;
+            margin: 0 0 24px 0;
+        }
+        .story-content h2 em {
+            color: var(--brand-accent);
+            font-style: italic;
+        }
+        .story-content p {
+            font-size: 14px;
+            line-height: 1.9;
+            color: var(--text-main);
+            margin: 0 0 20px 0;
+            max-width: 480px;
+        }
+        .story-stats {
+            display: flex;
+            gap: 50px;
+            margin-top: 40px;
+        }
+        .story-stats div strong {
+            display: block;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 30px;
+            color: var(--brand-accent);
+            font-weight: 400;
+        }
+        .story-stats div span {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ===== ARRIVALS ===== */
+        .arrivals-section {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            padding: 0 20px 100px 20px;
+        }
+        .product-card {
+            position: relative;
+            border: 1px solid #ccd6e5;
+            padding: 0;
+            width: 260px;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .product-card::before,
+        .product-card::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .product-card::before {
+            top: 10px;
+            left: 10px;
+            border-top: 1.5px solid var(--brand-accent);
+            border-left: 1.5px solid var(--brand-accent);
+            transform: translate(5px, 5px);
+        }
+        .product-card::after {
+            top: 10px;
+            right: 10px;
+            border-top: 1.5px solid var(--brand-accent);
+            border-right: 1.5px solid var(--brand-accent);
+            transform: translate(-5px, 5px);
+        }
+        .product-card:hover {
+            border-color: var(--hairline);
+            transform: translateY(-4px);
+        }
+        .product-card:hover::before,
+        .product-card:hover::after {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+        .product-card .thumb {
+            height: 260px;
+            background: var(--bg-panel-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .product-card .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-card .body {
+            padding: 20px;
+            text-align: center;
+        }
+        .product-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: var(--heading);
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .product-card .price {
+            color: var(--brand-accent);
+            margin: 0 0 20px 0;
+            font-size: 16px;
+        }
+        .product-card button {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--heading);
+            border: 1px solid #b7c5da;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .product-card button:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials-section {
+            background-color: var(--bg-panel);
+            padding: 100px 20px;
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+        }
+        .testimonials-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+        .testimonial-card {
+            padding: 34px 28px;
+        }
+        .testimonial-card .stars {
+            color: var(--brand-accent);
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+        }
+        .testimonial-card p.quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 17px;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin: 0 0 22px 0;
+        }
+        .testimonial-card .cust {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .testimonial-card .cust strong {
+            color: var(--brand-accent);
+            font-weight: 400;
+        }
+
+        /* ===== NEWSLETTER ===== */
+        .newsletter-section {
+            padding: 100px 20px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 100%, rgba(61, 110, 165, 0.08) 0%, transparent 60%);
+        }
+        .newsletter-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: var(--heading);
+            font-weight: 500;
+            margin: 14px 0 14px 0;
+        }
+        .newsletter-section p {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 440px;
+            margin: 0 auto 34px auto;
+            line-height: 1.7;
+        }
+        .newsletter-form {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            max-width: 440px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .newsletter-form input {
+            flex: 1;
+            min-width: 220px;
+            padding: 15px 20px;
+            background: transparent;
+            border: 1px solid #c1cee1;
+            border-radius: 30px;
+            color: var(--heading);
+            font-size: 13px;
+            font-family: 'Jost', sans-serif;
+        }
+        .newsletter-form input::placeholder {
+            color: var(--text-muted);
+        }
+        .newsletter-form input:focus {
+            border-color: var(--brand-accent);
+            outline: none;
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            position: relative;
+            background-color: var(--bg-page);
+            border-top: 1px solid var(--hairline);
+            padding: 0 20px 0 20px;
+            overflow: hidden;
+        }
+
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--brand-navy-light) 20%, var(--brand-accent) 50%, var(--brand-navy-light) 80%, transparent 100%);
+            opacity: 0.5;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 70px 0 30px 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 50px;
+            padding-bottom: 50px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .footer-brand img {
+            height: 54px;
+            width: auto;
+            margin-bottom: 18px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+            display: block;
+        }
+
+        .footer-brand p {
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.9;
+            max-width: 280px;
+            margin: 0 0 22px 0;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-brand .tagline {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 15px;
+            color: var(--brand-accent);
+            margin: -8px 0 18px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 12px;
+        }
+        .footer-socials a {
+            color: var(--text-muted);
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(15, 34, 71, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: all 0.35s ease;
+            background: rgba(15, 34, 71, 0.03);
+        }
+        .footer-socials a:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+            background: rgba(15, 34, 71, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(15, 34, 71, 0.10);
+        }
+
+        .footer-col h4 {
+            font-size: 10px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--brand-accent);
+            margin: 0 0 22px 0;
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 28px;
+            height: 1.5px;
+            background: var(--brand-accent);
+            opacity: 0.4;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 300;
+            margin-bottom: 14px;
+            transition: color 0.3s ease, padding-left 0.25s ease;
+            letter-spacing: 0.3px;
+        }
+        .footer-col a:hover {
+            color: var(--brand-accent);
+            padding-left: 6px;
+        }
+
+        .footer-bottom {
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-bottom p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0;
+            letter-spacing: 0.8px;
+        }
+
+        .footer-bottom .legal-links {
+            display: flex;
+            gap: 28px;
+        }
+        .footer-bottom .legal-links a {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            transition: color 0.3s ease;
+        }
+        .footer-bottom .legal-links a:hover {
+            color: var(--brand-accent);
+        }
+
+        .footer-col {
+            position: relative;
+        }
+
+        .footer-col::before,
+        .footer-col::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .footer-col::before {
+            top: 0;
+            left: 0;
+            border-top: 1px solid rgba(15, 34, 71, 0.2);
+            border-left: 1px solid rgba(15, 34, 71, 0.2);
+            transform: translate(6px, 6px);
+        }
+        .footer-col::after {
+            bottom: 0;
+            right: 0;
+            border-bottom: 1px solid rgba(15, 34, 71, 0.2);
+            border-right: 1px solid rgba(15, 34, 71, 0.2);
+            transform: translate(-6px, -6px);
+        }
+
+        .footer-col:hover::before,
+        .footer-col:hover::after {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 600px;
+            }
+            .story-section {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+            .story-content p {
+                max-width: 100%;
+            }
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+            .footer-brand p {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .brand-logo .brand-wordmark {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .hero-title {
+                font-size: 40px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 34px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .footer-bottom .legal-links {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo" />
+        </a>
+
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+           <a href="{% url 'store:collections' %}">Collections</a>
+           <a href="{% url 'store:about' %}">About</a>
+          <a href="{% url 'store:contact' %}">Contact</a>
+        </div>
+
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <i class="far fa-heart"></i>
+            
+            <!-- DYNAMIC USER AUTH ICON -->
+            {% if user.is_authenticated %}
+                <!-- User Dashboard / My Orders -->
+                <a href="{% url 'store:my_orders' %}" style="color: inherit;" title="My Account ({{ user.username }})">
+                    <i class="far fa-user-circle"></i>
+                </a>
+                <!-- Logout Icon -->
+                <a href="{% url 'store:logout_user' %}" style="color: inherit;" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            {% else %}
+                <!-- Login Icon -->
+                <a href="{% url 'store:login_user' %}" style="color: inherit;" title="Log In">
+                    <i class="far fa-user"></i>
+                </a>
+            {% endif %}
+            
+            <!-- CART ICON WITH BADGE -->
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}" style="color: inherit;">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+    <!-- ===== END NAVBAR ===== -->
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-subtitle">Welcome to Mapscart</p>
+            <h1 class="hero-title">Experience <span class="italic-gold">A Think Trend</span></h1>
+            <p class="hero-desc">Discover our latest collections crafted for the modern lifestyle.</p>
+
+            <div class="hero-buttons">
+                <a href="#shop" class="btn btn-primary">
+                    Shop Collection <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#arrivals" class="btn btn-secondary">
+                    Explore New Arrivals
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURED CATEGORIES ===== -->
+    <section class="categories-section">
+        <div class="section-header">
+            <span class="section-subtitle">Featured Categories</span>
+            <h2 class="section-title">Find your signature</h2>
+        </div>
+
+        <div class="categories-grid">
+            <!-- Earrings -->
+            <a href="#" class="category-card">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop');"></div>
+                <div class="category-overlay"></div>
+                <div class="category-info">
+                    <h3>Earrings</h3>
+                    <p>Light-catching halos &amp; drops</p>
+                </div>
+            </a>
+
+            <!-- Necklaces -->
+            <a href="#" class="category-card">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=600&auto=format&fit=crop');"></div>
+                <div class="category-overlay"></div>
+                <div class="category-info">
+                    <h3>Necklaces</h3>
+                    <p>Pendants for every story</p>
+                </div>
+            </a>
+
+            <!-- Rings -->
+            <a href="#" class="category-card">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1622398925373-3f91b1e275f5?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cmluZ3xlbnwwfHwwfHx8MA%3D%3D');"></div>
+                <div class="category-overlay"></div>
+                <div class="category-info">
+                    <h3>Rings</h3>
+                    <p>Solitaires &amp; statements</p>
+                </div>
+            </a>
+
+            <!-- Bracelets -->
+            <a href="#" class="category-card">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop');"></div>
+                <div class="category-overlay"></div>
+                <div class="category-info">
+                    <h3>Bracelets</h3>
+                    <p>Fluid lines of light</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== MARQUEE ===== -->
+    <div class="marquee-strip" aria-hidden="true">
+        <div class="marquee-track">
+            <span>18K Gold</span><span>Sterling Silver</span><span>Natural Diamond</span><span>Freshwater Pearl</span><span>Rose Gold</span><span>Platinum</span>
+            <span>18K Gold</span><span>Sterling Silver</span><span>Natural Diamond</span><span>Freshwater Pearl</span><span>Rose Gold</span><span>Platinum</span>
+        </div>
+    </div>
+
+    <!-- ===== STORY / ABOUT ===== -->
+    <section class="story-section" id="about">
+        <div class="story-image-wrap">
+            <div class="story-image-frame"></div>
+            <img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=800&auto=format&fit=crop" alt="Jeweller shaping a gold piece by hand" />
+        </div>
+        <div class="story-content">
+            <span class="section-subtitle">Our Craft</span>
+            <h2>Every piece begins as <em>an idea</em>, not an inventory line.</h2>
+            <p>Mapscart works with small ateliers who still set stones by hand and finish metal under a loupe, not a conveyor belt. We think of jewellery as a wearable decision — something chosen once and kept for years.</p>
+            <p>That philosophy shapes everything from the alloys we use to the boxes pieces travel in. A think trend, not a passing one.</p>
+            <div class="story-stats">
+                <div><strong>12+</strong><span>Years Curating</span></div>
+                <div><strong>40</strong><span>Partner Ateliers</span></div>
+                <div><strong>98%</strong><span>Repeat Wearers</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== LATEST ARRIVALS ===== -->
+    <div class="arrivals-section" id="shop">
+        <div class="section-header">
+            <span class="section-subtitle">Just In</span>
+            <h2 class="section-title">Latest Arrivals</h2>
+        </div>
+
+        <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+            {% for product in recent_products %}
+            <div class="product-card">
+                <div class="thumb">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" />
+                    {% else %}
+                    <span style="color: var(--text-muted);">No Image</span>
+                    {% endif %}
+                </div>
+
+                <div class="body">
+                    <h3>{{ product.title }}</h3>
+                    <p class="price">${{ product.price }}</p>
+
+                    <a href="{% url 'store:product_detail' product.pk %}" style="text-decoration: none;">
+                        <button type="button">View Details</button>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: var(--text-muted);">Our collection is currently being updated.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials-section">
+        <div class="section-header">
+            <span class="section-subtitle">Kind Words</span>
+            <h2 class="section-title">Worn &amp; Loved</h2>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">The ring arrived better finished than the photos even suggested. It doesn't feel mass-produced at all.</p>
+                <div class="cust"><strong>Ayesha R.</strong> — Delhi</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">My go-to gift shop now. The packaging alone makes it feel like an occasion every time.</p>
+                <div class="cust"><strong>Karan M.</strong> — Bengaluru</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">Three years on, my necklace still looks new. Customer care was patient with all my sizing questions too.</p>
+                <div class="cust"><strong>Priya S.</strong> — Mumbai</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== NEWSLETTER ===== -->
+    <section class="newsletter-section">
+        <span class="section-subtitle">Stay In The Loop</span>
+        <h2>Get first look at new drops</h2>
+        <p>Join our list for early access to limited collections and the occasional private sale. No spam, ever.</p>
+        <form class="newsletter-form" action="#" method="post">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Your email address" required />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+        </form>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer" id="footer">
+        <div class="footer-inner">
+
+            <div class="footer-grid">
+                <!-- Brand -->
+                <div class="footer-brand">
+                    <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo" />
+                    <p class="tagline">— a think trend, not a passing one —</p>
+                    <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <!-- Shop -->
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <a href="#">Earrings</a>
+                    <a href="#">Necklaces</a>
+                    <a href="#">Rings</a>
+                    <a href="#">Bracelets</a>
+                    <a href="#">Gift Sets</a>
+                </div>
+
+                <!-- Help -->
+                <div class="footer-col">
+                    <h4>Help</h4>
+                    <a href="#">Track Order</a>
+                    <a href="#">Shipping &amp; Returns</a>
+                    <a href="#">Size Guide</a>
+                    <a href="#">FAQs</a>
+                    <a href="#">Contact Support</a>
+                </div>
+
+                <!-- Company -->
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#about">Our Story</a>
+                    <a href="#">Sustainability</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mapscart. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

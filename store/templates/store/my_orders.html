@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | MAPSCART</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-accent: #a3702f;
+            --heading: #241a0f;
+            --text-main: #4a3c2c;
+            --bg-page: #f7f0e1;
+            --bg-panel: #efe3c8;
+            --hairline: rgba(163, 112, 47, 0.28);
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Jost', sans-serif; margin: 0; padding: 0; background-color: var(--bg-page); color: var(--text-main); }
+        
+        /* Navbar Placeholder */
+        .navbar { width: 100%; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background-color: #081428; }
+        .brand-logo img { height: 60px; }
+        .nav-links a { color: #fff; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 20px;}
+        
+        /* Dashboard Layout */
+        .dashboard-wrapper { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--hairline); padding-bottom: 20px; }
+        .dashboard-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--heading); margin: 0; font-weight: 500; }
+        
+        /* Order Cards */
+        .order-card { background: var(--bg-panel); border-radius: 8px; border: 1px solid var(--hairline); margin-bottom: 30px; overflow: hidden; }
+        .order-header { background: rgba(163, 112, 47, 0.1); padding: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--hairline); font-size: 14px; }
+        .order-header div { display: flex; flex-direction: column; gap: 5px; }
+        .order-header strong { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--heading); font-weight: 600; }
+        
+        .order-items { padding: 20px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed var(--hairline); }
+        .item-row:last-child { border-bottom: none; }
+        .item-details { display: flex; gap: 20px; align-items: center; }
+        .item-details h4 { margin: 0 0 5px 0; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--heading); }
+        .item-details p { margin: 0; font-size: 13px; color: var(--text-muted); }
+        
+        .btn-outline { border: 1px solid var(--brand-accent); color: var(--brand-accent); padding: 10px 20px; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 30px; transition: all 0.3s ease; }
+        .btn-outline:hover { background: var(--brand-accent); color: #fff; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- Simple Navbar for Dashboard -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Return to Shop</a>
+            <a href="{% url 'store:logout_user' %}" style="color: #ddb35e;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Order History</h1>
+            <p>Welcome back, <strong>{{ user.username }}</strong></p>
+        </div>
+
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <span>Order Placed</span>
+                        <strong>{{ order.date_ordered|date:"F j, Y" }}</strong>
+                    </div>
+                    <div>
+                        <span>Total Amount</span>
+                        <strong>${{ order.amount_paid }}</strong>
+                    </div>
+                    <div>
+                        <span>Order #</span>
+                        <strong>{{ order.id }}</strong>
+                    </div>
+                    <div>
+                        <span>Status</span>
+                        <strong style="color: #2e7d32;">Processing</strong>
+                    </div>
+                </div>
+                
+                <div class="order-items">
+                    {% for item in order.items.all %}
+                    <div class="item-row">
+                        <div class="item-details">
+                            <div>
+                                <h4>{{ item.product.title }}</h4>
+                                <p>Qty: {{ item.quantity }} | Price: ${{ item.price }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="{% url 'store:product_detail' item.product.pk %}" class="btn-outline">Buy Again</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No orders yet</h3>
+                <p>When you place an order, it will appear here.</p>
+                <a href="{% url 'store:all_products' %}" class="btn-outline" style="display: inline-block; margin-top: 20px;">Start Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

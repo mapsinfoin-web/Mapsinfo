@@ -1,0 +1,383 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.title }} | MAPSCART</title>
+
+    <!-- Import Google Fonts & FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Navy + gold palette matching the Mapskart logo, consistent with home & cart pages */
+        :root {
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
+            --brand-accent: #b1832e;
+            --brand-accent-light: #ddb35e;
+            --heading: #0e1b32;
+            --text-main: #33455e;
+            --text-muted: #7a8aa3;
+            --bg-page: #f7f9fc;
+            --bg-panel: #eef2f8;
+            --bg-panel-2: #e2e8f2;
+            --bg-footer: #081428;
+            --hairline: rgba(15, 34, 71, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+        }
+
+        /* Navbar Styles - Adjusted to have a solid background so it's visible without a hero image */
+        .navbar {
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+            box-sizing: border-box;
+        }
+
+        .brand-logo img {
+            height: 88px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--brand-accent); }
+
+        .nav-icons { display: flex; gap: 20px; color: #fff; font-size: 16px; align-items: center; }
+        .nav-icons i { cursor: pointer; transition: color 0.3s ease; }
+        .nav-icons i:hover { color: var(--brand-accent); }
+
+        /* Cart Badge */
+        .cart-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent);
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* --- PRODUCT DETAIL LAYOUT --- */
+        .product-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .product-image-wrapper {
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--hairline);
+        }
+
+        .product-image-wrapper img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .no-image {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .product-info h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            color: var(--heading);
+            margin: 0 0 10px 0;
+            font-weight: 500;
+        }
+
+        .product-category {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--brand-accent);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .product-price {
+            font-size: 28px;
+            color: var(--text-main);
+            margin: 0 0 30px 0;
+            font-weight: 400;
+        }
+
+        .product-description {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-navy-light) 100%);
+            color: #fff;
+            border: 1px solid var(--brand-accent-light);
+            padding: 18px 40px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(120deg, var(--brand-accent) 0%, var(--brand-accent-light) 100%);
+            border-color: var(--brand-accent-light);
+            color: var(--brand-navy);
+        }
+        .btn-primary.disabled {
+            background: #94a0b3;
+            border-color: #94a0b3;
+            cursor: not-allowed;
+        }
+
+        /* --- FOOTER (Matches your homepage exactly) --- */
+        .site-footer {
+            background-color: var(--bg-page);
+            border-top: 1px solid var(--hairline);
+            padding: 0 20px 0 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 70px 0 30px 0;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 50px;
+            padding-bottom: 50px;
+            border-bottom: 1px solid var(--hairline);
+        }
+        .footer-brand img { height: 54px; margin-bottom: 18px; }
+        .footer-brand p { font-size: 13px; line-height: 1.9; margin: 0 0 22px 0; font-weight: 300; }
+        .footer-brand .tagline { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: var(--brand-accent); margin: -8px 0 18px 0; }
+        .footer-col h4 { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--brand-accent); margin: 0 0 22px 0; }
+        .footer-col a { display: block; color: var(--text-main); text-decoration: none; font-size: 13px; margin-bottom: 14px; transition: color 0.3s ease; }
+        .footer-col a:hover { color: var(--brand-accent); }
+        .footer-bottom { padding-top: 30px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+        @media (max-width: 900px) {
+            .product-container { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .navbar { padding: 16px 20px; }
+            .nav-links { display: none; }
+        }
+        /* Gallery Styles */
+        .product-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto; /* Allows scrolling if there are many thumbnails */
+            padding-bottom: 5px;
+        }
+
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--bg-panel);
+            transition: border-color 0.3s ease;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            border-color: var(--brand-accent);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:all_products' %}">Collections</a>
+            <a href="{% url 'store:all_products' %}">About</a>
+            <a href="{% url 'store:all_products' %}">Contact</a>
+        </div>
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <i class="far fa-sun"></i>
+            <i class="far fa-heart"></i>
+            <i class="far fa-user"></i>
+            <!-- Cart with badge -->
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}" style="color: inherit;">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+    <!-- ===== END NAVBAR ===== -->
+
+    <!-- ===== PRODUCT DETAIL ===== -->
+    <div class="product-container">
+        <!-- Left Side: Image -->
+      <!-- Left Side: Image Gallery -->
+        <div class="product-gallery">
+            <!-- Main Large Image -->
+            <div class="product-image-wrapper">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" id="main-image">
+                {% else %}
+                    <div class="no-image">No Image Available</div>
+                {% endif %}
+            </div>
+
+            <!-- Thumbnail Row -->
+            <div class="thumbnail-container">
+                <!-- First thumbnail is the main product image -->
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="thumbnail active" onclick="swapImage(this)">
+                {% endif %}
+                
+                <!-- Loop through the extra gallery images -->
+                {% for gallery_img in product.gallery_images.all %}
+                    <img src="{{ gallery_img.image.url }}" class="thumbnail" onclick="swapImage(this)">
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Right Side: Details -->
+        <div class="product-info">
+            <span class="product-category">{{ product.category.name|default:"Uncategorized" }}</span>
+            <h1>{{ product.title }}</h1>
+            <p class="product-price">${{ product.price }}</p>
+            
+            <div class="product-description">
+                {{ product.description|linebreaks }}
+            </div>
+
+            {% if product.in_stock %}
+                <a href="{% url 'store:add_cart' product.pk %}" class="btn-primary">Add to Cart</a>
+            {% else %}
+                <button class="btn-primary disabled" disabled>Out of Stock</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+                    <p class="tagline">— a think trend, not a passing one —</p>
+                    <p>Considered jewellery for people who choose once and wear often.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <a href="#">Earrings</a>
+                    <a href="#">Necklaces</a>
+                    <a href="#">Rings</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Help</h4>
+                    <a href="#">Shipping &amp; Returns</a>
+                    <a href="#">FAQs</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#">Our Story</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mapscart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+ 
+    <script>
+        function swapImage(thumbnail) {
+            // Grab the main image element
+            const mainImage = document.getElementById('main-image');
+            
+            // Swap the main image's source with the clicked thumbnail's source
+            mainImage.src = thumbnail.src;
+            
+            // Remove the 'active' gold border from all thumbnails
+            const allThumbnails = document.querySelectorAll('.thumbnail');
+            allThumbnails.forEach(img => img.classList.remove('active'));
+            
+            // Add the 'active' gold border to the clicked thumbnail
+            thumbnail.classList.add('active');
+        }
+    </script>
+</body>
+</html>
