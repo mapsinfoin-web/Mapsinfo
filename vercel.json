@@ -1,13 +1,10 @@
 {
     "builds": [{
-        "src": "YOUR_PROJECT_NAME/wsgi.py",
-        "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb" }
+        "src": "mapscart/wsgi.py",
+        "use": "@vercel/python"
     }],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "YOUR_PROJECT_NAME/wsgi.py"
-        }
-    ]
+    "routes": [{
+        "src": "/(.*)",
+        "dest": "mapscart/wsgi.py"
+    }]
 }
