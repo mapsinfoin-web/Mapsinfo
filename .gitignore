@@ -1,16 +1,16 @@
-# Django
-*.log
-*.pot
-*.pyc
+# Python
 __pycache__/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
+*.py[cod]
+*$py.class
 
 # Virtual Environment
+.venv/
 venv/
 env/
 
-# Environment Variables
-.env
+# Django
+db.sqlite3
+media/
+
+# OS Files
+.DS_Store

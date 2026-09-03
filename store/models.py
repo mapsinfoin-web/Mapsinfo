@@ -15,7 +15,6 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    # NEW FIELD: Unique Product ID
     sku = models.CharField(max_length=10, unique=True, blank=True, null=True, help_text="Unique Product ID") 
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -24,7 +23,6 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    # Automatically generate a unique 8-character ID if you leave it blank
     def save(self, *args, **kwargs):
         if not self.sku:
             self.sku = uuid.uuid4().hex[:8].upper()
@@ -64,13 +62,26 @@ class ProductGallery(models.Model):
         verbose_name_plural = 'Product Galleries'
 
 class Order(models.Model):
+    PAYMENT_CHOICES = (
+        ('COD', 'Cash on Delivery'),
+        ('PHONEPE', 'PhonePe UPI'),
+    )
+
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     full_name = models.CharField(max_length=250)
     email = models.EmailField(max_length=250)
+    
+    # NEW FIELD: Mobile Number
+    mobile_number = models.CharField(max_length=20, default="") 
+    
     shipping_address = models.TextField()
     city = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='COD')
+    is_paid = models.BooleanField(default=False, help_text="Check this when PhonePe payment is verified or COD is collected.")
+    
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -85,7 +96,6 @@ class OrderItem(models.Model):
     def __str__(self):
         return f'{self.quantity} x {self.product.title}'
     
-# --- CONTACT INQUIRY MODEL ---
 class ContactInquiry(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()

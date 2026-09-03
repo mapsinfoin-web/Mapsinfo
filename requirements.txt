@@ -1,3 +1,5 @@
 django
 pillow>=10.0.0
 django-jazzmin
+psycopg2-binary
+dj-database-url

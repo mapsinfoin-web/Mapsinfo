@@ -40,18 +40,13 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    # Shows full customer details directly in the main list
-    list_display = ['id', 'full_name', 'email', 'city', 'amount_paid', 'date_ordered']
+    # Added mobile_number, shipping_address, and postal_code to the main view!
+    list_display = ['id', 'full_name', 'mobile_number', 'email', 'shipping_address', 'city', 'postal_code', 'amount_paid', 'payment_method', 'is_paid']
     
-    # Creates a clickable timeline at the top (e.g., "Today", "Past 7 days", "This month")
+    list_editable = ['is_paid'] 
     date_hierarchy = 'date_ordered' 
-    
-    list_filter = ['city']
-    
-    # Adds a search bar to instantly find a customer's order by their name, email, or order ID
-    search_fields = ['full_name', 'email', 'shipping_address', 'id']
-    
-    # Attaches the purchased items directly to the Order view
+    list_filter = ['is_paid', 'payment_method', 'city']
+    search_fields = ['full_name', 'email', 'mobile_number', 'shipping_address', 'id']
     inlines = [OrderItemInline]
     
 from .models import ContactInquiry # Make sure to add this to your imports at the top if you prefer!

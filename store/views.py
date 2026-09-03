@@ -132,30 +132,35 @@ def checkout(request):
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, is_active=True)
     except Cart.DoesNotExist:
-        return redirect('store:all_products') # Redirect if cart is empty
+        return redirect('store:all_products')
 
     total = sum([item.product.price * item.quantity for item in cart_items])
 
     if request.method == 'POST':
-        # 1. Capture the form data
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
+        
+        # 1. GRAB THE NUMBER FROM THE HTML FORM
+        mobile_number = request.POST.get('mobile_number') 
+        
         shipping_address = request.POST.get('shipping_address')
         city = request.POST.get('city')
         postal_code = request.POST.get('postal_code')
+        payment_method = request.POST.get('payment_method')
 
-        # 2. Create the permanent Order
+        # 2. SAVE THE NUMBER TO THE DATABASE
         order = Order.objects.create(
             user=request.user if request.user.is_authenticated else None,
             full_name=full_name,
             email=email,
+            mobile_number=mobile_number, # <-- This is the crucial missing line
             shipping_address=shipping_address,
             city=city,
             postal_code=postal_code,
-            amount_paid=total
+            amount_paid=total,
+            payment_method=payment_method
         )
 
-        # 3. Snapshot the cart items into permanent OrderItems
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -164,7 +169,6 @@ def checkout(request):
                 quantity=item.quantity
             )
 
-        # 4. Clear the user's cart now that they have purchased
         cart_items.delete()
         cart.delete()
 
@@ -245,3 +249,56 @@ def contact(request):
         return redirect('store:contact')
         
     return render(request, 'store/contact.html')
+
+def checkout(request):
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+    except Cart.DoesNotExist:
+        return redirect('store:all_products')
+
+    total = sum([item.product.price * item.quantity for item in cart_items])
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        shipping_address = request.POST.get('shipping_address')
+        city = request.POST.get('city')
+        postal_code = request.POST.get('postal_code')
+        mobile_number = request.POST.get('mobile_number')
+    
+        print(f"DEBUG: The captured mobile number is -> {mobile_number}")
+        
+        # Capture the PhonePe or COD choice
+        payment_method = request.POST.get('payment_method')
+
+        # Create the Order
+        order = Order.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            full_name=full_name,
+            email=email,
+            shipping_address=shipping_address,
+            city=city,
+            postal_code=postal_code,
+            amount_paid=total,
+            payment_method=payment_method,
+            mobile_number=mobile_number
+        )
+
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                price=item.product.price,
+                quantity=item.quantity
+            )
+
+        cart_items.delete()
+        cart.delete()
+
+        return redirect('store:checkout_success')
+
+    return render(request, 'store/checkout.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
