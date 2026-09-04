@@ -15,7 +15,7 @@ def all_products(request):
     recent_products = Product.objects.filter(in_stock=True).order_by('-created')[:4]
     
     # Send BOTH variables to the home.html template
-    return render(request, 'store/home.html', {
+    return render(request, 'store/index.html', {
         'products': products,
         'recent_products': recent_products
     })
