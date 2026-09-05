@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['.vercel.app', '*']
 # Application definition
 
 INSTALLED_APPS = [
+   
     'jazzmin',
     'cloudinary_storage',
     'django.contrib.admin',
@@ -47,16 +48,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary',
     'store',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 
 ]
 
@@ -163,10 +167,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 
 # Cloudinary Credentials (Pulled securely from Vercel Environment Variables)
+# Cloudinary Credentials (Hardcoded for deployment)
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('dddvvn0s'),
-    'API_KEY': os.environ.get('272412746889333'),
-    'API_SECRET': os.environ.get('38TzwinefOoLBMRsVx8R-oC1tTc'),
+    'CLOUD_NAME': 'dddvvn0s',
+    'API_KEY': '272412746889333',
+    'API_SECRET': '38TzwinefOoLBMRsVx8R-oC1tTc',
+
 }
 
 # Override default file saving to use Cloudinary instead of the local hard drive
@@ -175,6 +181,11 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# Required fallback to prevent the django-cloudinary-storage collectstatic crash
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+WHITENOISE_MANIFEST_STRICT = False
