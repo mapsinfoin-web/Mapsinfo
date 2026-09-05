@@ -159,7 +159,7 @@ JAZZMIN_SETTINGS = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Add this line so Vercel can compile your static assets
 STATIC_ROOT = BASE_DIR / 'staticfiles'
