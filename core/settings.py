@@ -162,6 +162,7 @@ JAZZMIN_SETTINGS = {
 STATIC_URL = '/static/'
 
 # Add this line so Vercel can compile your static assets
+STATIC_ROOT = BASE_DIR / 'static'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
