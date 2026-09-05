@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import dj_database_url
 import os
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,12 +38,14 @@ ALLOWED_HOSTS = ['.vercel.app', '*']
 
 INSTALLED_APPS = [
     'jazzmin',
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
     'store',
 ]
 
@@ -51,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-   
+
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -67,8 +73,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.cart_item_count',
-                
-                
+
+
             ],
         },
     },
@@ -121,25 +127,16 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-
 # --- JAZZMIN ADMIN DASHBOARD SETTINGS ---
 JAZZMIN_SETTINGS = {
     "site_title": "MAPSCART Admin",
     "site_header": "MAPSCART",
     "site_brand": "MAPSCART Admin",
     "welcome_sign": "Welcome to the MAPSCART Dashboard",
-    
+
     # Adds a global search bar at the top for Orders and Products
     "search_model": ["store.Order", "store.Product"],
-    
+
     # Graphic Icons for the side menu (Uses FontAwesome)
     "icons": {
         "auth.User": "fas fa-users",
@@ -149,15 +146,35 @@ JAZZMIN_SETTINGS = {
         "store.Order": "fas fa-shopping-cart",
         "store.Cart": "fas fa-shopping-basket",
     },
-    
+
     # Allows you to change the colors of the admin panel instantly
     "show_ui_builder": True,
 }
 
-STATIC_URL = 'static/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/6.0/howto/static-files/
+
+STATIC_URL = 'static/'
 
 # Add this line so Vercel can compile your static assets
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+
+# Cloudinary Credentials (Pulled securely from Vercel Environment Variables)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('dddvvn0s'),
+    'API_KEY': os.environ.get('272412746889333'),
+    'API_SECRET': os.environ.get('38TzwinefOoLBMRsVx8R-oC1tTc'),
+}
+
+# Override default file saving to use Cloudinary instead of the local hard drive
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
