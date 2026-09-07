@@ -41,13 +41,24 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     # Added mobile_number, shipping_address, and postal_code to the main view!
-    list_display = ['id', 'full_name', 'mobile_number', 'email', 'shipping_address', 'city', 'postal_code', 'amount_paid', 'payment_method', 'is_paid']
+    list_display = ['id', 'get_total_items','get_purchased_skus','full_name', 'mobile_number', 'email', 'shipping_address', 'city', 'postal_code', 'amount_paid', 'payment_method', 'is_paid']
     
     list_editable = ['is_paid'] 
     date_hierarchy = 'date_ordered' 
     list_filter = ['is_paid', 'payment_method', 'city']
     search_fields = ['full_name', 'email', 'mobile_number', 'shipping_address', 'id']
     inlines = [OrderItemInline]
+    
+    @admin.display(description='Total Items')
+    def get_total_items(self, obj):
+        # Calculates the total number of products the user placed in this order
+        return sum(item.quantity for item in obj.orderitem_set.all())
+
+    @admin.display(description='Purchased Products (SKU)')
+    def get_purchased_skus(self, obj):
+        # Grabs the title and SKU from the Product table for every item in the order
+        items = obj.orderitem_set.all()
+        return ", ".join([f"{item.product.title} (SKU: {item.product.sku})" for item in items])
     
 from .models import ContactInquiry # Make sure to add this to your imports at the top if you prefer!
 
