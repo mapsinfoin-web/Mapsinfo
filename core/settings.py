@@ -161,8 +161,12 @@ JAZZMIN_SETTINGS = {
 
 STATIC_URL = '/static/'
 
-# Add this line so Vercel can compile your static assets
-STATIC_ROOT = BASE_DIR / 'static'
+# Tell Django exactly where to look for your hero.png and logo.jpeg
+STATICFILES_DIRS = [
+    BASE_DIR / 'store' / 'static',
+]
+
+# The single destination folder for Vercel
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
@@ -182,11 +186,9 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-# Required fallback to prevent the django-cloudinary-storage collectstatic crash
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 WHITENOISE_MANIFEST_STRICT = False
