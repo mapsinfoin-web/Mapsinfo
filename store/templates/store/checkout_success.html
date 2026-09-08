@@ -3,22 +3,196 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Order Confirmed | MAPSCART</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Order Confirmed | MAPSKART</title>
+
+    <!-- Google Fonts: Poppins (main), Cormorant for accent -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root { --brand-accent: #a3702f; --heading: #241a0f; --bg-page: #f7f0e1; }
-        body { font-family: 'Jost', sans-serif; background-color: var(--bg-page); color: var(--heading); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-        .success-box { max-width: 500px; padding: 40px; }
-        h1 { font-family: 'Cormorant Garamond', serif; font-size: 48px; margin-bottom: 10px; font-weight: 500; }
-        p { font-size: 16px; color: #4a3c2c; line-height: 1.6; margin-bottom: 30px; }
-        .btn-primary { background: var(--brand-accent); color: #fff; padding: 15px 30px; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; border-radius: 30px; display: inline-block; }
+        :root {
+            --brand-accent: #a3702f;
+            --brand-accent-light: #ddb35e;
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
+            --heading: #241a0f;
+            --text-main: #4a3c2c;
+            --bg-page: #f7f0e1;
+            --bg-footer: #1c130b;
+            --hairline: rgba(163, 112, 47, 0.28);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+        }
+        .brand-logo img {
+            height: 120px;   /* increased from 60px */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .nav-links a:hover { color: var(--brand-accent); }
+
+        /* ===== SUCCESS BOX ===== */
+        .success-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .success-box {
+            max-width: 550px;
+            padding: 50px 40px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--hairline);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: var(--brand-accent);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .success-box h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 500;
+            color: var(--heading);
+            margin: 0 0 12px 0;
+        }
+
+        .success-box p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 300;
+            color: var(--text-main);
+            line-height: 1.8;
+            margin: 0 0 30px 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--brand-accent) 0%, #8c6234 100%);
+            color: #fff;
+            padding: 16px 40px;
+            text-decoration: none;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 30px;
+            display: inline-block;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid var(--brand-accent);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(120deg, var(--brand-navy) 0%, var(--brand-navy-light) 100%);
+            border-color: var(--brand-accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(163, 112, 47, 0.25);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 75px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .success-box {
+                padding: 30px 20px;
+                margin: 0 10px;
+            }
+            .success-box h1 {
+                font-size: 36px;
+            }
+            .success-box p {
+                font-size: 14px;
+            }
+            .success-icon {
+                font-size: 48px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="success-box">
-        <h1>Thank You!</h1>
-        <p>Your order has been placed successfully. We are preparing your considered jewellery for shipment and will send you an email confirmation shortly.</p>
-        <a href="{% url 'store:all_products' %}" class="btn-primary">Return to Boutique</a>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:collections' %}">Collections</a>
+            <a href="{% url 'store:about' %}">About</a>
+            <a href="{% url 'store:contact' %}">Contact</a>
+        </div>
+    </nav>
+
+    <!-- ===== SUCCESS CONTENT ===== -->
+    <div class="success-wrapper">
+        <div class="success-box">
+            <span class="success-icon"><i class="fas fa-check-circle"></i></span>
+            <h1>Thank You!</h1>
+            <p>
+                Your order has been placed successfully. We are preparing your considered jewellery for shipment and will send you an email confirmation shortly.
+            </p>
+            <a href="{% url 'store:all_products' %}" class="btn-primary">Return to Boutique</a>
+        </div>
     </div>
+
 </body>
 </html>

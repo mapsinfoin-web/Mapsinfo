@@ -4,17 +4,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ product.title }} | MAPSCART</title>
+    <title>{{ product.title }} | MAPSKART</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- Google Fonts: Poppins (main), Cormorant for accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* ——— same variables as checkout ——— */
         :root {
             --brand-accent: #a3702f;
+            --brand-accent-light: #ddb35e;
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
             --heading: #241a0f;
             --text-main: #4a3c2c;
+            --text-muted: #7a6a5a;
             --bg-page: #f7f0e1;
             --bg-panel: #efe3c8;
             --bg-footer: #1c130b;
@@ -22,27 +26,32 @@
         }
 
         * { box-sizing: border-box; }
+
         body {
-            font-family: 'Jost', sans-serif;
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
             margin: 0;
             padding: 0;
             background-color: var(--bg-page);
             color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ——— navbar (same as checkout) ——— */
+        /* ===== NAVBAR ===== */
         .navbar {
             width: 100%;
-            padding: 20px 50px;
+            padding: 30px 50px;   /* increased padding for larger logo */
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
         }
         .brand-logo img {
-            height: 60px;
+            height: 120px;   /* increased from 60px */
             width: auto;
             object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
         }
         .nav-links {
             display: flex;
@@ -54,7 +63,9 @@
             font-size: 11px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            transition: color 0.3s;
+            transition: color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
         }
         .nav-links a:hover {
             color: var(--brand-accent);
@@ -68,10 +79,14 @@
         }
         .nav-icons a {
             color: inherit;
+            transition: color 0.3s ease;
+        }
+        .nav-icons a:hover {
+            color: var(--brand-accent);
         }
         .nav-icons i {
             cursor: pointer;
-            transition: color 0.3s;
+            transition: color 0.3s ease;
         }
         .nav-icons i:hover {
             color: var(--brand-accent);
@@ -92,9 +107,10 @@
             font-weight: 600;
             line-height: 1.4;
             box-shadow: 0 2px 8px rgba(163, 112, 47, 0.4);
+            font-family: 'Poppins', sans-serif;
         }
 
-        /* ——— product layout ——— */
+        /* ===== PRODUCT LAYOUT ===== */
         .product-container {
             max-width: 1100px;
             margin: 80px auto;
@@ -103,9 +119,10 @@
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: start;
+            flex: 1;
         }
 
-        /* gallery */
+        /* Gallery */
         .product-gallery {
             display: flex;
             flex-direction: column;
@@ -130,6 +147,7 @@
         .no-image {
             color: var(--text-muted);
             font-size: 16px;
+            font-weight: 300;
         }
         .thumbnail-container {
             display: flex;
@@ -152,7 +170,7 @@
             border-color: var(--brand-accent);
         }
 
-        /* product info */
+        /* Product Info */
         .product-info {
             padding-top: 10px;
         }
@@ -177,6 +195,7 @@
             font-size: 24px;
             margin: 0 0 30px 0;
             font-weight: 400;
+            font-family: 'Poppins', sans-serif;
         }
         .product-description {
             font-size: 16px;
@@ -184,15 +203,16 @@
             margin-bottom: 40px;
             padding-bottom: 40px;
             border-bottom: 1px solid var(--hairline);
+            font-weight: 300;
         }
 
-        /* add to cart button */
+        /* Add to Cart Button */
         .btn-add {
             background: var(--brand-accent);
             color: #fff;
             border: none;
             padding: 18px 40px;
-            font-family: 'Jost', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 12px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -202,6 +222,7 @@
             width: 100%;
             display: block;
             text-align: center;
+            font-weight: 600;
         }
         .btn-add:hover {
             background: #8c6234;
@@ -220,17 +241,19 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 300;
         }
         .shipping-note i {
             color: var(--brand-accent);
         }
 
-        /* ——— footer (same as checkout) ——— */
+        /* ===== FOOTER ===== */
         .site-footer {
             background-color: var(--bg-footer);
             color: #fff;
             padding: 60px 20px 30px 20px;
-            font-family: 'Jost', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            margin-top: auto;
         }
         .footer-inner {
             max-width: 1100px;
@@ -244,7 +267,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .footer-brand img {
-            height: 54px;
+            height: 80px;   /* increased from 54px */
             margin-bottom: 18px;
             filter: grayscale(100%) invert(1) brightness(200%);
         }
@@ -253,6 +276,7 @@
             line-height: 1.9;
             color: #cbd5e1;
             max-width: 280px;
+            font-weight: 300;
         }
         .footer-col h4 {
             font-size: 12px;
@@ -260,6 +284,7 @@
             text-transform: uppercase;
             color: var(--brand-accent);
             margin: 0 0 22px 0;
+            font-weight: 600;
         }
         .footer-col a {
             display: block;
@@ -268,6 +293,7 @@
             font-size: 13px;
             margin-bottom: 14px;
             transition: color 0.3s;
+            font-weight: 300;
         }
         .footer-col a:hover {
             color: var(--brand-accent);
@@ -280,8 +306,10 @@
             color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 2px;
+            font-weight: 300;
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .product-container {
                 grid-template-columns: 1fr;
@@ -291,16 +319,26 @@
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            .nav-links {
-                display: none;
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 75px;
             }
         }
+
         @media (max-width: 600px) {
             .navbar {
                 padding: 16px 20px;
             }
             .brand-logo img {
-                height: 50px;
+                height: 60px;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+            .product-title {
+                font-size: 32px;
             }
         }
     </style>
@@ -310,7 +348,7 @@
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo" />
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
         </a>
         <div class="nav-links">
             <a href="{% url 'store:all_products' %}">Shop</a>
@@ -388,7 +426,7 @@
         <div class="footer-inner">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo" />
+                    <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
                     <p>Considered jewellery for people who choose once and wear often. Handcrafted with care.</p>
                 </div>
                 <div class="footer-col">
@@ -411,7 +449,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Mapscart. All rights reserved.</p>
+                <p>&copy; 2026 MAPSKART. All rights reserved.</p>
             </div>
         </div>
     </footer>

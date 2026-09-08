@@ -4,64 +4,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders | MAPSCART</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>My Orders | MAPSKART</title>
+
+    <!-- Google Fonts: Poppins (main), Cormorant for accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --brand-accent: #a3702f;
+            --brand-accent-light: #ddb35e;
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
             --heading: #241a0f;
             --text-main: #4a3c2c;
+            --text-muted: #7a6a5a;
             --bg-page: #f7f0e1;
             --bg-panel: #efe3c8;
+            --bg-footer: #1c130b;
             --hairline: rgba(163, 112, 47, 0.28);
         }
+
         * { box-sizing: border-box; }
-        body { font-family: 'Jost', sans-serif; margin: 0; padding: 0; background-color: var(--bg-page); color: var(--text-main); }
-        
-        /* Navbar Placeholder */
-        .navbar { width: 100%; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background-color: #081428; }
-        .brand-logo img { height: 60px; }
-        .nav-links a { color: #fff; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 20px;}
-        
-        /* Dashboard Layout */
-        .dashboard-wrapper { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--hairline); padding-bottom: 20px; }
-        .dashboard-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--heading); margin: 0; font-weight: 500; }
-        
-        /* Order Cards */
-        .order-card { background: var(--bg-panel); border-radius: 8px; border: 1px solid var(--hairline); margin-bottom: 30px; overflow: hidden; }
-        .order-header { background: rgba(163, 112, 47, 0.1); padding: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--hairline); font-size: 14px; }
-        .order-header div { display: flex; flex-direction: column; gap: 5px; }
-        .order-header strong { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--heading); font-weight: 600; }
-        
-        .order-items { padding: 20px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed var(--hairline); }
-        .item-row:last-child { border-bottom: none; }
-        .item-details { display: flex; gap: 20px; align-items: center; }
-        .item-details h4 { margin: 0 0 5px 0; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--heading); }
-        .item-details p { margin: 0; font-size: 13px; color: var(--text-muted); }
-        
-        .btn-outline { border: 1px solid var(--brand-accent); color: var(--brand-accent); padding: 10px 20px; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 30px; transition: all 0.3s ease; }
-        .btn-outline:hover { background: var(--brand-accent); color: #fff; }
-        
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 15px; }
+
+        body {
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            padding: 30px 50px;   /* increased padding for larger logo */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+        }
+        .brand-logo img {
+            height: 120px;   /* increased from 60px */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            color: #fff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--brand-accent);
+        }
+        .nav-links a.logout-link {
+            color: var(--brand-accent-light);
+        }
+        .nav-links a.logout-link:hover {
+            color: #fff;
+        }
+
+        /* ===== DASHBOARD WRAPPER ===== */
+        .dashboard-wrapper {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--hairline);
+            padding-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .dashboard-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: var(--heading);
+            margin: 0;
+            font-weight: 500;
+        }
+        .dashboard-header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            margin: 0;
+        }
+        .dashboard-header p strong {
+            font-weight: 500;
+            color: var(--heading);
+        }
+
+        /* ===== ORDER CARDS ===== */
+        .order-card {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            border: 1px solid var(--hairline);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .order-header {
+            background: rgba(163, 112, 47, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--hairline);
+            font-size: 14px;
+            gap: 15px;
+        }
+        .order-header div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .order-header div span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        .order-header strong {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            color: var(--heading);
+            font-weight: 600;
+        }
+        .order-header .status-processing {
+            color: #2e7d32;
+        }
+
+        .order-items {
+            padding: 20px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed var(--hairline);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .item-details h4 {
+            margin: 0 0 5px 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            color: var(--heading);
+            font-weight: 500;
+        }
+        .item-details p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--brand-accent);
+            color: var(--brand-accent);
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .btn-outline:hover {
+            background: var(--brand-accent);
+            color: #fff;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--heading);
+            font-weight: 500;
+        }
+        .empty-state p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+        .empty-state .btn-outline {
+            margin-top: 20px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 75px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+            .dashboard-title {
+                font-size: 28px;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .order-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .order-header div {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .order-header div span {
+                font-size: 10px;
+            }
+            .order-header strong {
+                font-size: 16px;
+            }
+            .item-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .item-details {
+                width: 100%;
+            }
+            .btn-outline {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Simple Navbar for Dashboard -->
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo">
         </a>
         <div class="nav-links">
-            <a href="{% url 'store:all_products' %}">Return to Shop</a>
-            <a href="{% url 'store:logout_user' %}" style="color: #ddb35e;">Logout</a>
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:collections' %}">Collections</a>
+            <a href="{% url 'store:about' %}">About</a>
+            <a href="{% url 'store:contact' %}">Contact</a>
+            <a href="{% url 'store:logout_user' %}" class="logout-link">Logout</a>
         </div>
     </nav>
 
+    <!-- ===== DASHBOARD CONTENT ===== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Order History</h1>
@@ -86,10 +330,10 @@
                     </div>
                     <div>
                         <span>Status</span>
-                        <strong style="color: #2e7d32;">Processing</strong>
+                        <strong class="status-processing">Processing</strong>
                     </div>
                 </div>
-                
+
                 <div class="order-items">
                     {% for item in order.items.all %}
                     <div class="item-row">
@@ -111,7 +355,7 @@
             <div class="empty-state">
                 <h3>No orders yet</h3>
                 <p>When you place an order, it will appear here.</p>
-                <a href="{% url 'store:all_products' %}" class="btn-outline" style="display: inline-block; margin-top: 20px;">Start Shopping</a>
+                <a href="{% url 'store:all_products' %}" class="btn-outline">Start Shopping</a>
             </div>
         {% endif %}
     </div>

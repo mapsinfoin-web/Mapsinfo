@@ -3,28 +3,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Our Heritage | MAPSCART</title>
-    <!-- Loaded Cinzel for headers, Cormorant for body text, Jost for UI -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Our Heritage | MAPSKART</title>
+
+    <!-- Google Fonts: Poppins (main), Cinzel & Cormorant for accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
-            --brand-navy: #0a1118; /* Deeper, richer navy */
-            --brand-accent: #c5a059; /* A softer, more expensive-looking gold */
+            --brand-navy: #0a1118;
+            --brand-accent: #c5a059;
             --text-dark: #1c1c1c;
             --text-gray: #4a4a4a;
-            --bg-classic: #fcfbf8; /* True alabaster cream */
+            --bg-classic: #fcfbf8;
             --hairline: #e3ddd5;
         }
-        
+
         * { box-sizing: border-box; }
-        body { font-family: 'Cormorant Garamond', serif; margin: 0; padding: 0; background-color: var(--bg-classic); color: var(--text-gray); overflow-x: hidden; }
-        
-        /* Navbar (Jost font for clean UI) */
-        .navbar { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background-color: var(--brand-navy); font-family: 'Jost', sans-serif; }
-        .brand-logo img { height: 60px; }
-        .nav-links a { color: #fff; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 20px; transition: color 0.4s ease;}
+        body {
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-classic);
+            color: var(--text-gray);
+            overflow-x: hidden;
+        }
+
+        /* Navbar (Poppins for clean UI) */
+        .navbar {
+            padding: 30px 50px;  /* increased padding for larger logo */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--brand-navy);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .brand-logo img {
+            height: 120px;  /* increased from 60px to match index */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .nav-links a {
+            color: #fff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            margin-right: 20px;
+            transition: color 0.4s ease;
+            font-weight: 500;
+        }
         .nav-links a:hover { color: var(--brand-accent); }
 
         /* Animations */
@@ -37,51 +68,218 @@
         .delay-2 { animation-delay: 0.6s; }
 
         /* Cinematic Hero */
-        .hero-section { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; position: relative; }
-        .hero-eyebrow { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--brand-accent); margin-bottom: 30px; }
-        .hero-title { font-family: 'Cinzel', serif; font-size: 72px; color: var(--text-dark); margin: 0; font-weight: 400; line-height: 1.1; letter-spacing: -1px; }
-        .hero-title span { display: block; font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 64px; color: var(--brand-accent); font-weight: 300; letter-spacing: 1px; }
+        .hero-section {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        .hero-eyebrow {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--brand-accent);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        .hero-title {
+            font-family: 'Cinzel', serif;   /* kept Cinzel for dramatic impact */
+            font-size: 72px;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .hero-title span {
+            display: block;
+            font-style: italic;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 64px;
+            color: var(--brand-accent);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
         .hero-line { width: 1px; height: 100px; background-color: var(--brand-accent); margin-top: 50px; }
 
         /* The Story Layout */
-        .story-section { max-width: 1200px; margin: 0 auto; padding: 80px 20px 120px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-        
+        .story-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 120px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
         .story-content { padding-right: 40px; }
-        .drop-cap { float: left; font-size: 90px; line-height: 70px; padding-top: 4px; padding-right: 15px; font-family: 'Cinzel', serif; color: var(--brand-accent); }
-        .story-content p { font-size: 21px; line-height: 1.8; color: var(--text-dark); text-align: justify; margin-bottom: 30px; }
-        .story-content .sub-text { font-size: 16px; color: var(--text-gray); font-family: 'Jost', sans-serif; font-weight: 300; line-height: 1.9; margin-top: 40px; }
+
+        .drop-cap {
+            float: left;
+            font-size: 90px;
+            line-height: 70px;
+            padding-top: 4px;
+            padding-right: 15px;
+            font-family: 'Cinzel', serif;
+            color: var(--brand-accent);
+        }
+
+        .story-content p {
+            font-family: 'Poppins', sans-serif;   /* changed to Poppins */
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1.8;
+            color: var(--text-dark);
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+
+        .story-content .sub-text {
+            font-size: 15px;
+            color: var(--text-gray);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            line-height: 1.9;
+            margin-top: 40px;
+        }
 
         /* Asymmetric Image Gallery */
         .image-gallery { position: relative; height: 700px; width: 100%; }
-        .img-primary { position: absolute; top: 0; right: 0; width: 75%; height: 80%; object-fit: cover; z-index: 1; filter: grayscale(10%); }
-        .img-secondary { position: absolute; bottom: 0; left: 0; width: 55%; height: 50%; object-fit: cover; z-index: 2; border: 12px solid var(--bg-classic); box-shadow: -10px 10px 30px rgba(0,0,0,0.05); }
+        .img-primary {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 75%;
+            height: 80%;
+            object-fit: cover;
+            z-index: 1;
+            filter: grayscale(10%);
+        }
+        .img-secondary {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 55%;
+            height: 50%;
+            object-fit: cover;
+            z-index: 2;
+            border: 12px solid var(--bg-classic);
+            box-shadow: -10px 10px 30px rgba(0,0,0,0.05);
+        }
 
         /* Dramatic Pull-Quote */
-        .quote-section { background-color: var(--brand-navy); padding: 120px 20px; text-align: center; color: #fff; }
+        .quote-section {
+            background-color: var(--brand-navy);
+            padding: 120px 20px;
+            text-align: center;
+            color: #fff;
+        }
         .quote-wrapper { max-width: 800px; margin: 0 auto; }
-        .quote-mark { font-family: 'Cinzel', serif; font-size: 80px; color: var(--brand-accent); opacity: 0.5; line-height: 0; margin-bottom: 20px; display: block; }
-        .quote-text { font-size: 40px; font-style: italic; font-weight: 300; line-height: 1.4; margin: 0; }
-        .quote-author { font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-top: 40px; color: var(--brand-accent); }
+        .quote-mark {
+            font-family: 'Cinzel', serif;
+            font-size: 80px;
+            color: var(--brand-accent);
+            opacity: 0.5;
+            line-height: 0;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .quote-text {
+            font-family: 'Cormorant Garamond', serif;  /* kept for elegance */
+            font-size: 40px;
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.4;
+            margin: 0;
+        }
+        .quote-author {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 40px;
+            color: var(--brand-accent);
+            font-weight: 500;
+        }
 
         /* The Pillars */
-        .pillars-section { max-width: 1200px; margin: 0 auto; padding: 120px 20px; }
+        .pillars-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 20px;
+        }
         .pillars-header { text-align: center; margin-bottom: 80px; }
-        .pillars-header h2 { font-family: 'Cinzel', serif; font-size: 42px; color: var(--text-dark); font-weight: 400; margin: 0; }
-        
-        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
-        .pillar-card { padding: 40px; text-align: center; border: 1px solid transparent; transition: all 0.5s ease; cursor: default; }
-        .pillar-card:hover { border-color: var(--hairline); background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
-        .pillar-number { font-family: 'Cinzel', serif; font-size: 16px; color: var(--brand-accent); margin-bottom: 20px; display: block; }
-        .pillar-card h3 { font-size: 26px; color: var(--text-dark); margin: 0 0 20px 0; font-weight: 400; }
-        .pillar-card p { font-family: 'Jost', sans-serif; font-size: 14px; line-height: 1.8; color: var(--text-gray); font-weight: 300; }
+        .pillars-header h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            color: var(--text-dark);
+            font-weight: 400;
+            margin: 0;
+        }
 
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+        }
+        .pillar-card {
+            padding: 40px;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: all 0.5s ease;
+            cursor: default;
+        }
+        .pillar-card:hover {
+            border-color: var(--hairline);
+            background: #fff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+        }
+        .pillar-number {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            color: var(--brand-accent);
+            margin-bottom: 20px;
+            display: block;
+        }
+        .pillar-card h3 {
+            font-family: 'Poppins', sans-serif;   /* changed to Poppins */
+            font-size: 22px;
+            color: var(--text-dark);
+            margin: 0 0 20px 0;
+            font-weight: 500;
+        }
+        .pillar-card p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-gray);
+            font-weight: 300;
+        }
+
+        /* Responsive */
         @media (max-width: 992px) {
-            .story-section { grid-template-columns: 1fr; }
+            .story-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .story-content { padding-right: 0; }
             .image-gallery { height: 500px; margin-top: 40px; }
             .pillars-grid { grid-template-columns: 1fr; gap: 30px; }
             .hero-title { font-size: 50px; }
             .hero-title span { font-size: 42px; }
             .quote-text { font-size: 28px; }
+            .navbar { padding: 16px 20px; }
+            .brand-logo img { height: 75px; }  /* responsive adjustment */
+        }
+
+        @media (max-width: 600px) {
+            .brand-logo img { height: 60px; }  /* smaller on mobile */
         }
     </style>
 </head>
@@ -90,7 +288,7 @@
     <!-- Navbar -->
     <nav class="navbar">
         <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSCART Logo">
+            <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo">
         </a>
         <div class="nav-links">
             <a href="{% url 'store:all_products' %}">Shop</a>

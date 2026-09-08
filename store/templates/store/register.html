@@ -3,38 +3,224 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register | MAPSCART</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Register | MAPSKART</title>
+
+    <!-- Google Fonts: Poppins (main), Cormorant for accent -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --brand-accent: #a3702f;
+            --brand-accent-light: #ddb35e;
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
             --heading: #241a0f;
+            --text-main: #4a3c2c;
+            --text-muted: #7a6a5a;
             --bg-page: #f7f0e1;
             --bg-panel: #efe3c8;
+            --bg-footer: #1c130b;
             --hairline: rgba(163, 112, 47, 0.28);
         }
-        body { font-family: 'Jost', sans-serif; background-color: var(--bg-page); color: var(--heading); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .auth-container { background: var(--bg-panel); padding: 50px; border-radius: 8px; border: 1px solid var(--hairline); width: 100%; max-width: 400px; text-align: center; }
-        .auth-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; margin: 0 0 20px 0; font-weight: 500; }
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #cfc09a; background: transparent; border-radius: 4px; box-sizing: border-box; }
-        .btn-primary { width: 100%; background: var(--brand-accent); color: #fff; padding: 15px; border: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border-radius: 30px; margin-top: 10px; }
-        .auth-links { margin-top: 20px; font-size: 13px; }
-        .auth-links a { color: var(--brand-accent); text-decoration: none; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+        }
+        .brand-logo img {
+            height: 120px;   /* increased from 60px */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            color: #fff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--brand-accent);
+        }
+
+        /* ===== REGISTER FORM ===== */
+        .auth-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .auth-container {
+            background: var(--bg-panel);
+            padding: 50px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--hairline);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .auth-container h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            margin: 0 0 20px 0;
+            font-weight: 500;
+            color: var(--heading);
+        }
+
+        /* Django form rendering */
+        .auth-container p {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .auth-container p label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--heading);
+        }
+        .auth-container p input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cfc09a;
+            background: transparent;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--text-main);
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .auth-container p input:focus {
+            outline: none;
+            border-color: var(--brand-accent);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--brand-accent);
+            color: #fff;
+            padding: 15px;
+            border: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 30px;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #8c6234;
+        }
+
+        .auth-links {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        .auth-links a {
+            color: var(--brand-accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 75px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+            .auth-container {
+                padding: 30px 20px;
+            }
+            .auth-container h2 {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h2>Create an Account</h2>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn-primary">Register</button>
-        </form>
-        <div class="auth-links">
-            <p>Already have an account? <a href="{% url 'store:login_user' %}">Log in here</a>.</p>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:collections' %}">Collections</a>
+            <a href="{% url 'store:about' %}">About</a>
+            <a href="{% url 'store:contact' %}">Contact</a>
+        </div>
+    </nav>
+
+    <!-- ===== REGISTER FORM ===== -->
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <h2>Create an Account</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+            <div class="auth-links">
+                <p>Already have an account? <a href="{% url 'store:login_user' %}">Log in here</a>.</p>
+            </div>
         </div>
     </div>
+
 </body>
 </html>

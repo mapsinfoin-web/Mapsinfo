@@ -3,46 +3,229 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ category.name }} | MAPSCART</title>
-    <!-- Use exactly the same CSS styles in the <head> as your collections.html file -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>{{ category.name }} | MAPSKART</title>
+
+    <!-- Google Fonts: Poppins (main), Cormorant for accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root { --brand-accent: #b1832e; --heading: #0e1b32; --bg-page: #f7f9fc; --bg-panel: #eef2f8; --text-muted: #7a8aa3; }
-        body { font-family: 'Jost', sans-serif; margin: 0; padding: 0; background-color: var(--bg-page); }
-        .navbar { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background-color: #081428; }
-        .brand-logo img { height: 60px; }
-        .nav-links a { color: #fff; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 20px;}
-        
-        .page-header { text-align: center; padding: 80px 20px 40px 20px; }
-        .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--heading); margin: 0 0 10px 0; font-weight: 500; }
-        
-        /* Reusing your Arrivals Grid from home.html */
-        .product-grid { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
-        .product-card { width: 260px; background: var(--bg-panel); border-radius: 8px; overflow: hidden; border: 1px solid #ccd6e5; text-align: center; }
-        .product-card .thumb { height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #e2e8f2; }
-        .product-card .thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .product-card .body { padding: 20px; }
-        .product-card h3 { margin: 0 0 10px 0; font-size: 18px; font-family: 'Cormorant Garamond', serif; color: var(--heading); }
-        .product-card .price { color: var(--brand-accent); font-size: 16px; margin-bottom: 20px; }
-        .product-card button { width: 100%; padding: 10px; background: transparent; color: var(--heading); border: 1px solid #b7c5da; border-radius: 4px; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .product-card button:hover { border-color: var(--brand-accent); color: var(--brand-accent); }
+        :root {
+            --brand-accent: #b1832e;
+            --brand-accent-light: #ddb35e;
+            --brand-navy: #0f2247;
+            --brand-navy-light: #3d6ea5;
+            --heading: #0e1b32;
+            --text-main: #33455e;
+            --text-muted: #7a8aa3;
+            --bg-page: #f7f9fc;
+            --bg-panel: #eef2f8;
+            --bg-panel-2: #e2e8f2;
+            --bg-footer: #081428;
+            --hairline: rgba(15, 34, 71, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            padding: 30px 50px;   /* increased padding for larger logo */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-footer);
+        }
+        .brand-logo img {
+            height: 120px;   /* increased from 60px */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            color: #fff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--brand-accent);
+        }
+        .nav-links a.active {
+            color: var(--brand-accent);
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            padding: 80px 20px 40px 20px;
+        }
+        .page-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            color: var(--heading);
+            margin: 0 0 10px 0;
+            font-weight: 500;
+        }
+        .page-header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* ===== PRODUCT GRID ===== */
+        .product-grid {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 100px 20px;
+        }
+
+        .product-card {
+            width: 260px;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ccd6e5;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--brand-accent);
+        }
+
+        .product-card .thumb {
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--bg-panel-2);
+        }
+        .product-card .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-card .body {
+            padding: 20px;
+        }
+        .product-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--heading);
+            font-weight: 500;
+        }
+        .product-card .price {
+            color: var(--brand-accent);
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .product-card button {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--heading);
+            border: 1px solid #b7c5da;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        .product-card button:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 75px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+            .page-header h1 {
+                font-size: 36px;
+            }
+            .product-grid {
+                gap: 20px;
+                padding: 0 10px 60px 10px;
+            }
+            .product-card {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
-        <a href="{% url 'store:all_products' %}" class="brand-logo"><img src="{% static 'logo.jpeg' %}" alt="MAPSCART Logo" /></a>
+        <a href="{% url 'store:all_products' %}" class="brand-logo">
+            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
+        </a>
         <div class="nav-links">
-            <a href="{% url 'store:collections' %}">Back to Collections</a>
+            <a href="{% url 'store:all_products' %}">Shop</a>
+            <a href="{% url 'store:collections' %}" class="active">Collections</a>
+            <a href="{% url 'store:about' %}">About</a>
+            <a href="{% url 'store:contact' %}">Contact</a>
         </div>
     </nav>
 
+    <!-- ===== PAGE HEADER ===== -->
     <div class="page-header">
         <h1>{{ category.name }}</h1>
-        <p style="color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 11px;">
-            {{ products.count }} Pieces Available
-        </p>
+        <p>{{ products.count }} Pieces Available</p>
     </div>
 
+    <!-- ===== PRODUCT GRID ===== -->
     <div class="product-grid">
         {% for product in products %}
         <div class="product-card">
@@ -50,7 +233,7 @@
                 {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" />
                 {% else %}
-                <span style="color: var(--text-muted);">No Image</span>
+                <span style="color: var(--text-muted); font-weight: 300;">No Image</span>
                 {% endif %}
             </div>
             <div class="body">
@@ -62,8 +245,9 @@
             </div>
         </div>
         {% empty %}
-        <p style="text-align: center; color: var(--text-muted); width: 100%;">No pieces available in this collection yet.</p>
+        <p style="text-align: center; color: var(--text-muted); width: 100%; font-weight: 300;">No pieces available in this collection yet.</p>
         {% endfor %}
     </div>
+
 </body>
-</html>
+</html>     

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Cart, CartItem, ProductGallery, Order, OrderItem
+from .models import Category, Product, Cart, CartItem, ProductGallery, Order, OrderItem, ContactInquiry
 
 # --- PRODUCT GALLERY ---
 class ProductGalleryInline(admin.TabularInline):
@@ -25,6 +25,8 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['title', 'sku']
     # Attach the gallery inline to this product view
     inlines = [ProductGalleryInline]
+    # Controls field order/visibility on the add/edit form - sku shown right after title
+    fields = ['category', 'title', 'sku', 'description', 'price', 'image', 'in_stock']
 
 # --- CART ---
 # Register your Cart models so you can view them in the admin panel too
@@ -40,33 +42,29 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    # Added mobile_number, shipping_address, and postal_code to the main view!
-    list_display = ['id', 'get_total_items','get_purchased_skus','full_name', 'mobile_number', 'email', 'shipping_address', 'city', 'postal_code', 'amount_paid', 'payment_method', 'is_paid']
-    
-    list_editable = ['is_paid'] 
-    date_hierarchy = 'date_ordered' 
+    list_display = ['id', 'get_total_items', 'get_purchased_skus', 'full_name', 'mobile_number', 'email', 'shipping_address', 'city', 'postal_code', 'amount_paid', 'payment_method', 'is_paid']
+
+    list_editable = ['is_paid']
+    date_hierarchy = 'date_ordered'
     list_filter = ['is_paid', 'payment_method', 'city']
     search_fields = ['full_name', 'email', 'mobile_number', 'shipping_address', 'id']
     inlines = [OrderItemInline]
-    
+
     @admin.display(description='Total Items')
     def get_total_items(self, obj):
-        # Calculates the total number of products the user placed in this order
-        return sum(item.quantity for item in obj.orderitem_set.all())
+        # Order.items is the related_name defined on OrderItem.order
+        return sum(item.quantity for item in obj.items.all())
 
     @admin.display(description='Purchased Products (SKU)')
     def get_purchased_skus(self, obj):
-        # Grabs the title and SKU from the Product table for every item in the order
-        items = obj.orderitem_set.all()
+        items = obj.items.all()
         return ", ".join([f"{item.product.title} (SKU: {item.product.sku})" for item in items])
-    
-from .models import ContactInquiry # Make sure to add this to your imports at the top if you prefer!
 
 # --- CONTACT INQUIRIES ---
 @admin.register(ContactInquiry)
 class ContactInquiryAdmin(admin.ModelAdmin):
     list_display = ['name', 'subject', 'email', 'created_at']
     search_fields = ['name', 'email', 'subject']
-    
+
     # We make these read-only so you don't accidentally edit a customer's original message!
     readonly_fields = ['name', 'email', 'subject', 'message', 'created_at']
