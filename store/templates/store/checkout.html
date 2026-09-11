@@ -312,7 +312,7 @@
 
                 <!-- QR Code Box (hidden by default) -->
                 <div id="qr-box" class="qr-box" style="display: none;">
-                    <p>Scan this QR code using your <strong>PhonePe</strong> app to pay <strong>${{ total }}</strong>.</p>
+                    <p>Scan this QR code using your <strong>PhonePe</strong> app to pay <strong>₹{{ total }}</strong>.</p>
                     <!-- Replace with your actual PhonePe QR image -->
                     <img src="{% static 'phonepe_qr.jpeg' %}" alt="PhonePe QR Code" />
                     <p>Please complete the transaction on PhonePe before clicking Place Order.</p>
@@ -332,13 +332,13 @@
                     <h4>{{ item.product.title }}</h4>
                     <p>Qty: {{ item.quantity }}</p>
                 </div>
-                <div>${{ item.sub_total }}</div>
+                <div>₹{{ item.sub_total }}</div>
             </div>
             {% endfor %}
 
             <div class="summary-total">
                 <span>Total</span>
-                <span>${{ total }}</span>
+                <span>₹{{ total }}</span>
             </div>
         </div>
     </div>

@@ -1158,7 +1158,14 @@
 
                 <div class="body">
                     <h3>{{ product.title }}</h3>
-                    <p class="price">${{ product.price }}</p>
+                    <p class="price">
+    {% if product.mrp %}
+        <span style="text-decoration: line-through; color: var(--text-muted); font-size: 13px; margin-right: 8px;">
+            ₹{{ product.mrp }}
+        </span>
+    {% endif %}
+    ₹{{ product.price }}
+</p>
 
                     <a href="{% url 'store:product_detail' product.pk %}" style="text-decoration: none;">
                         <button type="button">View Details</button>

@@ -15,18 +15,15 @@ class CategoryAdmin(admin.ModelAdmin):
 # --- PRODUCT ---
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    # Now shows the SKU in the product list
-    list_display = ['title', 'sku', 'price', 'in_stock', 'created']
-    # Adds a filter sidebar
+    # Show MRP next to the Sale Price
+    list_display = ['title', 'sku', 'mrp', 'price', 'in_stock', 'created']
     list_filter = ['in_stock', 'category']
-    # Allows you to edit these fields directly from the list view
-    list_editable = ['price', 'in_stock']
-    # Adds a search bar to easily find products by Name or SKU
+    # Allow quick editing of both prices directly from the list page
+    list_editable = ['mrp', 'price', 'in_stock']
     search_fields = ['title', 'sku']
-    # Attach the gallery inline to this product view
     inlines = [ProductGalleryInline]
-    # Controls field order/visibility on the add/edit form - sku shown right after title
-    fields = ['category', 'title', 'sku', 'description', 'price', 'image', 'in_stock']
+    # Add 'mrp' to the detailed edit form
+    fields = ['category', 'title', 'sku', 'description', 'mrp', 'price', 'image', 'in_stock']
 
 # --- CART ---
 # Register your Cart models so you can view them in the admin panel too

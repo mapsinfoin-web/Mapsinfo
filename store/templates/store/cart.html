@@ -327,7 +327,7 @@
                             </div>
                         </div>
                     </td>
-                    <td style="font-size: 18px;">${{ item.product.price }}</td>
+                    <td style="font-size: 18px;">₹{{ item.product.price }}</td>
                     <td>
                         <div class="qty-controls">
                             <a href="{% url 'store:remove_cart' item.product.id %}" class="qty-btn"><i class="fas fa-minus"></i></a>
@@ -335,7 +335,7 @@
                             <a href="{% url 'store:add_cart' item.product.id %}" class="qty-btn"><i class="fas fa-plus"></i></a>
                         </div>
                     </td>
-                    <td style="font-size: 18px; font-weight: 500; text-align: right;">${{ item.sub_total }}</td>
+                    <td style="font-size: 18px; font-weight: 500; text-align: right;">₹{{ item.sub_total }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -343,7 +343,7 @@
             <div class="cart-summary">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>${{ total }}</span>
+                    <span>₹{{ total }}</span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping</span>
@@ -351,7 +351,7 @@
                 </div>
                 <div class="summary-total">
                     <span>Total</span>
-                    <span>${{ total }}</span>
+                    <span>₹{{ total }}</span>
                 </div>
                 <a href="{% url 'store:checkout' %}" class="btn-primary" style="width: 100%; text-align: center; padding: 18px 0;">Proceed to Checkout</a>
             </div>

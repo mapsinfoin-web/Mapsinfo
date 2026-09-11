@@ -18,14 +18,18 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text="Unique Product ID") 
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    mrp = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Original Retail Price (crossed out)")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Current Sale Price")
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     in_stock = models.BooleanField(default=True)
+    
+    # Restored fields:
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         if not self.sku:
+            import uuid
             self.sku = uuid.uuid4().hex[:8].upper()
         super().save(*args, **kwargs)
 
