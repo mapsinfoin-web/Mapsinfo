@@ -35,25 +35,26 @@
 
         /* ===== NAVBAR ===== */
         .navbar {
-            padding: 30px 50px;   /* increased padding for larger logo */
+            padding: 15px 50px;   /* halved */
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--brand-navy);
         }
         .brand-logo img {
-            height: 120px;   /* increased from 60px */
+            height: 60px;   /* halved */
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
         }
         .nav-links {
             display: flex;
-            gap: 40px;
+            align-items: center;
+            gap: 30px;
         }
         .nav-links a {
             color: #fff;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 2px;
             text-transform: uppercase;
             text-decoration: none;
@@ -63,6 +64,61 @@
         }
         .nav-links a:hover { color: var(--brand-accent); }
         .nav-links a.active { color: var(--brand-accent); }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            color: #fff;
+            font-size: 16px;
+            align-items: center;
+        }
+        .nav-icons a {
+            color: inherit;
+            transition: color 0.4s ease;
+        }
+        .nav-icons a:hover {
+            color: var(--brand-accent);
+        }
+        .nav-icons i {
+            cursor: pointer;
+            transition: color 0.4s ease;
+        }
+        .nav-icons i:hover {
+            color: var(--brand-accent);
+        }
+        .cart-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent);
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Mobile menu toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.4s ease;
+        }
+        .nav-toggle:hover {
+            color: var(--brand-accent);
+        }
 
         /* ===== ANIMATIONS ===== */
         @keyframes fadeUp {
@@ -226,6 +282,67 @@
             font-weight: 400;
         }
 
+        /* ===== FOOTER ===== */
+        .site-footer {
+            background-color: var(--brand-navy);
+            color: #fff;
+            padding: 70px 20px 30px 20px;
+            font-family: 'Poppins', sans-serif;
+            margin-top: auto;
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 50px;
+            padding-bottom: 50px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .footer-brand img {
+            height: 60px;
+            margin-bottom: 18px;
+        }
+        .footer-brand p {
+            font-size: 13px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 280px;
+            font-weight: 300;
+        }
+        .footer-col h4 {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--brand-accent);
+            margin: 0 0 22px 0;
+            font-weight: 600;
+        }
+        .footer-col a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 14px;
+            transition: color 0.3s;
+            font-weight: 300;
+        }
+        .footer-col a:hover {
+            color: var(--brand-accent);
+        }
+        .footer-bottom {
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .contact-container {
@@ -240,28 +357,69 @@
             }
             .contact-form-wrapper { padding-left: 0; }
             .navbar {
-                padding: 16px 20px;
+                padding: 10px 20px;
             }
             .brand-logo img {
-                height: 75px;
+                height: 40px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
         @media (max-width: 600px) {
             .navbar {
-                padding: 16px 20px;
+                padding: 8px 16px;
+                position: relative;
             }
             .brand-logo img {
-                height: 60px;
+                height: 32px;
+            }
+            .nav-icons {
+                gap: 14px;
+                font-size: 15px;
+            }
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
             }
             .nav-links {
-                gap: 20px;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--brand-navy);
+                transition: max-height 0.35s ease;
+                z-index: 10;
+            }
+            .nav-links.open {
+                max-height: 260px;
+            }
+            .nav-links a {
+                width: 100%;
+                padding: 14px 0;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
             .page-header h1 {
                 font-size: 40px;
             }
             .detail-block p {
                 font-size: 16px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 34px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -278,6 +436,38 @@
             <a href="{% url 'store:collections' %}">Collections</a>
             <a href="{% url 'store:about' %}">About</a>
             <a href="{% url 'store:contact' %}" class="active">Contact</a>
+        </div>
+
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <i class="far fa-heart"></i>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'store:my_orders' %}" title="My Account ({{ user.username }})">
+                <i class="far fa-user-circle"></i>
+            </a>
+            <a href="{% url 'store:logout_user' %}" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'store:login_user' %}" title="Log In">
+                <i class="far fa-user"></i>
+            </a>
+            {% endif %}
+
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -346,6 +536,56 @@
         </div>
 
     </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo">
+                    <p>Considered jewellery for people who choose once and wear often. Handcrafted with care.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Discover</h4>
+                    <a href="{% url 'store:collections' %}">Collections</a>
+                    <a href="{% url 'store:all_products' %}">New Arrivals</a>
+                    <a href="#">Gift Guide</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Assistance</h4>
+                    <a href="{% url 'store:my_orders' %}">Track Order</a>
+                    <a href="{% url 'store:contact' %}">Contact Us</a>
+                    <a href="#">Shipping &amp; Returns</a>
+                </div>
+                <div class="footer-col">
+                    <h4>The Brand</h4>
+                    <a href="{% url 'store:about' %}">Our Story</a>
+                    <a href="#">Sustainability</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MAPSKART. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== MOBILE NAV TOGGLE SCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                    toggle.innerHTML = isOpen
+                        ? '<i class="fas fa-times"></i>'
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

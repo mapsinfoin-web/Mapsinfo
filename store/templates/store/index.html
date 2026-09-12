@@ -39,12 +39,17 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-page);
             color: var(--text-main);
+            overflow-x: hidden;
         }
 
         a {
@@ -120,7 +125,7 @@
         }
         .nav-links a {
             color: #fff;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 2px;
             text-transform: uppercase;
             transition: color 0.3s ease;
@@ -143,6 +148,22 @@
             transition: color 0.3s ease;
         }
         .nav-icons i:hover {
+            color: var(--brand-accent);
+        }
+
+        /* Mobile menu toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-toggle:hover {
             color: var(--brand-accent);
         }
 
@@ -197,7 +218,7 @@
         }
 
         .hero-subtitle {
-            font-size: 10px;
+            font-size: 12px;
             letter-spacing: 4px;
             color: var(--brand-accent-light);
             text-transform: uppercase;
@@ -225,7 +246,7 @@
         }
 
         .hero-desc {
-            font-size: 14px;
+            font-size: 16px;
             color: #c3ccdc;
             margin-bottom: 40px;
             letter-spacing: 0.5px;
@@ -292,7 +313,7 @@
         }
 
         .section-subtitle {
-            font-size: 10px;
+            font-size: 12px;
             letter-spacing: 4px;
             color: var(--brand-accent);
             text-transform: uppercase;
@@ -403,7 +424,7 @@
         .category-info h3 {
             font-family: 'Cormorant Garamond', serif;
             color: #fff;
-            font-size: 20px;
+            font-size: 22px;
             margin: 0 0 6px 0;
             font-weight: 400;
         }
@@ -411,53 +432,9 @@
         .category-info p {
             font-family: 'Poppins', sans-serif;
             color: #c3ccdc;
-            font-size: 10px;
+            font-size: 12px;
             margin: 0;
             font-weight: 300;
-        }
-
-        /* ===== MARQUEE ===== */
-        .marquee-strip {
-            border-top: 1px solid var(--hairline);
-            border-bottom: 1px solid var(--hairline);
-            padding: 22px 0;
-            overflow: hidden;
-            background-color: var(--bg-panel);
-            white-space: nowrap;
-        }
-        .marquee-track {
-            display: inline-flex;
-            animation: scroll-left 28s linear infinite;
-        }
-        .marquee-track span {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 300;
-            font-size: 18px;
-            color: rgba(15, 34, 71, 0.4);
-            padding: 0 28px;
-            display: inline-flex;
-            align-items: center;
-            letter-spacing: 2px;
-        }
-        .marquee-track span::after {
-            content: '\2726';
-            font-style: normal;
-            color: var(--brand-accent);
-            margin-left: 28px;
-            font-size: 12px;
-        }
-        @keyframes scroll-left {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .marquee-track {
-                animation: none;
-            }
         }
 
         /* ===== STORY ===== */
@@ -509,7 +486,7 @@
             font-style: italic;
         }
         .story-content p {
-            font-size: 14px;
+            font-size: 16px;
             line-height: 1.9;
             color: var(--text-main);
             margin: 0 0 20px 0;
@@ -530,7 +507,7 @@
             font-weight: 400;
         }
         .story-stats div span {
-            font-size: 10px;
+            font-size: 12px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -607,7 +584,7 @@
         }
         .product-card h3 {
             margin: 0 0 10px 0;
-            font-size: 18px;
+            font-size: 20px;
             color: var(--heading);
             font-weight: 500;
             font-family: 'Poppins', sans-serif;
@@ -615,7 +592,7 @@
         .product-card .price {
             color: var(--brand-accent);
             margin: 0 0 20px 0;
-            font-size: 16px;
+            font-size: 18px;
             font-family: 'Poppins', sans-serif;
             font-weight: 500;
         }
@@ -628,7 +605,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 1px;
             text-transform: uppercase;
             font-family: 'Poppins', sans-serif;
@@ -658,20 +635,20 @@
         }
         .testimonial-card .stars {
             color: var(--brand-accent);
-            font-size: 12px;
+            font-size: 14px;
             letter-spacing: 3px;
             margin-bottom: 18px;
         }
         .testimonial-card p.quote {
             font-family: 'Poppins', sans-serif;
             font-weight: 300;
-            font-size: 16px;
+            font-size: 18px;
             line-height: 1.7;
             color: var(--text-main);
             margin: 0 0 22px 0;
         }
         .testimonial-card .cust {
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -697,7 +674,7 @@
             margin: 14px 0 14px 0;
         }
         .newsletter-section p {
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text-muted);
             max-width: 440px;
             margin: 0 auto 34px auto;
@@ -721,7 +698,7 @@
             border: 1px solid #c1cee1;
             border-radius: 30px;
             color: var(--heading);
-            font-size: 13px;
+            font-size: 15px;
             font-family: 'Poppins', sans-serif;
             font-weight: 300;
         }
@@ -777,7 +754,7 @@
         }
 
         .footer-brand p {
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text-main);
             line-height: 1.9;
             max-width: 280px;
@@ -790,7 +767,7 @@
         .footer-brand .tagline {
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
-            font-size: 15px;
+            font-size: 17px;
             color: var(--brand-accent);
             margin: -8px 0 18px 0;
             letter-spacing: 0.5px;
@@ -809,7 +786,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 15px;
             transition: all 0.35s ease;
             background: rgba(15, 34, 71, 0.03);
         }
@@ -822,7 +799,7 @@
         }
 
         .footer-col h4 {
-            font-size: 10px;
+            font-size: 12px;
             letter-spacing: 2.5px;
             text-transform: uppercase;
             color: var(--brand-accent);
@@ -847,7 +824,7 @@
         .footer-col a {
             display: block;
             color: var(--text-main);
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 300;
             margin-bottom: 14px;
             transition: color 0.3s ease, padding-left 0.25s ease;
@@ -869,7 +846,7 @@
         }
 
         .footer-bottom p {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--text-muted);
             margin: 0;
             letter-spacing: 0.8px;
@@ -882,7 +859,7 @@
             gap: 28px;
         }
         .footer-bottom .legal-links a {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--text-muted);
             letter-spacing: 0.8px;
             transition: color 0.3s ease;
@@ -930,19 +907,35 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
+            .brand-logo img {
+                height: 130px;
+            }
+            .hero-title {
+                font-size: 56px;
+            }
             .categories-grid {
                 grid-template-columns: repeat(2, 1fr);
                 max-width: 600px;
             }
+            .categories-section {
+                padding: 80px 20px 60px 20px;
+            }
             .story-section {
                 grid-template-columns: 1fr;
                 gap: 50px;
+                padding: 90px 20px;
             }
             .story-content p {
                 max-width: 100%;
             }
+            .testimonials-section {
+                padding: 80px 20px;
+            }
             .testimonials-grid {
                 grid-template-columns: 1fr;
+            }
+            .newsletter-section {
+                padding: 80px 20px;
             }
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
@@ -964,11 +957,102 @@
                 font-size: 20px;
                 letter-spacing: 2px;
             }
+            .nav-icons {
+                gap: 14px;
+                font-size: 15px;
+            }
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
+            }
             .nav-links {
-                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--brand-navy);
+                transition: max-height 0.35s ease;
+            }
+            .nav-links.open {
+                max-height: 320px;
+            }
+            .nav-links a {
+                width: 100%;
+                padding: 16px 0;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .hero {
+                height: 100svh;
             }
             .hero-title {
                 font-size: 40px;
+            }
+            .hero-desc {
+                font-size: 15px;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            .hero-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .categories-section {
+                padding: 60px 20px 40px 20px;
+            }
+            .section-title {
+                font-size: 36px;
+            }
+            .story-section {
+                padding: 60px 20px;
+                gap: 40px;
+            }
+            .story-content h2 {
+                font-size: 30px;
+            }
+            .story-image-frame {
+                top: 14px;
+                left: 14px;
+                right: -14px;
+                bottom: -14px;
+            }
+            .story-stats {
+                flex-wrap: wrap;
+                gap: 30px;
+                margin-top: 30px;
+            }
+            .arrivals-section {
+                padding: 0 20px 60px 20px;
+                margin: 20px auto 0 auto;
+            }
+            .product-card {
+                width: 100%;
+                max-width: 320px;
+            }
+            .testimonials-section {
+                padding: 60px 20px;
+            }
+            .testimonial-card {
+                padding: 24px 18px;
+            }
+            .newsletter-section {
+                padding: 60px 20px;
+            }
+            .newsletter-section h2 {
+                font-size: 28px;
+            }
+            .footer-inner {
+                padding: 50px 0 30px 0;
+            }
+            .footer-brand img {
+                margin-left: 0;
             }
             .footer-grid {
                 grid-template-columns: 1fr;
@@ -988,6 +1072,36 @@
             .categories-grid {
                 grid-template-columns: 1fr;
                 max-width: 300px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero-title {
+                font-size: 32px;
+            }
+            .hero-subtitle {
+                font-size: 11px;
+                letter-spacing: 2px;
+            }
+            .brand-logo img {
+                height: 60px;
+            }
+            .nav-icons {
+                gap: 10px;
+                font-size: 14px;
+            }
+            .section-title {
+                font-size: 30px;
+            }
+            .story-content h2 {
+                font-size: 26px;
+            }
+            .newsletter-form {
+                flex-direction: column;
+            }
+            .newsletter-form input,
+            .newsletter-form button {
+                width: 100%;
             }
         }
     </style>
@@ -1038,6 +1152,11 @@
                     {% endif %}
                 </a>
             </div>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
     <!-- ===== END NAVBAR ===== -->
@@ -1047,7 +1166,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="hero-subtitle">Welcome to MAPSKART</p>
-            <h1 class="hero-title">Experience <span class="italic-gold">A Think Trend</span></h1>
+            <h1 class="hero-title"><span class="italic-gold">A Think Trend</span></h1>
             <p class="hero-desc">Discover our latest collections crafted for the modern lifestyle.</p>
 
             <div class="hero-buttons">
@@ -1110,14 +1229,6 @@
             </a>
         </div>
     </section>
-
-    <!-- ===== MARQUEE ===== -->
-    <div class="marquee-strip" aria-hidden="true">
-        <div class="marquee-track">
-            <span>18K Gold</span><span>Sterling Silver</span><span>Natural Diamond</span><span>Freshwater Pearl</span><span>Rose Gold</span><span>Platinum</span>
-            <span>18K Gold</span><span>Sterling Silver</span><span>Natural Diamond</span><span>Freshwater Pearl</span><span>Rose Gold</span><span>Platinum</span>
-        </div>
-    </div>
 
     <!-- ===== STORY / ABOUT ===== -->
     <section class="story-section" id="about">
@@ -1276,6 +1387,23 @@
 
         </div>
     </footer>
+
+    <!-- ===== MOBILE NAV TOGGLE SCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                    toggle.innerHTML = isOpen
+                        ? '<i class="fas fa-times"></i>'
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -12,17 +12,17 @@
 
     <style>
         :root {
-            --brand-accent: #a3702f;
+            --brand-accent: #b1832e;
             --brand-accent-light: #ddb35e;
             --brand-navy: #0f2247;
             --brand-navy-light: #3d6ea5;
-            --heading: #241a0f;
-            --text-main: #4a3c2c;
-            --text-muted: #7a6a5a;
-            --bg-page: #f7f0e1;
-            --bg-panel: #efe3c8;
-            --bg-footer: #1c130b;
-            --hairline: rgba(163, 112, 47, 0.28);
+            --heading: #0e1b32;
+            --text-main: #33455e;
+            --text-muted: #7a8aa3;
+            --bg-page: #f7f9fc;
+            --bg-panel: #eef2f8;
+            --bg-footer: #081428;
+            --hairline: rgba(15, 34, 71, 0.16);
         }
 
         * { box-sizing: border-box; }
@@ -41,14 +41,14 @@
         /* ===== NAVBAR ===== */
         .navbar {
             width: 100%;
-            padding: 30px 50px;   /* increased padding for larger logo */
+            padding: 15px 50px;   /* halved from 30px */
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
         }
         .brand-logo img {
-            height: 120px;   /* increased from 60px */
+            height: 60px;   /* halved from 120px */
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
@@ -60,7 +60,7 @@
         .nav-links a {
             color: #fff;
             text-decoration: none;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 2px;
             text-transform: uppercase;
             transition: color 0.3s ease;
@@ -108,6 +108,22 @@
             line-height: 1.4;
             box-shadow: 0 2px 8px rgba(163, 112, 47, 0.4);
             font-family: 'Poppins', sans-serif;
+        }
+
+        /* Mobile menu toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-toggle:hover {
+            color: var(--brand-accent);
         }
 
         /* ===== PRODUCT LAYOUT ===== */
@@ -267,9 +283,8 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .footer-brand img {
-            height: 80px;   /* increased from 54px */
+            height: 80px;
             margin-bottom: 18px;
-            filter: grayscale(100%) invert(1) brightness(200%);
         }
         .footer-brand p {
             font-size: 13px;
@@ -314,31 +329,80 @@
             .product-container {
                 grid-template-columns: 1fr;
                 gap: 40px;
-                margin-top: 60px;
+                margin: 40px auto;
             }
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
             }
             .navbar {
-                padding: 16px 20px;
+                padding: 10px 20px;
             }
             .brand-logo img {
-                height: 75px;
+                height: 40px;
             }
         }
 
         @media (max-width: 600px) {
             .navbar {
-                padding: 16px 20px;
+                padding: 8px 16px;
+                position: relative;
             }
             .brand-logo img {
-                height: 60px;
+                height: 32px;
+            }
+            .nav-icons {
+                gap: 14px;
+                font-size: 15px;
+            }
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
+                order: 3;
             }
             .nav-links {
-                gap: 20px;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--bg-footer);
+                transition: max-height 0.35s ease;
+                z-index: 10;
+            }
+            .nav-links.open {
+                max-height: 260px;
+            }
+            .nav-links a {
+                width: 100%;
+                padding: 14px 0;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
             .product-title {
                 font-size: 32px;
+            }
+            .product-container {
+                padding: 0 16px;
+                gap: 30px;
+            }
+            .product-image-wrapper {
+                padding: 20px;
+            }
+            .btn-add {
+                padding: 16px 30px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 34px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -373,6 +437,11 @@
                     {% endif %}
                 </a>
             </div>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -470,6 +539,20 @@
             document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
             thumbnail.classList.add('active');
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                    toggle.innerHTML = isOpen
+                        ? '<i class="fas fa-times"></i>'
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+        });
     </script>
 
 </body>

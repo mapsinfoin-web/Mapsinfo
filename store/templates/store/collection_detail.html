@@ -41,14 +41,14 @@
         /* ===== NAVBAR ===== */
         .navbar {
             width: 100%;
-            padding: 30px 50px;   /* increased padding for larger logo */
+            padding: 15px 50px;   /* halved from 30px */
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
         }
         .brand-logo img {
-            height: 120px;   /* increased from 60px */
+            height: 60px;   /* halved from 120px */
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
@@ -59,7 +59,7 @@
         }
         .nav-links a {
             color: #fff;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 2px;
             text-transform: uppercase;
             text-decoration: none;
@@ -70,6 +70,61 @@
             color: var(--brand-accent);
         }
         .nav-links a.active {
+            color: var(--brand-accent);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            color: #fff;
+            font-size: 16px;
+            align-items: center;
+        }
+        .nav-icons a {
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+        .nav-icons a:hover {
+            color: var(--brand-accent);
+        }
+        .nav-icons i {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-icons i:hover {
+            color: var(--brand-accent);
+        }
+        .cart-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent);
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Mobile menu toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-toggle:hover {
             color: var(--brand-accent);
         }
 
@@ -87,7 +142,7 @@
         }
         .page-header p {
             font-family: 'Poppins', sans-serif;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 1px;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -138,14 +193,14 @@
         }
         .product-card h3 {
             margin: 0 0 10px 0;
-            font-size: 18px;
+            font-size: 20px;
             font-family: 'Cormorant Garamond', serif;
             color: var(--heading);
             font-weight: 500;
         }
         .product-card .price {
             color: var(--brand-accent);
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 20px;
             font-family: 'Poppins', sans-serif;
             font-weight: 500;
@@ -157,7 +212,7 @@
             color: var(--heading);
             border: 1px solid #b7c5da;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 13px;
             text-transform: uppercase;
             cursor: pointer;
             transition: 0.3s;
@@ -173,22 +228,54 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .navbar {
-                padding: 16px 20px;
+                padding: 10px 20px;
             }
             .brand-logo img {
-                height: 75px;
+                height: 40px;
             }
         }
 
         @media (max-width: 600px) {
             .navbar {
-                padding: 16px 20px;
+                padding: 8px 16px;
+                position: relative;
             }
             .brand-logo img {
-                height: 60px;
+                height: 32px;
+            }
+            .nav-icons {
+                gap: 14px;
+                font-size: 15px;
+            }
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
             }
             .nav-links {
-                gap: 20px;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--bg-footer);
+                transition: max-height 0.35s ease;
+                z-index: 10;
+            }
+            .nav-links.open {
+                max-height: 260px;
+            }
+            .nav-links a {
+                width: 100%;
+                padding: 14px 0;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .page-header {
+                padding: 50px 20px 30px 20px;
             }
             .page-header h1 {
                 font-size: 36px;
@@ -217,6 +304,38 @@
             <a href="{% url 'store:about' %}">About</a>
             <a href="{% url 'store:contact' %}">Contact</a>
         </div>
+
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <i class="far fa-heart"></i>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'store:my_orders' %}" title="My Account ({{ user.username }})">
+                <i class="far fa-user-circle"></i>
+            </a>
+            <a href="{% url 'store:logout_user' %}" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'store:login_user' %}" title="Log In">
+                <i class="far fa-user"></i>
+            </a>
+            {% endif %}
+
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </nav>
 
     <!-- ===== PAGE HEADER ===== -->
@@ -241,11 +360,11 @@
                 <p class="price">
     {% if product.mrp %}
         <span style="text-decoration: line-through; color: var(--text-muted); font-size: 13px; margin-right: 8px;">
-            ${{ product.mrp }}
+            ₹{{ product.mrp }}
         </span>
     {% endif %}
-    ${{ product.price }}
-</p>₹{{ product.price }}</p>
+    ₹{{ product.price }}
+</p>
                 <a href="{% url 'store:product_detail' product.pk %}" style="text-decoration: none;">
                     <button type="button">View Details</button>
                 </a>
@@ -256,5 +375,22 @@
         {% endfor %}
     </div>
 
+    <!-- ===== MOBILE NAV TOGGLE SCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                    toggle.innerHTML = isOpen
+                        ? '<i class="fas fa-times"></i>'
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+        });
+    </script>
+
 </body>
-</html>     
+</html>

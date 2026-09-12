@@ -18,7 +18,7 @@
             --heading: #241a0f;
             --text-main: #4a3c2c;
             --bg-page: #f7f0e1;
-            --bg-footer: #1c130b;
+            --bg-footer: #081428;
             --hairline: rgba(163, 112, 47, 0.28);
         }
 
@@ -35,17 +35,22 @@
             flex-direction: column;
         }
 
-        /* ===== NAVBAR ===== */
+        /* ===== NAVBAR (matches index page theme, height halved) ===== */
         .navbar {
             width: 100%;
-            padding: 30px 50px;
+            padding: 15px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
+        .brand-logo { display: flex; align-items: center; gap: 14px; }
         .brand-logo img {
-            height: 120px;   /* increased from 60px */
+            height: 60px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
@@ -64,7 +69,40 @@
             font-family: 'Poppins', sans-serif;
             font-weight: 500;
         }
-        .nav-links a:hover { color: var(--brand-accent); }
+        .nav-links a:hover { color: var(--brand-accent-light); }
+        .nav-icons { display: flex; gap: 20px; color: #fff; font-size: 16px; align-items: center; }
+        .nav-icons i { cursor: pointer; transition: color 0.3s ease; }
+        .nav-icons i:hover { color: var(--brand-accent-light); }
+
+        /* Mobile menu toggle */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .nav-toggle:hover { color: var(--brand-accent-light); }
+
+        /* Cart Badge */
+        .cart-icon-wrapper { position: relative; display: inline-block; }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--brand-accent-light);
+            color: var(--brand-navy);
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.4;
+        }
 
         /* ===== SUCCESS BOX ===== */
         .success-wrapper {
@@ -134,22 +172,37 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .navbar {
-                padding: 16px 20px;
+                padding: 8px 20px;
             }
             .brand-logo img {
-                height: 75px;
+                height: 38px;
             }
         }
 
         @media (max-width: 600px) {
-            .navbar {
-                padding: 16px 20px;
-            }
-            .brand-logo img {
-                height: 60px;
-            }
+            .navbar { padding: 6px 20px; }
+            .brand-logo img { height: 30px; }
+            .nav-icons { gap: 14px; font-size: 15px; }
+            .nav-toggle { display: inline-flex; align-items: center; }
             .nav-links {
-                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--brand-navy);
+                transition: max-height 0.35s ease;
+            }
+            .nav-links.open { max-height: 320px; }
+            .nav-links a {
+                width: 100%;
+                padding: 16px 0;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
             .success-box {
                 padding: 30px 20px;
@@ -165,6 +218,11 @@
                 font-size: 48px;
             }
         }
+
+        @media (max-width: 400px) {
+            .brand-logo img { height: 24px; }
+            .nav-icons { gap: 10px; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -174,11 +232,46 @@
         <a href="{% url 'store:all_products' %}" class="brand-logo">
             <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
         </a>
+
         <div class="nav-links">
             <a href="{% url 'store:all_products' %}">Shop</a>
             <a href="{% url 'store:collections' %}">Collections</a>
             <a href="{% url 'store:about' %}">About</a>
             <a href="{% url 'store:contact' %}">Contact</a>
+        </div>
+
+        <div class="nav-icons">
+            <i class="fas fa-search"></i>
+            <i class="far fa-heart"></i>
+
+            <!-- DYNAMIC USER AUTH ICON -->
+            {% if user.is_authenticated %}
+            <a href="{% url 'store:my_orders' %}" style="color: inherit;" title="My Account ({{ user.username }})">
+                <i class="far fa-user-circle"></i>
+            </a>
+            <a href="{% url 'store:logout_user' %}" style="color: inherit;" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'store:login_user' %}" style="color: inherit;" title="Log In">
+                <i class="far fa-user"></i>
+            </a>
+            {% endif %}
+
+            <!-- Cart with badge -->
+            <div class="cart-icon-wrapper">
+                <a href="{% url 'store:cart_detail' %}" style="color: inherit;">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -193,6 +286,22 @@
             <a href="{% url 'store:all_products' %}" class="btn-primary">Return to Boutique</a>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                    toggle.innerHTML = isOpen
+                        ? '<i class="fas fa-times"></i>'
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
