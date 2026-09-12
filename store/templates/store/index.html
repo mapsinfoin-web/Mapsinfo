@@ -713,8 +713,8 @@
         /* ===== FOOTER ===== */
         .site-footer {
             position: relative;
-            background-color: var(--bg-page);
-            border-top: 1px solid var(--hairline);
+            background-color: var(--bg-footer);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding: 0 20px 0 20px;
             overflow: hidden;
         }
@@ -741,7 +741,7 @@
             grid-template-columns: 1.5fr 1fr 1fr 1fr;
             gap: 50px;
             padding-bottom: 50px;
-            border-bottom: 1px solid var(--hairline);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
          .footer-brand img {
@@ -755,7 +755,7 @@
 
         .footer-brand p {
             font-size: 15px;
-            color: var(--text-main);
+            color: var(--footer-text);
             line-height: 1.9;
             max-width: 280px;
             margin: 0 0 22px 0;
@@ -768,7 +768,7 @@
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
             font-size: 17px;
-            color: var(--brand-accent);
+            color: var(--footer-heading);
             margin: -8px 0 18px 0;
             letter-spacing: 0.5px;
         }
@@ -778,31 +778,31 @@
             gap: 12px;
         }
         .footer-socials a {
-            color: var(--text-muted);
+            color: var(--footer-text);
             width: 38px;
             height: 38px;
-            border: 1px solid rgba(15, 34, 71, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 15px;
             transition: all 0.35s ease;
-            background: rgba(15, 34, 71, 0.03);
+            background: rgba(255, 255, 255, 0.04);
         }
         .footer-socials a:hover {
             border-color: var(--brand-accent);
-            color: var(--brand-accent);
-            background: rgba(15, 34, 71, 0.08);
+            color: var(--brand-accent-light);
+            background: rgba(255, 255, 255, 0.08);
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(15, 34, 71, 0.10);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         }
 
         .footer-col h4 {
             font-size: 12px;
             letter-spacing: 2.5px;
             text-transform: uppercase;
-            color: var(--brand-accent);
+            color: var(--footer-heading);
             margin: 0 0 22px 0;
             font-weight: 600;
             position: relative;
@@ -823,7 +823,7 @@
 
         .footer-col a {
             display: block;
-            color: var(--text-main);
+            color: var(--footer-text);
             font-size: 15px;
             font-weight: 300;
             margin-bottom: 14px;
@@ -847,7 +847,7 @@
 
         .footer-bottom p {
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--footer-text);
             margin: 0;
             letter-spacing: 0.8px;
             font-family: 'Poppins', sans-serif;
@@ -860,7 +860,7 @@
         }
         .footer-bottom .legal-links a {
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--footer-text);
             letter-spacing: 0.8px;
             transition: color 0.3s ease;
             font-family: 'Poppins', sans-serif;
@@ -1173,9 +1173,6 @@
                 <a href="#shop" class="btn btn-primary">
                     Shop Collection <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="#arrivals" class="btn btn-secondary">
-                    Explore New Arrivals
-                </a>
             </div>
         </div>
     </section>
@@ -1338,7 +1335,6 @@
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="footer-socials">
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
                         <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
