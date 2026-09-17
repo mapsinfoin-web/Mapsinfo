@@ -250,6 +250,7 @@ def contact(request):
         
     return render(request, 'store/contact.html')
 
+@login_required(login_url='/accounts/login/')
 def checkout(request):
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -267,7 +268,7 @@ def checkout(request):
         postal_code = request.POST.get('postal_code')
         mobile_number = request.POST.get('mobile_number')
     
-        print(f"DEBUG: The captured mobile number is -> {mobile_number}")
+       
         
         # Capture the PhonePe or COD choice
         payment_method = request.POST.get('payment_method')

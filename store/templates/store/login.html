@@ -30,6 +30,7 @@
             font-family: 'Poppins', sans-serif;  /* changed to Poppins */
             margin: 0;
             padding: 0;
+            padding-top: 180px; /* reserve space for the fixed navbar */
             background-color: var(--bg-page);
             color: var(--text-main);
             min-height: 100vh;
@@ -39,18 +40,35 @@
 
         /* ===== NAVBAR ===== */
         .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             padding: 30px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
+            box-sizing: border-box;
+            z-index: 1000;
+            transition: padding 0.35s ease, box-shadow 0.35s ease;
         }
+
+        /* Shrunk / pinned state once the page is scrolled */
+        .navbar.scrolled {
+            padding: 10px 50px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+        .navbar.scrolled .brand-logo img {
+            height: 55px;
+        }
+
         .brand-logo img {
             height: 120px;   /* increased from 60px */
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+            transition: height 0.35s ease;
         }
         .nav-links {
             display: flex;
@@ -194,8 +212,15 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
+            body { padding-top: 107px; }
             .navbar {
                 padding: 16px 20px;
+            }
+            .navbar.scrolled {
+                padding: 8px 20px;
+            }
+            .navbar.scrolled .brand-logo img {
+                height: 45px;
             }
             .brand-logo img {
                 height: 75px;
@@ -203,8 +228,15 @@
         }
 
         @media (max-width: 600px) {
+            body { padding-top: 92px; }
             .navbar {
                 padding: 16px 20px;
+            }
+            .navbar.scrolled {
+                padding: 6px 20px;
+            }
+            .navbar.scrolled .brand-logo img {
+                height: 36px;
             }
             .brand-logo img {
                 height: 60px;
@@ -250,6 +282,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var navbar = document.querySelector('.navbar');
+            if (navbar) {
+                function handleNavScroll() {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+                window.addEventListener('scroll', handleNavScroll, { passive: true });
+                handleNavScroll();
+            }
+        });
+    </script>
 
 </body>
 </html>

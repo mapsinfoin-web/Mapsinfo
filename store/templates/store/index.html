@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MAPSKART | A Think Trend</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" />
 
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet" />
@@ -71,7 +72,7 @@
 
         /* ===== NAVBAR ===== */
         .navbar {
-            position: absolute;
+            position: fixed;
             top: 0;
             width: 100%;
             padding: 30px 50px;
@@ -80,6 +81,20 @@
             align-items: center;
             box-sizing: border-box;
             z-index: 1000;
+            transition: padding 0.35s ease, background-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        /* Shrunk / pinned state once the page is scrolled */
+        .navbar.scrolled {
+            padding: 8px 50px;
+            background-color: var(--bg-footer);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+        }
+        .navbar.scrolled .brand-logo img {
+            height: 70px;
+        }
+        .navbar.scrolled .brand-logo .brand-wordmark {
+            font-size: 20px;
         }
 
         .brand-logo {
@@ -93,6 +108,7 @@
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+            transition: height 0.35s ease;
         }
 
         .brand-logo .brand-wordmark {
@@ -517,15 +533,21 @@
 
         /* ===== ARRIVALS ===== */
         .arrivals-section {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 40px auto 0 auto;
             padding: 0 20px 100px 20px;
+        }
+        .arrivals-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
+            justify-items: stretch;
         }
         .product-card {
             position: relative;
             border: 1px solid #ccd6e5;
             padding: 0;
-            width: 260px;
+            width: 100%;
             background: var(--bg-panel);
             border-radius: 8px;
             overflow: hidden;
@@ -612,6 +634,39 @@
             font-weight: 500;
         }
         .product-card button:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+        }
+
+        /* See Full Collection card — reuses .product-card look */
+        .see-collection-card {
+            text-decoration: none;
+        }
+        .see-collection-card .thumb {
+            background: var(--bg-panel-2);
+        }
+        .see-collection-card .thumb i {
+            font-size: 48px;
+            color: var(--brand-accent);
+        }
+        .see-collection-card .cta {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--heading);
+            border: 1px solid #b7c5da;
+            border-radius: 4px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            text-align: center;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .see-collection-card:hover .cta {
             border-color: var(--brand-accent);
             color: var(--brand-accent);
         }
@@ -913,6 +968,9 @@
             .hero-title {
                 font-size: 56px;
             }
+            .arrivals-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
             .categories-grid {
                 grid-template-columns: repeat(2, 1fr);
                 max-width: 600px;
@@ -949,6 +1007,12 @@
         @media (max-width: 600px) {
             .navbar {
                 padding: 16px 20px;
+            }
+            .navbar.scrolled {
+                padding: 6px 20px;
+            }
+            .navbar.scrolled .brand-logo img {
+                height: 40px;
             }
             .brand-logo img {
                 height: 75px;
@@ -1031,6 +1095,10 @@
             .arrivals-section {
                 padding: 0 20px 60px 20px;
                 margin: 20px auto 0 auto;
+            }
+            .arrivals-grid {
+                grid-template-columns: 1fr;
+                justify-items: center;
             }
             .product-card {
                 width: 100%;
@@ -1170,7 +1238,7 @@
             <p class="hero-desc">Discover our latest collections crafted for the modern lifestyle.</p>
 
             <div class="hero-buttons">
-                <a href="#shop" class="btn btn-primary">
+                <a href="{% url 'store:collections' %}" class="btn btn-primary">
                     Shop Collection <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -1253,7 +1321,7 @@
             <h2 class="section-title">Latest Arrivals</h2>
         </div>
 
-        <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+        <div class="arrivals-grid">
             {% for product in recent_products %}
             <div class="product-card">
                 <div class="thumb">
@@ -1283,6 +1351,17 @@
             {% empty %}
             <p style="text-align: center; color: var(--text-muted);">Our collection is currently being updated.</p>
             {% endfor %}
+
+            <a href="{% url 'store:collections' %}" class="product-card see-collection-card">
+                <div class="thumb">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="body">
+                    <h3>Want to see more?</h3>
+                    <p class="price" style="color: var(--text-muted); font-size: 14px;">Browse the full collection</p>
+                    <span class="cta">See Full Collection</span>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -1397,6 +1476,20 @@
                         ? '<i class="fas fa-times"></i>'
                         : '<i class="fas fa-bars"></i>';
                 });
+            }
+
+            // Shrink / pin the navbar on scroll
+            var navbar = document.querySelector('.navbar');
+            if (navbar) {
+                function handleNavScroll() {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+                window.addEventListener('scroll', handleNavScroll, { passive: true });
+                handleNavScroll();
             }
         });
     </script>

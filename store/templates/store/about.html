@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Our Heritage | MAPSKART</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png">
 
     <!-- Google Fonts: Poppins (main), Cinzel & Cormorant for accents -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -24,6 +25,7 @@
             font-family: 'Poppins', sans-serif;  /* changed to Poppins */
             margin: 0;
             padding: 0;
+            padding-top: 90px; /* reserve space for the fixed navbar */
             background-color: var(--bg-classic);
             color: var(--text-gray);
             overflow-x: hidden;
@@ -31,12 +33,28 @@
 
         /* Navbar (Poppins for clean UI) */
         .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             padding: 15px 50px;  /* halved */
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--brand-navy);
             font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            z-index: 1000;
+            transition: padding 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        /* Shrunk / pinned state once the page is scrolled */
+        .navbar.scrolled {
+            padding: 8px 50px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+        .navbar.scrolled .brand-logo img {
+            height: 40px;
         }
 
         .brand-logo img {
@@ -44,6 +62,7 @@
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+            transition: height 0.35s ease;
         }
 
         .nav-links {
@@ -129,13 +148,12 @@
 
         /* Cinematic Hero */
         .hero-section {
-            min-height: 70vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 20px;
+            padding: 60px 20px 40px 20px;
             position: relative;
         }
         .hero-eyebrow {
@@ -171,7 +189,7 @@
         .story-section {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 80px 20px 120px 20px;
+            padding: 20px 20px 120px 20px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 80px;
@@ -386,12 +404,13 @@
 
         /* Responsive */
         @media (max-width: 992px) {
-            .hero-section { min-height: 45vh; padding: 60px 20px 40px 20px; }
+            body { padding-top: 62px; }
+            .hero-section { padding: 40px 20px 20px 20px; }
             .hero-line { height: 60px; margin-top: 30px; }
             .story-section {
                 grid-template-columns: 1fr;
                 gap: 40px;
-                padding-top: 40px;
+                padding-top: 10px;
             }
             .story-content { padding-right: 0; }
             .image-gallery { height: 500px; margin-top: 40px; }
@@ -399,15 +418,21 @@
             .hero-title span { font-size: 42px; }
             .quote-text { font-size: 28px; }
             .navbar { padding: 10px 20px; }
+            .navbar.scrolled { padding: 6px 20px; }
+            .navbar.scrolled .brand-logo img { height: 32px; }
             .brand-logo img { height: 40px; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 600px) {
+            body { padding-top: 50px; }
             .navbar {
                 padding: 8px 16px;
-                position: relative;
             }
+            .navbar.scrolled {
+                padding: 5px 16px;
+            }
+            .navbar.scrolled .brand-logo img { height: 26px; }
             .brand-logo img { height: 32px; }
             .nav-icons {
                 gap: 14px;
@@ -600,6 +625,20 @@
                         ? '<i class="fas fa-times"></i>'
                         : '<i class="fas fa-bars"></i>';
                 });
+            }
+
+            // Shrink / pin the navbar on scroll
+            var navbar = document.querySelector('.navbar');
+            if (navbar) {
+                function handleNavScroll() {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+                window.addEventListener('scroll', handleNavScroll, { passive: true });
+                handleNavScroll();
             }
         });
     </script>
