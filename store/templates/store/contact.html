@@ -26,6 +26,7 @@
             font-family: 'Poppins', sans-serif;  /* changed to Poppins */
             margin: 0;
             padding: 0;
+            padding-top: 90px; /* reserve space for the fixed navbar */
             background-color: var(--bg-classic);
             color: var(--text-gray);
             overflow-x: hidden;
@@ -36,17 +37,35 @@
 
         /* ===== NAVBAR ===== */
         .navbar {
-            padding: 15px 50px;   /* halved */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--brand-navy);
+            font-family: 'Poppins', sans-serif;
+            z-index: 1000;
+            transition: padding 0.35s ease, box-shadow 0.35s ease;
         }
+
+        /* Shrunk / pinned state once the page is scrolled */
+        .navbar.scrolled {
+            padding: 8px 50px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+        .navbar.scrolled .brand-logo img {
+            height: 40px;
+        }
+
         .brand-logo img {
-            height: 60px;   /* halved */
+            height: 60px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+            transition: height 0.35s ease;
         }
         .nav-links {
             display: flex;
@@ -191,6 +210,21 @@
             transition: color 0.3s ease;
         }
         .detail-block a:hover { color: var(--brand-accent); }
+
+        .detail-label {
+            display: inline-block;
+            min-width: 150px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--brand-accent);
+            font-weight: 500;
+        }
+        .detail-block p i {
+            width: 22px;
+            color: var(--brand-accent);
+            font-size: 15px;
+        }
 
         .store-hours {
             font-family: 'Poppins', sans-serif;
@@ -357,22 +391,28 @@
                 padding-bottom: 60px;
             }
             .contact-form-wrapper { padding-left: 0; }
-            .navbar {
-                padding: 10px 20px;
-            }
-            .brand-logo img {
-                height: 40px;
-            }
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
 
+        @media (max-width: 992px) {
+            body { padding-top: 62px; }
+            .navbar { padding: 10px 20px; }
+            .navbar.scrolled { padding: 6px 20px; }
+            .navbar.scrolled .brand-logo img { height: 32px; }
+            .brand-logo img { height: 40px; }
+        }
+
         @media (max-width: 600px) {
+            body { padding-top: 50px; }
             .navbar {
                 padding: 8px 16px;
-                position: relative;
             }
+            .navbar.scrolled {
+                padding: 5px 16px;
+            }
+            .navbar.scrolled .brand-logo img { height: 26px; }
             .brand-logo img {
                 height: 32px;
             }
@@ -413,6 +453,10 @@
             .detail-block p {
                 font-size: 16px;
             }
+            .detail-label {
+                display: block;
+                min-width: 0;
+            }
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 34px;
@@ -430,7 +474,7 @@
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo">
+            <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo">
         </a>
         <div class="nav-links">
             <a href="{% url 'store:all_products' %}">Shop</a>
@@ -484,8 +528,8 @@
         <!-- Left: Details -->
         <div class="contact-details animate-up delay-1">
             <div class="detail-block">
-                <h3>The Atelier</h3>
-                <p>The Chanakya, Chanakyapuri<br>New Delhi, Delhi 110021</p>
+                <h3>MAPSKART</h3>
+                <p><span class="detail-label">Owner</span><br>Manish Kumar Ghai</p>
                 <div class="store-hours">
                     Monday – Saturday: 11:00 AM – 8:00 PM<br>
                     Sunday: By Private Appointment
@@ -494,10 +538,12 @@
 
             <div class="detail-block">
                 <h3>Direct Inquiries</h3>
-                <p><a href="mailto:concierge@mapscart.com">concierge@mapscart.com</a></p>
-                <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                <p><i class="fas fa-phone-alt"></i> <a href="tel:+919953595557">+91 99535 95557</a></p>
+                <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/919953595557" target="_blank" rel="noopener">+91 99535 95557 (WhatsApp)</a></p>
+                <p><i class="fas fa-headset"></i> <a href="tel:+919953525557">+91 99535 25557 (Customer Care)</a></p>
+                <p><i class="far fa-envelope"></i> <a href="mailto:mapskart.info.in@gmail.com">mapskart.info.in@gmail.com</a></p>
                 <div class="store-hours" style="margin-top: 10px;">
-                    Our client advisors are available via phone or email for bespoke requests, styling advice, and post-purchase support.
+                    Our client advisors are available via phone, WhatsApp or email for bespoke requests, styling advice, and post-purchase support.
                 </div>
             </div>
         </div>
@@ -543,7 +589,7 @@
         <div class="footer-inner">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo">
+                    <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo">
                     <p>Considered jewellery for people who choose once and wear often. Handcrafted with care.</p>
                 </div>
                 <div class="footer-col">
@@ -584,6 +630,20 @@
                         ? '<i class="fas fa-times"></i>'
                         : '<i class="fas fa-bars"></i>';
                 });
+            }
+
+            // Shrink / pin the navbar on scroll
+            var navbar = document.querySelector('.navbar');
+            if (navbar) {
+                function handleNavScroll() {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+                window.addEventListener('scroll', handleNavScroll, { passive: true });
+                handleNavScroll();
             }
         });
     </script>

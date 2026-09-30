@@ -33,21 +33,37 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 90px; /* reserve space for the fixed navbar */
         }
 
         /* ===== NAVBAR ===== */
         .navbar {
-            padding: 15px 50px;   /* halved from 30px */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-footer);
+            z-index: 1000;
+            transition: padding 0.35s ease, box-shadow 0.35s ease;
+        }
+        /* Shrunk / pinned state once the page is scrolled */
+        .navbar.scrolled {
+            padding: 8px 50px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+        .navbar.scrolled .brand-logo img {
+            height: 40px;
         }
         .brand-logo img {
-            height: 60px;   /* halved from 120px */
+            height: 60px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+            transition: height 0.35s ease;
         }
         .nav-links {
             display: flex;
@@ -209,8 +225,15 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
+            body { padding-top: 62px; }
             .navbar {
                 padding: 10px 20px;
+            }
+            .navbar.scrolled {
+                padding: 6px 20px;
+            }
+            .navbar.scrolled .brand-logo img {
+                height: 32px;
             }
             .brand-logo img {
                 height: 40px;
@@ -218,9 +241,15 @@
         }
 
         @media (max-width: 600px) {
+            body { padding-top: 50px; }
             .navbar {
                 padding: 8px 16px;
-                position: relative;
+            }
+            .navbar.scrolled {
+                padding: 5px 16px;
+            }
+            .navbar.scrolled .brand-logo img {
+                height: 26px;
             }
             .brand-logo img {
                 height: 32px;
@@ -351,6 +380,20 @@
                         ? '<i class="fas fa-times"></i>'
                         : '<i class="fas fa-bars"></i>';
                 });
+            }
+
+            // Shrink / pin the navbar on scroll
+            var navbar = document.querySelector('.navbar');
+            if (navbar) {
+                function handleNavScroll() {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                }
+                window.addEventListener('scroll', handleNavScroll, { passive: true });
+                handleNavScroll();
             }
         });
     </script>
