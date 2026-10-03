@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | MAPSKART</title>
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png">
 
@@ -26,7 +27,7 @@
             font-family: 'Poppins', sans-serif;  /* changed to Poppins */
             margin: 0;
             padding: 0;
-            padding-top: 90px; /* reserve space for the fixed navbar */
+            padding-top: 130px; /* reserve space for the fixed navbar */
             background-color: var(--bg-classic);
             color: var(--text-gray);
             overflow-x: hidden;
@@ -41,7 +42,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 15px 50px;
+            padding: 20px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -57,11 +58,11 @@
             box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
         }
         .navbar.scrolled .brand-logo img {
-            height: 40px;
+            height: 56px;
         }
 
         .brand-logo img {
-            height: 60px;
+            height: 90px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
@@ -337,7 +338,9 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .footer-brand img {
-            height: 60px;
+            height: 110px;
+            width: auto;
+            display: block;
             margin-bottom: 18px;
         }
         .footer-brand p {
@@ -397,25 +400,27 @@
         }
 
         @media (max-width: 992px) {
-            body { padding-top: 62px; }
-            .navbar { padding: 10px 20px; }
+            body { padding-top: 88px; }
+            .navbar { padding: 12px 20px; }
             .navbar.scrolled { padding: 6px 20px; }
-            .navbar.scrolled .brand-logo img { height: 32px; }
-            .brand-logo img { height: 40px; }
+            .navbar.scrolled .brand-logo img { height: 46px; }
+            .brand-logo img { height: 64px; }
+            .footer-brand img { height: 90px; }
         }
 
         @media (max-width: 600px) {
-            body { padding-top: 50px; }
+            body { padding-top: 76px; }
             .navbar {
                 padding: 8px 16px;
             }
             .navbar.scrolled {
                 padding: 5px 16px;
             }
-            .navbar.scrolled .brand-logo img { height: 26px; }
+            .navbar.scrolled .brand-logo img { height: 40px; }
             .brand-logo img {
-                height: 32px;
+                height: 56px;
             }
+            .footer-brand img { height: 80px; }
             .nav-icons {
                 gap: 14px;
                 font-size: 15px;
@@ -439,7 +444,7 @@
                 z-index: 10;
             }
             .nav-links.open {
-                max-height: 260px;
+                max-height: 320px;
             }
             .nav-links a {
                 width: 100%;
