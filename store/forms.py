@@ -8,3 +8,12 @@ class CustomRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+        
+
+def clean_email(self):
+    email = self.cleaned_data.get('email')
+    if email:
+        # Check for existing users with this email, ignoring case
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email address already exists.")
+    return email

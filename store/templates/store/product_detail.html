@@ -40,7 +40,7 @@
             flex-direction: column;
         }
 
-        /* ===== NAVBAR ===== */
+        /* ===== NAVBAR ===== */    
         .navbar {
             width: 100%;
             padding: 15px 50px;   /* halved from 30px */
@@ -249,6 +249,29 @@
             background: #b8aa94;
             cursor: not-allowed;
         }
+        .btn-buy {
+            background: var(--brand-navy);
+            margin-top: 12px;
+        }
+        .btn-buy:hover {
+            background: var(--brand-navy-light);
+        }
+        .stock-note {
+            font-size: 13px;
+            font-weight: 500;
+            color: #d68910;
+            margin: 0 0 14px 0;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid var(--hairline);
+            background: var(--bg-panel);
+        }
+        .alert.error { border-color: #c0392b; color: #c0392b; }
+        .alert.success { border-color: #1e8449; color: #1e8449; }
 
         .shipping-note {
             display: flex;
@@ -470,6 +493,11 @@
 
         <!-- Right: Details -->
         <div class="product-info">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             <span class="product-sku">SKU: {{ product.sku }}</span>
             <h1 class="product-title">{{ product.title }}</h1>
             <p class="product-price">
@@ -485,9 +513,18 @@
             </div>
 
             {% if product.in_stock %}
+                {% if product.is_low_stock %}
+                    <p class="stock-note">Only {{ product.stock }} left in stock</p>
+                {% endif %}
+
                 <form action="{% url 'store:add_cart' product.id %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="btn-add">Add to Cart</button>
+                </form>
+
+                <form action="{% url 'store:buy_now' product.pk %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-add btn-buy">Buy Now</button>
                 </form>
             {% else %}
                 <button class="btn-add disabled" disabled>Out of Stock</button>

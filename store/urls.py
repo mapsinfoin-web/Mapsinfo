@@ -24,5 +24,8 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     # Pages
     path('about/', views.about, name='about'),
-    path('contact/', views.contact, name='contact'), # <-- Add this line
+    path('contact/', views.contact, name='contact'),
+    path('buy/<int:pk>/', views.buy_now, name='buy_now'),
+    path('search/', views.search_products, name='search'),
+    path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),
 ]

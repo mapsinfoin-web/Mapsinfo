@@ -192,12 +192,26 @@
         }
 
         .product-card .thumb {
+            position: relative;
             height: 260px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             background: var(--bg-panel-2);
+        }
+        .product-card .sold-out {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--brand-navy);
+            color: #fff;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 20px;
         }
         .product-card .thumb img {
             width: 100%;
@@ -371,7 +385,7 @@
     <!-- ===== PAGE HEADER ===== -->
     <div class="page-header">
         <h1>{{ category.name }}</h1>
-        <p>{{ products.count }} Pieces Available</p>
+        <p>{{ products.count }} Pieces</p>
     </div>
 
     <!-- ===== PRODUCT GRID ===== -->
@@ -383,6 +397,9 @@
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" />
                 {% else %}
                 <span style="color: var(--text-muted); font-weight: 300;">No Image</span>
+                {% endif %}
+                {% if not product.in_stock %}
+                <span class="sold-out">Out of Stock</span>
                 {% endif %}
             </div>
             <div class="body">
