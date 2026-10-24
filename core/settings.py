@@ -135,10 +135,10 @@ USE_TZ = True
 
 # --- JAZZMIN ADMIN DASHBOARD SETTINGS ---
 JAZZMIN_SETTINGS = {
-    "site_title": "MAPSCART Admin",
-    "site_header": "MAPSCART",
-    "site_brand": "MAPSCART Admin",
-    "welcome_sign": "Welcome to the MAPSCART Dashboard",
+    "site_title": "MAPSKART Admin",
+    "site_header": "MAPSKART",
+    "site_brand": "MAPSKART Admin",
+    "welcome_sign": "Welcome to the MAPSKART Dashboard",
 
     # Adds a global search bar at the top for Orders and Products
     "search_model": ["store.Order", "store.Product"],
