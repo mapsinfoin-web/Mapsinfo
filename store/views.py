@@ -304,7 +304,8 @@ def register_user(request):
         form = CustomRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Automatically log the user in after registration
+            # Two login systems are installed (Django + allauth), so say which one to use
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('store:all_products')
     else:
         form = CustomRegistrationForm()

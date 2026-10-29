@@ -2,546 +2,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Heritage | MAPSKART</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png">
-
-    <!-- Google Fonts: Poppins (main), Cinzel & Cormorant for accents -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Story | MAPSKART</title>
+    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
         :root {
-            --brand-navy: #0a1118;
-            --brand-accent: #c5a059;
-            --text-dark: #1c1c1c;
-            --text-gray: #4a4a4a;
-            --bg-classic: #fcfbf8;
-            --hairline: #e3ddd5;
+            --navy: #1F3A66; --navy-2: #132639; --blue: #295CA3; --accent: #B3E0FF; --secondary: #C2D6E8;
+            --ink: #132639; --text: #2B3F57; --muted: #52637A; --bg: #F5F8FC; --soft: #E1E9F0;
+            --line: #D1DEE8; --radius: 18px;
+            --shadow: 0 10px 30px rgba(19, 38, 57, .08); --shadow-lg: 0 20px 50px rgba(19, 38, 57, .16);
+            --container: 1280px;
         }
-
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
-            margin: 0;
-            padding: 0;
-            padding-top: 130px; /* reserve space for the fixed navbar */
-            background-color: var(--bg-classic);
-            color: var(--text-gray);
-            overflow-x: hidden;
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 
-        /* Navbar (Poppins for clean UI) */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--brand-navy);
-            font-family: 'Poppins', sans-serif;
-            box-sizing: border-box;
-            z-index: 1000;
-            transition: padding 0.35s ease, box-shadow 0.35s ease;
-        }
+        /* ===== Header (same as the other pages) ===== */
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.9); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+        .header-main { display: flex; align-items: center; gap: 28px; padding: 12px 0; position: relative; }
+        .logo { --logo-h: 60px; display: flex; align-items: center; flex-shrink: 0; }
+        .logo img { height: var(--logo-h); width: auto; }
+        .logo img:first-child { transform: translateY(calc(var(--logo-h) * .12 * -1)); }
+        .logo img + img { margin-left: calc(var(--logo-h) * .3 * -1); }
+        .nav { margin-left: auto; display: flex; gap: 30px; font-size: 14px; font-weight: 500; }
+        .nav a { color: var(--text); padding: 6px 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+        .nav a:hover, .nav a.active { color: var(--navy); border-color: var(--navy); }
+        .icons { display: flex; align-items: center; gap: 18px; font-size: 18px; color: var(--ink); }
+        .icons a { color: inherit; transition: color .2s; }
+        .icons a:hover { color: var(--blue); }
+        .cart-wrap { position: relative; display: inline-block; }
+        .cart-badge { position: absolute; top: -9px; right: -11px; background: var(--navy); color: #fff; border-radius: 999px; padding: 2px 6px; font-size: 10px; font-weight: 700; line-height: 1.3; }
+        .nav-toggle { display: none; background: none; border: none; font-size: 20px; color: var(--ink); cursor: pointer; padding: 0; }
 
-        /* Shrunk / pinned state once the page is scrolled */
-        .navbar.scrolled {
-            padding: 8px 50px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-        }
-        .navbar.scrolled .brand-logo img {
-            height: 56px;
-        }
+        /* ===== Animation ===== */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeUp 1s cubic-bezier(.2, .8, .2, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: .25s; } .delay-2 { animation-delay: .5s; }
+        @media (prefers-reduced-motion: reduce) { .animate-up { animation: none; opacity: 1; } }
 
-        .brand-logo img {
-            height: 90px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
-            transition: height 0.35s ease;
-        }
+        /* ===== Hero ===== */
+        .hero { text-align: center; padding: 84px 20px 46px; }
+        .eyebrow { display: inline-block; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--blue); font-weight: 600; margin-bottom: 22px; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 68px; font-weight: 600; color: var(--ink); margin: 0; line-height: 1.1; letter-spacing: -1px; }
+        .hero h1 span { display: block; font-style: italic; font-weight: 500; color: var(--blue); }
+        .hero-line { width: 1px; height: 70px; background: linear-gradient(var(--navy), transparent); margin: 34px auto 0; }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        .nav-links a {
-            color: #fff;
-            font-size: 13px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            transition: color 0.4s ease;
-            font-weight: 500;
-        }
-        .nav-links a:hover { color: var(--brand-accent); }
-        .nav-links a.active { color: var(--brand-accent); }
+        /* ===== Story ===== */
+        .story { max-width: 1160px; margin: 0 auto; padding: 20px 24px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: start; }
+        .story-content p { font-size: 18px; line-height: 1.85; color: var(--ink); margin: 0 0 28px; font-weight: 400; }
+        .drop-cap { float: left; font-family: 'Playfair Display', serif; font-size: 88px; line-height: 70px; padding: 6px 14px 0 0; color: var(--navy); font-weight: 600; }
+        .story-content .sub-text { font-size: 15.5px; color: var(--muted); line-height: 1.9; font-weight: 400; margin-top: 34px; }
+        .gallery { position: relative; height: 640px; }
+        .img-primary { position: absolute; top: 0; right: 0; width: 76%; height: 80%; object-fit: cover; border-radius: 24px; box-shadow: var(--shadow-lg); }
+        .img-secondary { position: absolute; bottom: 0; left: 0; width: 56%; height: 48%; object-fit: cover; border-radius: 22px; border: 10px solid var(--bg); box-shadow: var(--shadow); }
 
-        .nav-icons {
-            display: flex;
-            gap: 20px;
-            color: #fff;
-            font-size: 16px;
-            align-items: center;
-        }
-        .nav-icons a {
-            color: inherit;
-            transition: color 0.4s ease;
-        }
-        .nav-icons a:hover {
-            color: var(--brand-accent);
-        }
-        .nav-icons i {
-            cursor: pointer;
-            transition: color 0.4s ease;
-        }
-        .nav-icons i:hover {
-            color: var(--brand-accent);
-        }
-        .cart-icon-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-        .cart-badge {
-            position: absolute;
-            top: -6px;
-            right: -10px;
-            background-color: var(--brand-accent);
-            color: #fff;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 9px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            line-height: 1.4;
-        }
+        /* ===== Quote ===== */
+        .quote { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); padding: 100px 24px; text-align: center; color: #fff; position: relative; overflow: hidden; }
+        .quote::after { content: ''; position: absolute; width: 420px; height: 420px; right: -120px; top: -160px; background: radial-gradient(circle, rgba(179, 224, 255, .22), transparent 70%); pointer-events: none; }
+        .quote-wrap { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+        .quote-mark { font-family: 'Playfair Display', serif; font-size: 90px; color: var(--accent); opacity: .6; line-height: .6; display: block; margin-bottom: 18px; }
+        .quote-text { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 38px; line-height: 1.4; margin: 0; }
+        .quote-author { margin-top: 34px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 600; }
 
-        /* Mobile menu toggle */
-        .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 20px;
-            line-height: 1;
-            padding: 0;
-            cursor: pointer;
-            transition: color 0.4s ease;
-        }
-        .nav-toggle:hover {
-            color: var(--brand-accent);
-        }
+        /* ===== Pillars ===== */
+        .pillars { max-width: 1000px; margin: 0 auto; padding: 100px 24px; }
+        .pillars-head { text-align: center; margin-bottom: 56px; }
+        .pillars-head h2 { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 600; color: var(--ink); margin: 0; letter-spacing: -.5px; }
+        .pillars-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+        .pillar { background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 40px 36px; text-align: center; transition: transform .35s ease, box-shadow .35s ease; }
+        .pillar:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        .pillar-number { width: 46px; height: 46px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; margin: 0 auto 20px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .pillar h3 { font-size: 21px; font-weight: 600; color: var(--ink); margin: 0 0 14px; }
+        .pillar p { font-size: 14.5px; line-height: 1.85; color: var(--muted); margin: 0; }
 
-        /* Animations */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-up { animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.3s; }
-        .delay-2 { animation-delay: 0.6s; }
+        /* ===== Footer ===== */
+        .site-footer { background: var(--navy-2); color: #fff; padding: 60px 24px 26px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 44px; padding-bottom: 38px; border-bottom: 1px solid rgba(255,255,255,.12); }
+        .footer-brand .f-logo { display: flex; align-items: center; margin-bottom: 16px; --logo-h: 64px; }
+        .footer-brand .f-logo img { height: var(--logo-h); width: auto; filter: brightness(0) invert(1); }
+        .footer-brand .f-logo img + img { margin-left: calc(var(--logo-h) * -.3); }
+        .footer-brand p { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,.72); max-width: 320px; margin: 0 0 18px; }
+        .social { display: flex; gap: 10px; }
+        .social a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); display: grid; place-items: center; font-size: 16px; transition: all .25s; }
+        .social a:hover { background: var(--accent); border-color: var(--accent); color: var(--navy-2); transform: translateY(-3px); }
+        .footer-col h4 { font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; font-weight: 600; }
+        .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,.75); margin-bottom: 12px; transition: color .2s; }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom { padding-top: 22px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.5); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
-        /* Cinematic Hero */
-        .hero-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 60px 20px 40px 20px;
-            position: relative;
-        }
-        .hero-eyebrow {
-            font-family: 'Poppins', sans-serif;
-            font-size: 10px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: var(--brand-accent);
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-        .hero-title {
-            font-family: 'Cinzel', serif;   /* kept Cinzel for dramatic impact */
-            font-size: 72px;
-            color: var(--text-dark);
-            margin: 0;
-            font-weight: 400;
-            line-height: 1.1;
-            letter-spacing: -1px;
-        }
-        .hero-title span {
-            display: block;
-            font-style: italic;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 64px;
-            color: var(--brand-accent);
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-       
-
-        /* The Story Layout */
-        .story-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 20px 120px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: start;
-        }
-
-        .story-content { padding-right: 40px; }
-
-        .drop-cap {
-            float: left;
-            font-size: 90px;
-            line-height: 70px;
-            padding-top: 4px;
-            padding-right: 15px;
-            font-family: 'Cinzel', serif;
-            color: var(--brand-accent);
-        }
-
-        .story-content p {
-            font-family: 'Poppins', sans-serif;   /* changed to Poppins */
-            font-size: 18px;
-            font-weight: 300;
-            line-height: 1.8;
-            color: var(--text-dark);
-            text-align: justify;
-            margin-bottom: 30px;
-        }
-
-        .story-content .sub-text {
-            font-size: 15px;
-            color: var(--text-gray);
-            font-family: 'Poppins', sans-serif;
-            font-weight: 300;
-            line-height: 1.9;
-            margin-top: 40px;
-        }
-
-        /* Asymmetric Image Gallery */
-        .image-gallery { position: relative; height: 700px; width: 100%; }
-        .img-primary {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 75%;
-            height: 80%;
-            object-fit: cover;
-            z-index: 1;
-            filter: grayscale(10%);
-        }
-        .img-secondary {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 55%;
-            height: 50%;
-            object-fit: cover;
-            z-index: 2;
-            border: 12px solid var(--bg-classic);
-            box-shadow: -10px 10px 30px rgba(0,0,0,0.05);
-        }
-
-        /* Dramatic Pull-Quote */
-        .quote-section {
-            background-color: var(--brand-navy);
-            padding: 120px 20px;
-            text-align: center;
-            color: #fff;
-        }
-        .quote-wrapper { max-width: 800px; margin: 0 auto; }
-        .quote-mark {
-            font-family: 'Cinzel', serif;
-            font-size: 80px;
-            color: var(--brand-accent);
-            opacity: 0.5;
-            line-height: 0;
-            margin-bottom: 20px;
-            display: block;
-        }
-        .quote-text {
-            font-family: 'Cormorant Garamond', serif;  /* kept for elegance */
-            font-size: 40px;
-            font-style: italic;
-            font-weight: 300;
-            line-height: 1.4;
-            margin: 0;
-        }
-        .quote-author {
-            font-family: 'Poppins', sans-serif;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-top: 40px;
-            color: var(--brand-accent);
-            font-weight: 500;
-        }
-
-        /* The Pillars */
-        .pillars-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 120px 20px;
-        }
-        .pillars-header { text-align: center; margin-bottom: 80px; }
-        .pillars-header h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 42px;
-            color: var(--text-dark);
-            font-weight: 400;
-            margin: 0;
-        }
-
-        .pillars-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 60px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .pillar-card {
-            padding: 40px;
-            text-align: center;
-            border: 1px solid transparent;
-            transition: all 0.5s ease;
-            cursor: default;
-        }
-        .pillar-card:hover {
-            border-color: var(--hairline);
-            background: #fff;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
-        }
-        .pillar-number {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            color: var(--brand-accent);
-            margin-bottom: 20px;
-            display: block;
-        }
-        .pillar-card h3 {
-            font-family: 'Poppins', sans-serif;   /* changed to Poppins */
-            font-size: 22px;
-            color: var(--text-dark);
-            margin: 0 0 20px 0;
-            font-weight: 500;
-        }
-        .pillar-card p {
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            line-height: 1.8;
-            color: var(--text-gray);
-            font-weight: 300;
-        }
-
-        /* ===== FOOTER ===== */
-        .site-footer {
-            background-color: var(--brand-navy);
-            color: #fff;
-            padding: 70px 20px 30px 20px;
-            font-family: 'Poppins', sans-serif;
-        }
-        .footer-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr 1fr;
-            gap: 50px;
-            padding-bottom: 50px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .footer-brand img {
-            height: 110px;
-            width: auto;
-            display: block;
-            margin-bottom: 18px;
-        }
-        .footer-brand p {
-            font-size: 13px;
-            line-height: 1.9;
-            color: rgba(255, 255, 255, 0.7);
-            max-width: 280px;
-            font-weight: 300;
-        }
-        .footer-col h4 {
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--brand-accent);
-            margin: 0 0 22px 0;
-            font-weight: 600;
-        }
-        .footer-col a {
-            display: block;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 13px;
-            margin-bottom: 14px;
-            transition: color 0.3s;
-            font-weight: 300;
-        }
-        .footer-col a:hover {
-            color: var(--brand-accent);
-        }
-        .footer-bottom {
-            padding-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 300;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            body { padding-top: 88px; }
-            .hero-section { padding: 40px 20px 20px 20px; }
-            .hero-line { height: 60px; margin-top: 30px; }
-            .story-section {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                padding-top: 10px;
-            }
-            .story-content { padding-right: 0; }
-            .image-gallery { height: 500px; margin-top: 40px; }
-            .hero-title { font-size: 50px; }
-            .hero-title span { font-size: 42px; }
-            .quote-text { font-size: 28px; }
-            .navbar { padding: 12px 20px; }
-            .navbar.scrolled { padding: 6px 20px; }
-            .navbar.scrolled .brand-logo img { height: 46px; }
-            .brand-logo img { height: 64px; }
-            .footer-brand img { height: 90px; }
+        /* ===== Responsive ===== */
+        @media (max-width: 960px) {
+            .story { grid-template-columns: 1fr; gap: 40px; padding-bottom: 70px; }
+            .gallery { height: 480px; }
+            .hero { padding: 56px 20px 30px; }
+            .hero h1 { font-size: 46px; }
+            .quote { padding: 70px 24px; }
+            .quote-text { font-size: 27px; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
         }
-
-        @media (max-width: 600px) {
-            body { padding-top: 76px; }
-            .navbar {
-                padding: 8px 16px;
-            }
-            .navbar.scrolled {
-                padding: 5px 16px;
-            }
-            .navbar.scrolled .brand-logo img { height: 40px; }
-            .brand-logo img { height: 56px; }
-            .footer-brand img { height: 80px; }
-            .nav-icons {
-                gap: 14px;
-                font-size: 15px;
-            }
-            .nav-toggle {
-                display: inline-flex;
-                align-items: center;
-            }
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                flex-direction: column;
-                align-items: center;
-                gap: 0;
-                max-height: 0;
-                overflow: hidden;
-                background: var(--brand-navy);
-                transition: max-height 0.35s ease;
-                z-index: 10;
-            }
-            .nav-links.open {
-                max-height: 320px;
-            }
-            .nav-links a {
-                width: 100%;
-                padding: 14px 0;
-                text-align: center;
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            .pillars-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 34px;
-            }
-            .footer-bottom {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
+        @media (max-width: 760px) {
+            .nav-toggle { display: inline-flex; margin-left: 4px; }
+            .nav { position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: #fff; border-bottom: 1px solid var(--line); max-height: 0; overflow: hidden; transition: max-height .35s ease; margin: 0; }
+            .nav.open { max-height: 280px; }
+            .nav a { padding: 15px 24px; border-bottom: 1px solid var(--line); }
+            .icons { margin-left: auto; gap: 14px; }
+            .pillars-grid { grid-template-columns: 1fr; }
+            .pillars { padding: 64px 24px; }
+            .pillars-head h2 { font-size: 32px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo">
-        </a>
-        <div class="nav-links">
-            <a href="{% url 'store:all_products' %}">Shop</a>
-            <a href="{% url 'store:collections' %}">Collections</a>
-            <a href="{% url 'store:about' %}" class="active">About</a>
-            <a href="{% url 'store:contact' %}">Contact</a>
-        </div>
-
-        <div class="nav-icons">
-            <i class="fas fa-search"></i>
-            <i class="far fa-heart"></i>
-
-            {% if user.is_authenticated %}
-            <a href="{% url 'store:my_orders' %}" title="My Account ({{ user.username }})">
-                <i class="far fa-user-circle"></i>
+    <header class="header">
+        <div class="container header-main">
+            <a href="{% url 'store:all_products' %}" class="logo">
+                <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
+                <img src="{% static '/2.png' %}" alt="" />
             </a>
-            <a href="{% url 'store:logout_user' %}" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
-            {% else %}
-            <a href="{% url 'store:login_user' %}" title="Log In">
-                <i class="far fa-user"></i>
-            </a>
-            {% endif %}
 
-            <div class="cart-icon-wrapper">
-                <a href="{% url 'store:cart_detail' %}">
+            <nav class="nav" id="nav">
+                <a href="{% url 'store:all_products' %}">Shop</a>
+                <a href="{% url 'store:collections' %}">Collections</a>
+                <a href="{% url 'store:about' %}" class="active">About</a>
+                <a href="{% url 'store:contact' %}">Contact</a>
+            </nav>
+
+            <div class="icons">
+                {% if user.is_authenticated %}
+                <a href="{% url 'store:my_orders' %}" title="My Orders ({{ user.username }})" aria-label="My Orders"><i class="far fa-user-circle"></i></a>
+                <a href="{% url 'store:logout_user' %}" title="Log out" aria-label="Log out"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                <a href="{% url 'store:login_user' %}" title="Log in" aria-label="Log in"><i class="far fa-user"></i></a>
+                {% endif %}
+
+                <a href="{% url 'store:cart_detail' %}" class="cart-wrap" aria-label="Cart">
                     <i class="fas fa-shopping-bag"></i>
-                    {% if cart_count > 0 %}
-                    <span class="cart-badge">{{ cart_count }}</span>
-                    {% endif %}
+                    {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
                 </a>
+
+                <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
             </div>
-
-            <!-- MOBILE MENU TOGGLE -->
-            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
-    </nav>
-
-    <!-- Hero -->
-    <header class="hero-section">
-        <span class="hero-eyebrow animate-up">Since Inception</span>
-        <h1 class="hero-title animate-up delay-1">The Art of <br><span>Fine Jewelry</span></h1>
-        <div class="hero-line animate-up delay-2"></div>
     </header>
 
+    <!-- Hero -->
+    <section class="hero">
+        <span class="eyebrow animate-up">Our Story</span>
+        <h1 class="animate-up delay-1">The Art of <span>Fine Jewelry</span></h1>
+        <div class="hero-line animate-up delay-2"></div>
+    </section>
+
     <!-- Story -->
-    <section class="story-section">
+    <section class="story">
         <div class="story-content animate-up">
             <p>
                 <span class="drop-cap">W</span>e believe that true elegance is never rushed. In a world increasingly driven by mass production, we have chosen a different path—one that honors the heritage of master craftsmanship and the enduring allure of precious materials.
@@ -550,103 +173,81 @@
                 Every piece in our collection is conceived as a wearable decision. We partner exclusively with independent ateliers where artisans still finish metals under a loupe and set stones entirely by hand. This meticulous attention to detail ensures that no two pieces are exactly alike, each bearing the subtle, irreplaceable signature of its maker.
             </p>
         </div>
-        <div class="image-gallery animate-up delay-1">
-            <img src="https://images.unsplash.com/photo-1589128777073-263566ae5e4d?q=80&w=800&auto=format&fit=crop" class="img-primary" alt="Jeweler working">
-            <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop" class="img-secondary" alt="Finished jewelry detail">
+        <div class="gallery animate-up delay-1">
+            <img src="https://images.unsplash.com/photo-1589128777073-263566ae5e4d?q=80&w=800&auto=format&fit=crop" class="img-primary" alt="Jeweler at work" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop" class="img-secondary" alt="Finished jewelry detail" loading="lazy" />
         </div>
     </section>
 
-    <!-- Dramatic Quote -->
-    <section class="quote-section">
-        <div class="quote-wrapper animate-up">
-            <span class="quote-mark">"</span>
+    <!-- Quote -->
+    <section class="quote">
+        <div class="quote-wrap animate-up">
+            <span class="quote-mark">&ldquo;</span>
             <h2 class="quote-text">We reject passing trends in favor of enduring style. It is a commitment to the art of fine jewelry.</h2>
             <div class="quote-author">The Manifesto</div>
         </div>
     </section>
 
-    <!-- The Pillars -->
-    <section class="pillars-section">
-        <div class="pillars-header animate-up">
-            <h2>Our Foundation</h2>
-        </div>
+    <!-- Pillars -->
+    <section class="pillars">
+        <div class="pillars-head animate-up"><h2>Our Foundation</h2></div>
         <div class="pillars-grid">
-            <div class="pillar-card animate-up">
-                <span class="pillar-number">I</span>
+            <div class="pillar animate-up">
+                <div class="pillar-number">I</div>
                 <h3>Enduring Craft</h3>
                 <p>Pieces cast, polished, and assembled using time-honored techniques, designed to withstand the rigors of daily wear and transcend generations.</p>
             </div>
-            <div class="pillar-card animate-up delay-1">
-                <span class="pillar-number">II</span>
+            <div class="pillar animate-up delay-1">
+                <div class="pillar-number">II</div>
                 <h3>Atelier Direct</h3>
                 <p>By skipping traditional supply chains, we guarantee fair compensation for our jewelers while delivering an uncompromising standard of luxury to you.</p>
             </div>
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo">
+                    <a href="{% url 'store:all_products' %}" class="f-logo">
+                        <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
+                        <img src="{% static '/2.png' %}" alt="" />
+                    </a>
                     <p>Considered jewellery for people who choose once and wear often. Handcrafted with care.</p>
+                    <div class="social">
+                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
                 </div>
                 <div class="footer-col">
                     <h4>Discover</h4>
                     <a href="{% url 'store:collections' %}">Collections</a>
                     <a href="{% url 'store:all_products' %}">New Arrivals</a>
-                    <a href="#">Gift Guide</a>
+                    <a href="{% url 'store:about' %}">Our Story</a>
                 </div>
                 <div class="footer-col">
                     <h4>Assistance</h4>
                     <a href="{% url 'store:my_orders' %}">Track Order</a>
                     <a href="{% url 'store:contact' %}">Contact Us</a>
-                    <a href="#">Shipping &amp; Returns</a>
-                </div>
-                <div class="footer-col">
-                    <h4>The Brand</h4>
-                    <a href="{% url 'store:about' %}">Our Story</a>
-                    <a href="#">Sustainability</a>
-                    <a href="#">Terms of Service</a>
+                    <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 MAPSKART. All rights reserved.</p>
+                <span>&copy; 2026 MAPSKART. All rights reserved.</span>
             </div>
         </div>
     </footer>
 
-    <!-- ===== MOBILE NAV TOGGLE SCRIPT ===== -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var toggle = document.getElementById('navToggle');
-            var links = document.querySelector('.nav-links');
-            if (toggle && links) {
-                toggle.addEventListener('click', function () {
-                    var isOpen = links.classList.toggle('open');
-                    toggle.setAttribute('aria-expanded', isOpen);
-                    toggle.innerHTML = isOpen
-                        ? '<i class="fas fa-times"></i>'
-                        : '<i class="fas fa-bars"></i>';
-                });
-            }
-
-            // Shrink / pin the navbar on scroll
-            var navbar = document.querySelector('.navbar');
-            if (navbar) {
-                function handleNavScroll() {
-                    if (window.scrollY > 40) {
-                        navbar.classList.add('scrolled');
-                    } else {
-                        navbar.classList.remove('scrolled');
-                    }
-                }
-                window.addEventListener('scroll', handleNavScroll, { passive: true });
-                handleNavScroll();
-            }
+        // Mobile menu
+        var toggle = document.getElementById('navToggle'), nav = document.getElementById('nav');
+        toggle.addEventListener('click', function () {
+            var open = nav.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', open);
+            toggle.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
     </script>
-
 </body>
 </html>
