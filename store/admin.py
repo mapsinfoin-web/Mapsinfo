@@ -1,9 +1,14 @@
+from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib import admin, messages
+from django.urls import reverse
 from django.db import transaction
-from django.utils.html import format_html
+from django.db.models import Q
+from django.utils.html import format_html, format_html_join
 
 from .models import (
-    Cart, CartItem, Category, ContactInquiry, Order, OrderItem, Product, ProductGallery,
+    BogoOffer, Cart, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product,
+    ProductGallery,
 )
 
 
@@ -45,13 +50,27 @@ class StockStatusFilter(admin.SimpleListFilter):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'sku', 'mrp', 'price', 'stock', 'stock_status', 'created']
-    list_filter = [StockStatusFilter, 'category']
+    list_display = ['title', 'sku', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
+    list_filter = [StockStatusFilter, 'category', 'is_active']
     # Quick-edit prices and stock straight from the list page
-    list_editable = ['mrp', 'price', 'stock']
+    list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku']
     inlines = [ProductGalleryInline]
-    fields = ['category', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image']
+    fields = ['category', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('bogo_offers')
+
+    @admin.display(description='Free gift offer')
+    def bogo_offer_names(self, obj):
+        offers = list(obj.bogo_offers.all())
+        if not offers:
+            # One click: opens the offer form with this product already selected as the main product
+            return format_html('<a href="{}?main_product={}">+ Set up free gift</a>',
+                               reverse('admin:store_bogooffer_add'), obj.pk)
+        return format_html_join(
+            ', ', '<a href="{}">{} ({})</a>',
+            ((reverse('admin:store_bogooffer_change', args=[o.pk]), o.name, o.status()) for o in offers))
 
     @admin.display(description='Status', ordering='stock')
     def stock_status(self, obj):
@@ -60,6 +79,106 @@ class ProductAdmin(admin.ModelAdmin):
         if obj.is_low_stock:
             return format_html('<b style="color:{};">Low ({})</b>', '#d68910', obj.stock)
         return format_html('<span style="color:{};">{}</span>', '#1e8449', 'In stock')
+
+
+# --- BOGO OFFERS ---
+class BogoOfferForm(forms.ModelForm):
+    class Meta:
+        model = BogoOffer
+        fields = '__all__'
+
+    def clean(self):
+        cleaned = super().clean()
+        main = cleaned.get('main_product')
+        free = cleaned.get('free_products')
+        if free is not None and not free:
+            self.add_error('free_products', 'Select at least one free product.')
+        if main and free and main in free:
+            self.add_error('free_products', 'The main product cannot also be its own free gift.')
+        return cleaned
+
+
+@admin.register(BogoOffer)
+class BogoOfferAdmin(admin.ModelAdmin):
+    """Pick the paid product and exactly which products the customer may choose for free."""
+    form = BogoOfferForm
+    list_display = ['name', 'main_product_price', 'gift_choices', 'offer_status', 'start_date', 'end_date',
+                    'orders_using_offer', 'is_active']
+    list_editable = ['is_active']
+    list_filter = ['is_active']
+    search_fields = ['name', 'main_product__title', 'main_product__sku', 'free_products__title']
+    # Searchable boxes: type a product name to find it (much easier than the two-pane list)
+    autocomplete_fields = ['main_product', 'free_products']
+    readonly_fields = ['usage_report']
+    actions = ['enable_offers', 'disable_offers']
+    fieldsets = (
+        (None, {
+            'fields': ('main_product', 'free_products', 'is_active'),
+            'description': '<b>Step 1:</b> choose the product the customer BUYS. '
+                           '<b>Step 2:</b> choose the product(s) they can pick as a FREE gift. '
+                           '<b>Step 3:</b> Save. That is all.',
+        }),
+        ('More options (optional)', {
+            'fields': ('name', 'free_per_main', 'max_free_per_order', 'start_date', 'end_date'),
+            'classes': ('collapse',),
+        }),
+        ('Orders using this offer', {'fields': ('usage_report',), 'classes': ('collapse',)}),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('main_product').prefetch_related('free_products', 'order_items')
+
+    @admin.display(description='Main product (price)')
+    def main_product_price(self, obj):
+        return f"{obj.main_product.title} - \u20b9{obj.main_product.price}"
+
+    @admin.display(description='Free gift choices (price)')
+    def gift_choices(self, obj):
+        return ', '.join(f"{p.title} (\u20b9{p.price})" for p in obj.free_products.all()) or '-'
+
+    @admin.display(description='Status')
+    def offer_status(self, obj):
+        status = obj.status()
+        colour = {'Live': '#1e8449', 'Scheduled': '#2874a6'}.get(status, '#c0392b')
+        return format_html('<b style="color:{};">{}</b>', colour, status)
+
+    @admin.display(description='Orders')
+    def orders_using_offer(self, obj):
+        return len({item.order_id for item in obj.order_items.all()})
+
+    @admin.display(description='Recent orders and the free gift chosen')
+    def usage_report(self, obj):
+        if not obj.pk:
+            return 'Save the offer first.'
+        gifts = obj.order_items.select_related('product', 'order').order_by('-order_id')[:25]
+        if not gifts:
+            return 'No orders have used this offer yet.'
+        rows = format_html_join(
+            '', '<tr><td style="padding:2px 12px 2px 0;"><a href="{}">Order #{}</a></td>'
+                '<td style="padding:2px 12px 2px 0;">{}</td><td>{} x {}</td></tr>',
+            ((reverse('admin:store_order_change', args=[g.order_id]), g.order_id,
+              g.order.full_name, g.quantity, g.product.title) for g in gifts))
+        return format_html('<table><tr><th align="left">Order</th><th align="left">Customer</th>'
+                           '<th align="left">Free gift chosen</th></tr>{}</table>', rows)
+
+    @admin.action(description='Turn ON selected offers')
+    def enable_offers(self, request, queryset):
+        done = 0
+        for offer in queryset:
+            offer.is_active = True
+            try:
+                offer.clean()   # only one active offer per main product
+            except ValidationError as exc:
+                self.message_user(request, f'"{offer.name}": {"; ".join(exc.messages)}', messages.ERROR)
+                continue
+            offer.save()
+            done += 1
+        if done:
+            self.message_user(request, f"{done} offer(s) turned on.", messages.SUCCESS)
+
+    @admin.action(description='Turn OFF selected offers')
+    def disable_offers(self, request, queryset):
+        self.message_user(request, f"{queryset.update(is_active=False)} offer(s) turned off.", messages.SUCCESS)
 
 
 # --- CART ---
@@ -72,29 +191,74 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     # Shows the exact items bought. Read-only so receipts cannot be accidentally altered.
-    readonly_fields = ['product', 'price', 'quantity']
+    readonly_fields = ['product', 'price', 'quantity', 'is_free_gift', 'bogo_offer']
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
         return False
 
 
+class PaymentStatusFilter(admin.SimpleListFilter):
+    """Sidebar filter to find the orders whose payment screenshot you still have to check."""
+    title = 'payment'
+    parameter_name = 'pay'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('verify', 'Screenshot uploaded - CHECK NOW'),
+            ('await', 'Awaiting payment (no screenshot)'),
+            ('paid', 'Paid'),
+        ]
+
+    def queryset(self, request, queryset):
+        has_shot = ~Q(payment_screenshot='') & Q(payment_screenshot__isnull=False)
+        open_orders = queryset.exclude(status='CANCELLED').filter(is_paid=False)
+        if self.value() == 'verify':
+            return open_orders.filter(has_shot)
+        if self.value() == 'await':
+            return open_orders.exclude(has_shot)
+        if self.value() == 'paid':
+            return queryset.filter(is_paid=True)
+        return queryset
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    ordering = ['-id']   # newest order first
     list_display = [
         'id', 'status', 'get_total_items', 'get_purchased_skus', 'full_name', 'mobile_number',
-        'email', 'shipping_address', 'city', 'postal_code', 'amount_paid',
-        'payment_method', 'is_paid', 'tracking_number',
+        'email', 'shipping_address', 'city', 'postal_code', 'discount_amount', 'amount_paid',
+        'payment_status', 'screenshot_link', 'is_paid', 'tracking_number',
     ]
     list_editable = ['status', 'is_paid', 'tracking_number']
     date_hierarchy = 'date_ordered'
-    list_filter = ['status', 'is_paid', 'payment_method', 'city']
+    list_filter = [PaymentStatusFilter, 'status', 'is_paid', 'city']
     search_fields = ['full_name', 'email', 'mobile_number', 'shipping_address', 'id', 'tracking_number']
     inlines = [OrderItemInline]
-    actions = ['mark_confirmed', 'mark_shipped', 'mark_delivered', 'cancel_and_restore_stock']
+    readonly_fields = ['discount_amount', 'offers_applied', 'screenshot_preview', 'payment_submitted_at']
+    actions = ['mark_payment_verified', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'cancel_and_restore_stock']
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('items__product')
+
+    @admin.display(description='Payment')
+    def payment_status(self, obj):
+        colour = {'Paid': '#1e8449', 'Payment under verification': '#d68910', 'Cancelled': '#7f8c8d'}.get(
+            obj.payment_status, '#c0392b')
+        return format_html('<b style="color:{};">{}</b>', colour, obj.payment_status)
+
+    @admin.display(description='Screenshot')
+    def screenshot_link(self, obj):
+        if not obj.payment_screenshot:
+            return '-'
+        return format_html('<a href="{}" target="_blank">View</a>', obj.payment_screenshot.url)
+
+    @admin.display(description='Payment screenshot')
+    def screenshot_preview(self, obj):
+        if not obj.payment_screenshot:
+            return 'Customer has not uploaded a screenshot yet.'
+        return format_html('<a href="{0}" target="_blank"><img src="{0}" style="max-height:360px;border-radius:8px;"></a>',
+                           obj.payment_screenshot.url)
 
     @admin.display(description='Total Items')
     def get_total_items(self, obj):
@@ -103,7 +267,9 @@ class OrderAdmin(admin.ModelAdmin):
 
     @admin.display(description='Purchased Products (SKU)')
     def get_purchased_skus(self, obj):
-        return ", ".join(f"{item.product.title} (SKU: {item.product.sku})" for item in obj.items.all())
+        return ", ".join(
+            f"{item.product.title} (SKU: {item.product.sku})" + (" [FREE GIFT]" if item.is_free_gift else "")
+            for item in obj.items.all())
 
     # --- Stock is returned automatically whenever an order becomes Cancelled ---
     def save_model(self, request, obj, form, change):
@@ -119,6 +285,11 @@ class OrderAdmin(admin.ModelAdmin):
                     f"Order #{obj.pk} was re-opened. Stock was NOT deducted again - adjust it manually if needed.",
                     messages.WARNING,
                 )
+
+    @admin.action(description='Payment verified: mark as Paid and Confirmed')
+    def mark_payment_verified(self, request, queryset):
+        count = queryset.exclude(status='CANCELLED').update(is_paid=True, status='CONFIRMED')
+        self.message_user(request, f"{count} order(s) marked as paid and confirmed.", messages.SUCCESS)
 
     @admin.action(description='Mark selected orders as Confirmed')
     def mark_confirmed(self, request, queryset):
@@ -152,3 +323,19 @@ class ContactInquiryAdmin(admin.ModelAdmin):
 
     # Read-only so you don't accidentally edit a customer's original message
     readonly_fields = ['name', 'email', 'subject', 'message', 'created_at']
+
+# --- PAYMENT SETTINGS (Paytm QR, WhatsApp number) ---
+@admin.register(PaymentSettings)
+class PaymentSettingsAdmin(admin.ModelAdmin):
+    """One page only: upload your Paytm QR and set the WhatsApp number that receives orders."""
+    fieldsets = (
+        ('Paytm QR code', {'fields': ('paytm_qr', 'payee_name', 'upi_id')}),
+        ('Where customers send their order + screenshot', {'fields': ('vendor_whatsapp',)}),
+        ('Optional', {'fields': ('extra_instructions',)}),
+    )
+
+    def has_add_permission(self, request):
+        return not PaymentSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False

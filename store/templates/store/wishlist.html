@@ -1,0 +1,446 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Wishlist | MAPSKART</title>
+    <meta name="description" content="Your saved MAPSKART pieces." />
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --navy: #1F3A66;      /* Primary */
+            --navy-2: #132639;    /* Foreground (darker end of gradients) */
+            --blue: #295CA3;      /* lighter step of Primary, for gradients */
+            --brand: #1F3A66;     /* Primary - links, eyebrows, focus, badges */
+            --accent: #B3E0FF;    /* Accent - highlights, hover states */
+            --secondary: #C2D6E8; /* Secondary */
+            --ink: #132639;       /* Foreground - headings / primary text */
+            --text: #2B3F57;      /* body text (tint of Foreground) */
+            --muted: #52637A;     /* secondary text (tint of Foreground) */
+            --bg: #F5F8FC;        /* Background */
+            --soft: #E1E9F0;      /* Muted */
+            --soft-2: #C2D6E8;    /* Secondary (image placeholders) */
+            --line: #D1DEE8;      /* Border */
+            --red: #e5484d;
+            --green: #1f9d63;
+            --radius: 18px;
+            --shadow: 0 10px 30px rgba(19, 38, 57, .08);
+            --shadow-lg: 0 20px 50px rgba(19, 38, 57, .16);
+            --container: 1280px;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 100px; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+        a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+        img { max-width: 100%; display: block; }
+        button { font-family: inherit; }
+        ::selection { background: var(--brand); color: #fff; }
+        a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        /* ===== ANNOUNCEMENT BAR ===== */
+        .announce { background: var(--navy); color: #fff; font-size: 12.5px; letter-spacing: .4px; overflow: hidden; white-space: nowrap; }
+        .announce-track { display: inline-flex; gap: 60px; padding: 10px 0; animation: marquee 28s linear infinite; }
+        .announce:hover .announce-track { animation-play-state: paused; }
+        .announce span i { color: var(--accent); margin-right: 8px; }
+        @keyframes marquee { to { transform: translateX(-50%); } }
+
+        /* ===== HEADER ===== */
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); transition: box-shadow .3s; }
+        .header.scrolled { box-shadow: 0 6px 24px rgba(19,38,57,.08); }
+        .header-main { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
+        .logo img { height: 52px; width: auto; object-fit: contain; }
+        .nav { display: flex; gap: 6px; }
+        .nav a { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--ink); border-radius: 999px; transition: background .2s, color .2s; }
+        .nav a:hover { background: var(--soft); color: var(--brand); }
+        .nav a.sale { color: var(--red); font-weight: 600; }
+        .search { flex: 1; max-width: 460px; position: relative; margin-left: auto; }
+        .search input { width: 100%; padding: 12px 18px 12px 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--soft); font-size: 14px; font-family: inherit; color: var(--ink); transition: all .2s; }
+        .search input:focus { background: #fff; border-color: var(--brand); outline: none; box-shadow: 0 0 0 4px rgba(31,58,102,.14); }
+        .search i { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+        .actions { display: flex; align-items: center; gap: 4px; }
+        .icon-btn { position: relative; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); font-size: 18px; background: none; border: none; cursor: pointer; transition: background .2s, color .2s; }
+        .icon-btn:hover { background: var(--soft); color: var(--brand); }
+        .badge { position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+        .nav-toggle { display: none; }
+
+        /* ===== BUTTONS ===== */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 28px; border-radius: 999px; font-size: 14px; font-weight: 600; border: 1.5px solid transparent; cursor: pointer; transition: all .25s ease; }
+        .btn-gold { background: linear-gradient(120deg, var(--accent), var(--secondary)); color: var(--ink); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(179,224,255,.45); }
+        .btn-ghost { background: rgba(255,255,255,.1); color: var(--ink); border-color: var(--line); }
+        .btn-ghost:hover { background: var(--soft); }
+        .btn-dark { background: var(--navy); color: #fff; }
+        .btn-dark:hover { background: var(--navy-2); transform: translateY(-2px); }
+
+        /* ===== SECTION HEAD ===== */
+        .section { padding: 72px 0 10px; }
+        .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .eyebrow { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+        .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 40px; color: var(--ink); margin: 6px 0 0; font-weight: 600; letter-spacing: -.5px; }
+
+        /* ===== PRODUCT GRID ===== */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .card { position: relative; background: #fff; border-radius: var(--radius); transition: transform .35s, box-shadow .35s; }
+        .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        .thumb { position: relative; aspect-ratio: 1/1.1; border-radius: var(--radius); overflow: hidden; background: var(--soft-2); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+        .card:hover .thumb img { transform: scale(1.07); }
+        .tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .3px; background: #fff; color: var(--ink); }
+        .wish { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; background: #fff; border: none; display: grid; place-items: center; cursor: pointer; font-size: 15px; color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,.1); transition: all .2s; }
+        .wish:hover { color: var(--red); transform: scale(1.1); }
+        .wish.on { color: var(--red); }
+        .wish.on i { font-weight: 900; }
+        .quick { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; padding: 12px; border-radius: 12px; border: none; background: rgba(31,58,102,.95); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0; transform: translateY(12px); transition: all .3s; text-align: center; }
+        .card:hover .quick { opacity: 1; transform: translateY(0); }
+        .quick:hover { background: var(--accent); color: var(--ink); }
+        .card-body { padding: 16px 6px 6px; }
+        .cat-label { font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+        .card-body h3 { margin: 5px 0 8px; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+        .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .price { font-size: 18px; font-weight: 700; color: var(--ink); }
+        .mrp { font-size: 13.5px; color: var(--muted); text-decoration: line-through; }
+        
+        /* ===== FOOTER ===== */
+        .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
+        .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
+        .footer-brand img { height: 70px; margin-bottom: 18px; }
+        .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
+        .socials { display: flex; gap: 10px; }
+        .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); display: grid; place-items: center; transition: all .3s; }
+        .socials a:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); transform: translateY(-3px); }
+        .fcol h4 { color: #fff; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 20px; font-weight: 600; }
+        .fcol a { display: block; margin-bottom: 12px; font-size: 14.5px; font-weight: 300; transition: color .2s, padding .2s; }
+        .fcol a:hover { color: var(--accent); padding-left: 5px; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 26px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+        .pay { display: flex; gap: 14px; font-size: 26px; color: rgba(194,214,232,.6); }
+        .legal { display: flex; gap: 22px; }
+        .legal a:hover { color: var(--accent); }
+
+        /* ===== TOAST + REVEAL ===== */
+        .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 120px); background: var(--navy); color: #fff; padding: 14px 24px; border-radius: 999px; font-size: 14px; font-weight: 500; z-index: 2000; box-shadow: var(--shadow-lg); transition: transform .4s cubic-bezier(.2,.9,.3,1.2); display: flex; align-items: center; gap: 10px; }
+        .toast.show { transform: translate(-50%, 0); }
+        .toast i { color: var(--accent); }
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (max-width: 1100px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            .nav { display: none; }
+            .nav.open { display: flex; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: #fff; padding: 12px 24px 20px; border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+            .nav-toggle { display: grid; }
+            .search { max-width: none; }
+        }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .container { padding: 0 16px; }
+            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
+            .logo img { height: 42px; }
+            .search { order: 5; flex-basis: 100%; margin-left: 0; }
+            .actions { margin-left: auto; }
+            .sec-head h2 { font-size: 30px; }
+            .section { padding-top: 54px; }
+            .footer-top { grid-template-columns: 1fr; gap: 30px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+            .quick { opacity: 1; transform: none; position: static; margin-top: 10px; width: 100%; }
+            .thumb { aspect-ratio: 1/1; }
+            .card-body h3 { font-size: 14.5px; }
+            .price { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ANNOUNCEMENT BAR ===== -->
+    <div class="announce" aria-label="Offers">
+        <div class="announce-track">
+            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-rotate-left"></i>Easy 7-day returns</span>
+            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-rotate-left"></i>Easy 7-day returns</span>
+            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header" id="header">
+        <div class="container header-main">
+            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
+                <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo" />
+            </a>
+
+            <nav class="nav" id="nav">
+                <a href="{% url 'store:all_products' %}">Shop</a>
+                <a href="{% url 'store:collections' %}">Collections</a>
+                <a href="{% url 'store:collections' %}">New Arrivals</a>
+                <a href="{% url 'store:about' %}">About</a>
+                <a href="{% url 'store:contact' %}">Contact</a>
+                <a href="{% url 'store:collections' %}" class="sale">Sale 🔥</a>
+            </nav>
+
+            <form class="search" action="{% url 'store:search' %}" method="GET">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" placeholder="Search earrings, rings, necklaces…" aria-label="Search products" required />
+            </form>
+
+            <div class="actions">
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
+                    <i class="far fa-heart"></i>
+                    <span class="badge" id="wishCount" {% if not wishlist_records %}style="display:none"{% endif %}>{{ wishlist_records|length }}</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
+                <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
+                {% endif %}
+
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+                </a>
+
+                <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section" id="wishlist-results">
+            <div class="container">
+                <div class="sec-head reveal">
+                    <div>
+                        <span class="eyebrow">Your Selection</span>
+                        <h2>My Wishlist</h2>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    {% for item in wishlist_records %}
+                    <article class="card reveal" id="wishlist-card-{{ item.product.pk }}">
+                        <div class="thumb">
+                            {% if not item.product.in_stock %}
+                                <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
+                            {% endif %}
+
+                            <!-- Heart button to let users unlike from this page -->
+                            <button class="wish on" type="button" data-id="{{ item.product.pk }}" aria-label="Remove from wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+
+                            <a href="{% url 'store:product_detail' item.product.pk %}">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" loading="lazy" />
+                                {% else %}
+                                <div style="height:100%;display:grid;place-items:center;color:var(--muted);">No Image</div>
+                                {% endif %}
+                            </a>
+
+                            {% if not item.product.in_stock %}
+                                <button class="quick" style="background: var(--muted); cursor: not-allowed;" disabled>Out of Stock</button>
+                            {% else %}
+                                <form action="{% url 'store:buy_now' item.product.pk %}" method="POST" style="margin:0; padding:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="quick">+ Quick Add</button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <span class="cat-label">{{ item.product.category.name }}</span>
+                            <h3><a href="{% url 'store:product_detail' item.product.pk %}">{{ item.product.title }}</a></h3>
+                            <div class="price-row">
+                                <span class="price">₹{{ item.product.price }}</span>
+                                {% if item.product.mrp %}
+                                    <span class="mrp">₹{{ item.product.mrp }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% empty %}
+                    <div class="empty" style="grid-column: 1 / -1; padding: 100px 0;">
+                        <i class="far fa-heart" style="font-size: 40px; color: var(--line); margin-bottom: 20px;"></i>
+                        <h3>Your wishlist is empty</h3>
+                        <p>Start saving your favorite pieces by clicking the heart icon on products.</p>
+                        <a href="{% url 'store:all_products' %}" class="btn btn-dark" style="margin-top: 15px;">Explore Collection</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png" alt="MAPSKART Logo" />
+                    <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
+                    <div class="socials">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="fcol">
+                    <h4>Shop</h4>
+                    <a href="{% url 'store:collection_detail' 'earrings' %}">Earrings</a>
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}">Necklaces</a>
+                    <a href="{% url 'store:collection_detail' 'rings' %}">Rings</a>
+                    <a href="{% url 'store:collection_detail' 'bracelets' %}">Bracelets</a>
+                </div>
+                <div class="fcol">
+                    <h4>Help</h4>
+                    <a href="#">Track Order</a>
+                    <a href="#">Shipping &amp; Returns</a>
+                    <a href="#">Size Guide</a>
+                    <a href="#">FAQs</a>
+                    <a href="{% url 'store:contact' %}">Contact Support</a>
+                </div>
+                <div class="fcol">
+                    <h4>Company</h4>
+                    <a href="{% url 'store:about' %}">Our Story</a>
+                    <a href="#">Sustainability</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
+                <div class="pay" aria-label="Payment methods">
+                    <i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-google-pay"></i><i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"><i class="fas fa-circle-check"></i><span id="toastMsg">Added</span></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('navToggle'), nav = document.getElementById('nav');
+            toggle.addEventListener('click', function () {
+                var open = nav.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', open);
+                toggle.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            });
+            var header = document.getElementById('header');
+            window.addEventListener('scroll', function () {
+                header.classList.toggle('scrolled', window.scrollY > 10);
+            }, { passive: true });
+            
+            /* Toast */
+            var toast = document.getElementById('toast'), toastMsg = document.getElementById('toastMsg'), tt;
+            function showToast(msg) {
+                toastMsg.textContent = msg; toast.classList.add('show');
+                clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+            }
+
+            /* Wishlist hearts with Backend Integration */
+            var wishCount = document.getElementById('wishCount'), n = {{ wishlist_records|length }};
+
+            var toggleBase = "{% url 'store:toggle_wishlist' 0 %}".replace(/0\/$/, '');
+
+            /* Read the CSRF token: form input first, then cookie, then the template's own token string */
+            function getCsrfToken() {
+                var el = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (el && el.value) return el.value;
+                var m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+                if (m) return decodeURIComponent(m[1]);
+                return '{{ csrf_token }}';
+            }
+
+            function goToLogin() {
+                window.location.href = "{% url 'store:login_user' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+            }
+
+            document.querySelectorAll('.wish').forEach(function (b) {
+                b.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var btn = this;
+                    if (btn.disabled) return;
+                    btn.disabled = true;
+
+                    fetch(toggleBase + btn.getAttribute('data-id') + '/', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-CSRFToken': getCsrfToken(),
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(function (response) {
+                        // Not logged in: a 401, or Django's login redirect (which returns an HTML page, not JSON)
+                        if (response.status === 401 || response.redirected) { goToLogin(); throw new Error('login'); }
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        if (data.status !== 'added' && data.status !== 'removed') throw new Error('Unexpected response');
+                        var isAdded = (data.status === 'added');
+
+                        // Toggle UI visuals
+                        if (isAdded) {
+                            btn.classList.add('on');
+                            btn.querySelector('i').className = 'fas fa-heart';
+                            n++;
+                        } else {
+                            btn.classList.remove('on');
+                            btn.querySelector('i').className = 'far fa-heart';
+                            n--;
+                            // On the wishlist page, take the card off the grid
+                            var card = btn.closest('.card');
+                            if (card) {
+                                card.style.transition = 'opacity .3s, transform .3s';
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(.96)';
+                                setTimeout(function () {
+                                    card.remove();
+                                    if (!document.querySelector('#wishlist-results .card')) { window.location.reload(); }
+                                }, 300);
+                            }
+                        }
+
+                        wishCount.textContent = n;
+                        wishCount.style.display = n > 0 ? 'grid' : 'none';
+                        showToast(isAdded ? 'Saved to wishlist' : 'Removed from wishlist');
+                    })
+                    .catch(function (error) {
+                        if (error.message !== 'login') {
+                            console.error('Wishlist toggle failed:', error);
+                            showToast('Could not update wishlist. Please try again.');
+                        }
+                    })
+                    .then(function () { btn.disabled = false; });
+                });
+            });
+
+            var items = document.querySelectorAll('.reveal');
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function (es) {
+                    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+                }, { threshold: .12 });
+                items.forEach(function (el) { io.observe(el); });
+            } else { items.forEach(function (el) { el.classList.add('in'); }); }
+        });
+    </script>
+</body>
+</html>

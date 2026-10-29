@@ -2,364 +2,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Orders | MAPSKART</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png">
-
-    <!-- Google Fonts: Poppins (main), Cormorant for accents -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         :root {
-            --brand-accent: #a3702f;
-            --brand-accent-light: #ddb35e;
-            --brand-navy: #0f2247;
-            --brand-navy-light: #3d6ea5;
-            --heading: #241a0f;
-            --text-main: #4a3c2c;
-            --text-muted: #7a6a5a;
-            --bg-page: #f7f0e1;
-            --bg-panel: #efe3c8;
-            --bg-footer: #1c130b;
-            --hairline: rgba(163, 112, 47, 0.28);
+            --navy: #1F3A66; --navy-2: #132639; --accent: #B3E0FF; --ink: #132639; --text: #2B3F57;
+            --muted: #52637A; --bg: #F5F8FC; --soft: #E1E9F0; --line: #D1DEE8; --red: #e5484d;
+            --green: #1f9d63; --shadow: 0 10px 30px rgba(19, 38, 57, .08); --container: 960px;
         }
-
         * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.9); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+        .header-main { display: flex; align-items: center; padding: 12px 0; gap: 20px; }
+        .logo { --logo-h: 56px; display: flex; align-items: center; }
+        .logo img { height: var(--logo-h); width: auto; }
+        .logo img:first-child { transform: translateY(calc(var(--logo-h) * .12 * -1)); }
+        .logo img + img { margin-left: calc(var(--logo-h) * .3 * -1); }
+        .nav-right { margin-left: auto; font-size: 14px; font-weight: 500; }
 
-        body {
-            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        main { padding: 36px 0 70px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--ink); margin: 0 0 6px; }
+        .sub { color: var(--muted); margin: 0 0 26px; }
+        .order { background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 22px; }
+        .order-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
+        .order-id { font-size: 18px; font-weight: 700; color: var(--ink); }
+        .order-date { font-size: 13px; color: var(--muted); margin-top: 2px; }
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+        .b-pending { background: #fef3c7; color: #92400e; } .b-confirmed { background: #e0f2fe; color: #075985; }
+        .b-shipped { background: #ede9fe; color: #5b21b6; } .b-delivered { background: #dcfce7; color: #166534; }
+        .b-cancelled { background: var(--soft); color: var(--muted); }
+        .p-wait { background: #fee2e2; color: #991b1b; } .p-verify { background: #fef3c7; color: #92400e; }
+        .p-paid { background: #dcfce7; color: #166534; } .p-cancel { background: var(--soft); color: var(--muted); }
 
-        /* ===== NAVBAR ===== */
-        .navbar {
-            width: 100%;
-            padding: 30px 50px;   /* increased padding for larger logo */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-footer);
-        }
-        .brand-logo img {
-            height: 120px;   /* increased from 60px */
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
-        }
-        .nav-links {
-            display: flex;
-            gap: 40px;
-        }
-        .nav-links a {
-            color: #fff;
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-        }
-        .nav-links a:hover {
-            color: var(--brand-accent);
-        }
-        .nav-links a.logout-link {
-            color: var(--brand-accent-light);
-        }
-        .nav-links a.logout-link:hover {
-            color: #fff;
-        }
+        .lines { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+        .lines li { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+        .thumb { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--soft); flex-shrink: 0; }
+        .l-title { flex: 1; font-size: 15px; font-weight: 600; color: var(--ink); }
+        .l-title small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
+        .l-price { font-weight: 600; color: var(--ink); white-space: nowrap; }
+        .free { color: var(--green); font-weight: 700; }
+        .again { font-size: 12.5px; color: var(--navy); text-decoration: underline; font-weight: 500; }
 
-        /* ===== DASHBOARD WRAPPER ===== */
-        .dashboard-wrapper {
-            max-width: 1000px;
-            margin: 60px auto;
-            padding: 0 20px;
-            flex: 1;
-            width: 100%;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--hairline);
-            padding-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .dashboard-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 36px;
-            color: var(--heading);
-            margin: 0;
-            font-weight: 500;
-        }
-        .dashboard-header p {
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            font-weight: 300;
-            margin: 0;
-        }
-        .dashboard-header p strong {
-            font-weight: 500;
-            color: var(--heading);
-        }
-
-        /* ===== ORDER CARDS ===== */
-        .order-card {
-            background: var(--bg-panel);
-            border-radius: 8px;
-            border: 1px solid var(--hairline);
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .order-header {
-            background: rgba(163, 112, 47, 0.1);
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--hairline);
-            font-size: 14px;
-            gap: 15px;
-        }
-        .order-header div {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .order-header div span {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
-        .order-header strong {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            color: var(--heading);
-            font-weight: 600;
-        }
-        .order-header .status-processing {
-            color: #2e7d32;
-        }
-
-        .order-items {
-            padding: 20px;
-        }
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px dashed var(--hairline);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .item-row:last-child {
-            border-bottom: none;
-        }
-
-        .item-details {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .item-details h4 {
-            margin: 0 0 5px 0;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            color: var(--heading);
-            font-weight: 500;
-        }
-        .item-details p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-muted);
-            font-family: 'Poppins', sans-serif;
-            font-weight: 300;
-        }
-
-        .btn-outline {
-            border: 1px solid var(--brand-accent);
-            color: var(--brand-accent);
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-            display: inline-block;
-        }
-        .btn-outline:hover {
-            background: var(--brand-accent);
-            color: #fff;
-        }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .empty-state h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 28px;
-            margin-bottom: 15px;
-            color: var(--heading);
-            font-weight: 500;
-        }
-        .empty-state p {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 300;
-            font-size: 16px;
-            color: var(--text-muted);
-        }
-        .empty-state .btn-outline {
-            margin-top: 20px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            .navbar {
-                padding: 16px 20px;
-            }
-            .brand-logo img {
-                height: 75px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .navbar {
-                padding: 16px 20px;
-            }
-            .brand-logo img {
-                height: 60px;
-            }
-            .nav-links {
-                gap: 20px;
-            }
-            .dashboard-title {
-                font-size: 28px;
-            }
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .order-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .order-header div {
-                flex-direction: row;
-                justify-content: space-between;
-                width: 100%;
-            }
-            .order-header div span {
-                font-size: 10px;
-            }
-            .order-header strong {
-                font-size: 16px;
-            }
-            .item-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .item-details {
-                width: 100%;
-            }
-            .btn-outline {
-                width: 100%;
-                text-align: center;
-            }
-        }
+        .order-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; align-items: flex-end; margin-top: 16px; }
+        .addr { font-size: 13.5px; color: var(--muted); line-height: 1.6; max-width: 480px; }
+        .totals { text-align: right; font-size: 14px; }
+        .totals .grand { font-size: 22px; font-weight: 800; color: var(--ink); }
+        .btn { display: inline-block; padding: 11px 22px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 14px; font-weight: 600; margin-top: 10px; }
+        .btn:hover { background: var(--navy-2); }
+        .empty { text-align: center; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 70px 20px; }
+        .empty i { font-size: 52px; color: var(--line); margin-bottom: 18px; }
+        @media (max-width: 600px) { .totals { text-align: left; } h1 { font-size: 28px; } }
     </style>
 </head>
 <body>
-
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar">
-        <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo">
-        </a>
-        <div class="nav-links">
-            <a href="{% url 'store:all_products' %}">Shop</a>
-            <a href="{% url 'store:collections' %}">Collections</a>
-            <a href="{% url 'store:about' %}">About</a>
-            <a href="{% url 'store:contact' %}">Contact</a>
-            <a href="{% url 'store:logout_user' %}" class="logout-link">Logout</a>
+    <header class="header">
+        <div class="container header-main">
+            <a href="{% url 'store:all_products' %}" class="logo">
+                <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
+                <img src="{% static '/2.png' %}" alt="" />
+            </a>
+            <a href="{% url 'store:all_products' %}" class="nav-right">&larr; Continue Shopping</a>
         </div>
-    </nav>
+    </header>
 
-    <!-- ===== DASHBOARD CONTENT ===== -->
-    <div class="dashboard-wrapper">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">Order History</h1>
-            <p>Welcome back, <strong>{{ user.username }}</strong></p>
-        </div>
+    <main class="container">
+        <h1>My Orders</h1>
+        <p class="sub">Everything you bought from us, newest first.</p>
 
-        {% if orders %}
-            {% for order in orders %}
-            <div class="order-card">
-                <div class="order-header">
-                    <div>
-                        <span>Order Placed</span>
-                        <strong>{{ order.date_ordered|date:"F j, Y" }}</strong>
-                    </div>
-                    <div>
-                        <span>Total Amount</span>
-                        <strong>₹{{ order.amount_paid }}</strong>
-                    </div>
-                    <div>
-                        <span>Order #</span>
-                        <strong>{{ order.id }}</strong>
-                    </div>
-                    <div>
-                        <span>Status</span>
-                        <strong class="status-processing">Processing</strong>
-                    </div>
+        {% for order in orders %}
+        <section class="order">
+            <div class="order-top">
+                <div>
+                    <div class="order-id">Order #{{ order.id }}</div>
+                    <div class="order-date">{{ order.date_ordered|date:"d M Y, h:i A" }}</div>
                 </div>
-
-                <div class="order-items">
-                    {% for item in order.items.all %}
-                    <div class="item-row">
-                        <div class="item-details">
-                            <div>
-                                <h4>{{ item.product.title }}</h4>
-                                <p>Qty: {{ item.quantity }} | Price: ₹{{ item.price }}</p>
-                            </div>
-                        </div>
-                        <div>
-                            <a href="{% url 'store:product_detail' item.product.pk %}" class="btn-outline">Buy Again</a>
-                        </div>
-                    </div>
-                    {% endfor %}
+                <div class="badges">
+                    <span class="badge b-{{ order.status|lower }}">{{ order.get_status_display }}</span>
+                    <span class="badge {% if order.status == 'CANCELLED' %}p-cancel{% elif order.is_paid %}p-paid{% elif order.payment_screenshot %}p-verify{% else %}p-wait{% endif %}">{{ order.payment_status }}</span>
                 </div>
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <h3>No orders yet</h3>
-                <p>When you place an order, it will appear here.</p>
-                <a href="{% url 'store:all_products' %}" class="btn-outline">Start Shopping</a>
-            </div>
-        {% endif %}
-    </div>
 
+            <ul class="lines">
+                {% for item in order.items.all %}
+                <li>
+                    {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="thumb" />
+                    {% else %}<div class="thumb"></div>{% endif %}
+                    <div class="l-title">
+                        {{ item.product.title }}
+                        <small>Qty {{ item.quantity }}{% if item.is_free_gift %} &middot; <span class="free">FREE GIFT</span>{% endif %}
+                            {% if item.product.is_active %} &middot; <a href="{% url 'store:product_detail' item.product.pk %}" class="again">Buy again</a>{% endif %}</small>
+                    </div>
+                    <div class="l-price">{% if item.is_free_gift %}<span class="free">₹0</span>{% else %}₹{{ item.price }}{% endif %}</div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="order-bottom">
+                <div class="addr">
+                    <b style="color: var(--ink);">Delivered to</b><br />
+                    {{ order.full_name }}, {{ order.shipping_address }}, {{ order.city }} - {{ order.postal_code }}<br />
+                    Phone: {{ order.mobile_number }}
+                    {% if order.tracking_number %}<br /><b style="color: var(--ink);">Tracking number:</b> {{ order.tracking_number }}{% endif %}
+                </div>
+                <div class="totals">
+                    {% if order.discount_amount %}<div class="free">Free gift saving: -₹{{ order.discount_amount }}</div>{% endif %}
+                    <div>Total paid</div>
+                    <div class="grand">₹{{ order.amount_paid }}</div>
+                    {% if not order.is_paid and order.status != 'CANCELLED' %}
+                    <a href="{% url 'store:order_payment' order.id %}" class="btn"><i class="fas fa-qrcode"></i> {% if order.payment_screenshot %}View payment{% else %}Pay now / upload screenshot{% endif %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% empty %}
+        <div class="empty">
+            <i class="fas fa-bag-shopping"></i>
+            <h3 style="color: var(--ink); margin: 0 0 8px;">No orders yet</h3>
+            <p style="margin: 0 0 22px;">When you buy something it will show up here.</p>
+            <a href="{% url 'store:all_products' %}" class="btn">Start Shopping</a>
+        </div>
+        {% endfor %}
+    </main>
+
+    <p style="text-align:center;font-size:13.5px;color:var(--muted);margin:0 0 40px;">
+        Follow us:
+        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-instagram"></i> Instagram</a> &nbsp;&middot;&nbsp;
+        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-facebook"></i> Facebook</a>
+    </p>
 </body>
 </html>

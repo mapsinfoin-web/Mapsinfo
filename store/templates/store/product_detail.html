@@ -256,6 +256,41 @@
         .btn-buy:hover {
             background: var(--brand-navy-light);
         }
+        /* Buy 1 Get 1 Free: free gift picker */
+        .gift-offer {
+            border: 1px dashed var(--brand-accent);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .gift-offer-head {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--heading);
+            margin-bottom: 4px;
+        }
+        .gift-offer-head i { color: var(--brand-accent); margin-right: 6px; }
+        .gift-offer-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 10px 0; }
+        .gift-choice {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid var(--hairline);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .gift-choice:has(input:checked) { border-color: var(--brand-accent); box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04); }
+        .gift-choice input { accent-color: var(--brand-accent); transform: scale(1.15); }
+        .gift-choice img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+        .gift-name { flex: 1; font-size: 14px; }
+        .gift-price { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+        .gift-price b { color: #1f9d63; margin-left: 4px; }
+        .gift-offer .btn-add { margin-top: 12px; }
+        .gift-offer .btn-buy { margin-top: 10px; }
         .stock-note {
             font-size: 13px;
             font-weight: 500;
@@ -318,6 +353,15 @@
             max-width: 280px;
             font-weight: 300;
         }
+        .footer-social { display: flex; gap: 10px; margin-top: 18px; }
+        .footer-social a {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: grid; place-items: center;
+            color: #cbd5e1; text-decoration: none; font-size: 15px;
+            transition: all 0.3s;
+        }
+        .footer-social a:hover { background: var(--brand-accent); border-color: var(--brand-accent); color: #fff; transform: translateY(-3px); }
         .footer-col h4 {
             font-size: 12px;
             letter-spacing: 2px;
@@ -517,6 +561,26 @@
                     <p class="stock-note">Only {{ product.stock }} left in stock</p>
                 {% endif %}
 
+                {% if offer and gift_choices %}
+                <!-- Buy 1 Get 1 Free: the customer picks the gift here, one click adds both -->
+                <div class="gift-offer">
+                    <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
+                    <form action="{% url 'store:add_cart' product.id %}" method="POST">
+                        {% csrf_token %}
+                        <p class="gift-offer-sub">Choose your FREE gift:</p>
+                        {% for g in gift_choices %}
+                        <label class="gift-choice">
+                            <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
+                            {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" />{% endif %}
+                            <span class="gift-name">{{ g.title }}</span>
+                            <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
+                        </label>
+                        {% endfor %}
+                        <button type="submit" class="btn-add">Add to Cart + Free Gift</button>
+                        <button type="submit" class="btn-add btn-buy" formaction="{% url 'store:buy_now' product.pk %}">Buy Now + Free Gift</button>
+                    </form>
+                </div>
+                {% else %}
                 <form action="{% url 'store:add_cart' product.id %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="btn-add">Add to Cart</button>
@@ -526,6 +590,7 @@
                     {% csrf_token %}
                     <button type="submit" class="btn-add btn-buy">Buy Now</button>
                 </form>
+                {% endif %}
             {% else %}
                 <button class="btn-add disabled" disabled>Out of Stock</button>
             {% endif %}
@@ -543,6 +608,10 @@
                 <div class="footer-brand">
                     <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
                     <p>Considered jewellery for people who choose once and wear often. Handcrafted with care.</p>
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    </div>
                 </div>
                 <div class="footer-col">
                     <h4>Discover</h4>

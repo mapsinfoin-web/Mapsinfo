@@ -2,488 +2,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout | MAPSKART</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/v1788764065/logo.png">
-
-    <!-- Google Fonts: Poppins (main), Cormorant for accents -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | MAPSKART</title>
+    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
+        /* Core variables */
         :root {
-            --brand-accent: #a3702f;
-            --heading: #241a0f;
-            --text-main: #4a3c2c;
-            --text-muted: #7a6a5a;
-            --bg-page: #f7f0e1;
-            --bg-panel: #efe3c8;
-            --bg-footer: #081428;
-            --hairline: rgba(163, 112, 47, 0.28);
-            /* Navbar-only palette, matched to index page theme */
-            --nav-accent: #ddb35e;
-            --brand-navy: #0f2247;
+            --navy: #1F3A66; --navy-2: #132639; --blue: #295CA3; --brand: #1F3A66;
+            --accent: #B3E0FF; --secondary: #C2D6E8; --ink: #132639; --text: #2B3F57;
+            --muted: #52637A; --bg: #F5F8FC; --soft: #E1E9F0; --soft-2: #C2D6E8;
+            --line: #D1DEE8; --red: #e5484d; --green: #1f9d63; --radius: 18px;
+            --shadow: 0 10px 30px rgba(19, 38, 57, .08);
+            --container: 1280px;
         }
         * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+        
+        /* Header */
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+        .header-main { display: flex; align-items: center; justify-content: center; padding: 14px 0; position: relative; }
+        .logo { --logo-h: 65px; display: flex; align-items: center; }
+        .logo img { height: var(--logo-h); width: auto; }
+        .logo img:first-child { transform: translateY(calc(var(--logo-h) * .12 * -1)); }
+        .logo img + img { margin-left: calc(var(--logo-h) * .3 * -1); }
+        .back-link { position: absolute; left: 24px; font-weight: 500; font-size: 14px; color: var(--muted); }
+        .back-link:hover { color: var(--brand); }
 
-        body {
-            font-family: 'Poppins', sans-serif;  /* changed to Poppins */
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-        }
+        /* Checkout Layout */
+        .checkout-section { padding: 40px 0 80px; }
+        .checkout-grid { display: grid; grid-template-columns: 1fr 420px; gap: 40px; align-items: start; }
+        
+        /* Forms */
+        .form-section { background: #fff; padding: 40px; border-radius: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+        .form-section h2 { font-family: 'Playfair Display', serif; font-size: 28px; margin: 0 0 24px; color: var(--ink); }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+        .form-group input { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); font-family: inherit; font-size: 15px; color: var(--ink); transition: all .2s; }
+        .form-group input:focus { outline: none; border-color: var(--brand); background: #fff; box-shadow: 0 0 0 4px rgba(31,58,102,.1); }
+        
+        /* Payment Methods */
+        .payment-methods { display: flex; flex-direction: column; gap: 12px; }
+        .pay-option { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: all .2s; }
+        .pay-option:hover { border-color: var(--brand); background: var(--bg); }
+        .pay-option input[type="radio"] { margin-right: 12px; accent-color: var(--brand); transform: scale(1.2); }
+        .pay-label { flex: 1; font-weight: 600; font-size: 15px; color: var(--ink); cursor: pointer; }
+        .pay-icons { color: var(--muted); font-size: 20px; display: flex; gap: 8px; }
+        
+        /* Order Summary Sidebar */
+        .summary-box { background: #fff; padding: 36px; border-radius: 24px; box-shadow: var(--shadow); position: sticky; top: 100px; }
+        .summary-box h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin: 0 0 24px; color: var(--ink); }
+        
+        .summary-items { max-height: 300px; overflow-y: auto; margin-bottom: 24px; padding-right: 10px; }
+        .s-item { display: flex; gap: 16px; margin-bottom: 16px; }
+        .s-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; background: var(--soft); flex-shrink: 0; }
+        .s-details { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .s-title { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 4px; line-height: 1.3; }
+        .s-meta { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+        
+        .totals { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 10px; }
+        .summary-line { display: flex; justify-content: space-between; font-size: 15px; color: var(--text); margin-bottom: 12px; }
+        .summary-line.savings { color: var(--green); font-weight: 600; }
+        .summary-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; color: var(--ink); margin-top: 20px; margin-bottom: 30px; }
+        
+        .btn-dark { display: block; width: 100%; padding: 18px; text-align: center; background: var(--navy); color: #fff; border-radius: 999px; font-size: 16px; font-weight: 600; transition: all .25s ease; border: none; cursor: pointer; }
+        .btn-dark:hover { background: var(--navy-2); transform: translateY(-2px); }
 
-        /* ===== NAVBAR (matches index page theme, height halved) ===== */
-        .navbar {
-            width: 100%;
-            padding: 15px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-footer);
-            box-sizing: border-box;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .messages { margin-bottom: 24px; }
+        .alert { padding: 16px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; background: #fee2e2; color: #991b1b; }
+        
+        @media (max-width: 900px) { 
+            .checkout-grid { grid-template-columns: 1fr; }
+            .summary-box { position: static; order: -1; }
         }
-        .brand-logo { display: flex; align-items: center; gap: 14px; }
-        .brand-logo img {
-            height: 90px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
-        }
-        .nav-links { display: flex; gap: 40px; }
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: color 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-        }
-        .nav-links a:hover { color: var(--nav-accent); }
-        .nav-icons { display: flex; gap: 20px; color: #fff; font-size: 16px; align-items: center; }
-        .nav-icons i { cursor: pointer; transition: color 0.3s ease; }
-        .nav-icons i:hover { color: var(--nav-accent); }
-
-        /* Mobile menu toggle */
-        .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            line-height: 1;
-            padding: 0;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        .nav-toggle:hover { color: var(--nav-accent); }
-
-        /* Cart Badge */
-        .cart-icon-wrapper { position: relative; display: inline-block; }
-        .cart-badge {
-            position: absolute;
-            top: -6px;
-            right: -10px;
-            background-color: var(--nav-accent);
-            color: var(--brand-navy);
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 9px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        /* ===== CHECKOUT LAYOUT ===== */
-        .checkout-wrapper {
-            max-width: 1100px;
-            margin: 60px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 50px;
-        }
-
-        .checkout-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 36px;
-            color: var(--heading);
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .checkout-form {
-            background: var(--bg-panel);
-            padding: 40px;
-            border-radius: 8px;
-            border: 1px solid var(--hairline);
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--heading);
-        }
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cfc09a;
-            background: transparent;
-            border-radius: 4px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 300;
-            font-size: 14px;
-            color: var(--text-main);
-        }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--brand-accent);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-        .form-row .form-group { flex: 1; }
-
-        /* ===== ORDER SUMMARY ===== */
-        .order-summary {
-            background: var(--bg-panel);
-            padding: 40px;
-            border-radius: 8px;
-            border: 1px solid var(--hairline);
-            height: fit-content;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--hairline);
-        }
-        .summary-item:last-child { border-bottom: none; }
-
-        .item-details h4 {
-            margin: 0 0 5px 0;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            color: var(--heading);
-        }
-        .item-details p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 300;
-        }
-
-        .summary-total {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid var(--hairline);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--heading);
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn-primary {
-            width: 100%;
-            background: var(--brand-accent);
-            color: #fff;
-            padding: 18px;
-            border: none;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 30px;
-            margin-top: 20px;
-            transition: background 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-        }
-        .btn-primary:hover { background: #8c6234; }
-
-        /* ===== PAYMENT ===== */
-        .payment-heading {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            margin-top: 30px;
-            border-bottom: 1px solid var(--hairline);
-            padding-bottom: 10px;
-            color: var(--heading);
-        }
-
-        .radio-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 15px;
-            margin-bottom: 15px;
-            font-weight: 400;
-        }
-        .radio-label input[type="radio"] {
-            accent-color: var(--brand-accent);
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .qr-box {
-            background: #fff;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid var(--hairline);
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .qr-box img {
-            width: 200px;
-            height: 200px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-        .qr-box p {
-            font-size: 14px;
-            margin: 0;
-            font-weight: 300;
-        }
-        .qr-box p:last-of-type {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 5px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            .checkout-wrapper {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .navbar {
-                padding: 8px 20px;
-            }
-            .brand-logo img {
-                height: 38px;
-            }
-        }
-
         @media (max-width: 600px) {
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            .checkout-form {
-                padding: 20px;
-            }
-            .order-summary {
-                padding: 20px;
-            }
-            .navbar { padding: 6px 20px; }
-            .brand-logo img { height: 30px; }
-            .nav-icons { gap: 14px; font-size: 15px; }
-            .nav-toggle { display: inline-flex; align-items: center; }
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                flex-direction: column;
-                align-items: center;
-                gap: 0;
-                max-height: 0;
-                overflow: hidden;
-                background: var(--brand-navy);
-                transition: max-height 0.35s ease;
-            }
-            .nav-links.open { max-height: 320px; }
-            .nav-links a {
-                width: 100%;
-                padding: 16px 0;
-                text-align: center;
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-        }
-
-        @media (max-width: 400px) {
-            .brand-logo img { height: 24px; }
-            .nav-icons { gap: 10px; font-size: 14px; }
+            .form-row { grid-template-columns: 1fr; }
+            .back-link { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar">
-        <a href="{% url 'store:all_products' %}" class="brand-logo">
-            <img src="{% static 'logo.jpeg' %}" alt="MAPSKART Logo" />
-        </a>
-
-        <div class="nav-links">
-            <a href="{% url 'store:all_products' %}">Shop</a>
-            <a href="{% url 'store:collections' %}">Collections</a>
-            <a href="{% url 'store:about' %}">About</a>
-            <a href="{% url 'store:contact' %}">Contact</a>
-        </div>
-
-        <div class="nav-icons">
-            <i class="fas fa-search"></i>
-            <i class="far fa-heart"></i>
-
-            <!-- DYNAMIC USER AUTH ICON -->
-            {% if user.is_authenticated %}
-            <a href="{% url 'store:my_orders' %}" style="color: inherit;" title="My Account ({{ user.username }})">
-                <i class="far fa-user-circle"></i>
+    <header class="header">
+        <div class="container header-main">
+            <a href="{% url 'store:cart_detail' %}" class="back-link">&larr; Back to Cart</a>
+            <a href="{% url 'store:all_products' %}" class="logo">
+                <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
+                <img src="{% static '/2.png' %}" alt="" />
             </a>
-            <a href="{% url 'store:logout_user' %}" style="color: inherit;" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
-            {% else %}
-            <a href="{% url 'store:login_user' %}" style="color: inherit;" title="Log In">
-                <i class="far fa-user"></i>
-            </a>
-            {% endif %}
-
-            <!-- Cart with badge -->
-            <div class="cart-icon-wrapper">
-                <a href="{% url 'store:cart_detail' %}" style="color: inherit;">
-                    <i class="fas fa-shopping-bag"></i>
-                    {% if cart_count > 0 %}
-                        <span class="cart-badge">{{ cart_count }}</span>
-                    {% endif %}
-                </a>
-            </div>
-
-            <!-- MOBILE MENU TOGGLE -->
-            <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
-    </nav>
+    </header>
 
-    <!-- ===== CHECKOUT CONTENT ===== -->
-    <div class="checkout-wrapper">
-        <!-- Left: Shipping & Payment -->
-        <div>
-            <h1 class="checkout-title">Shipping Details</h1>
-            <form method="POST" class="checkout-form">
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="full_name" required value="{{ user.username|default:'' }}" />
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" required value="{{ user.email|default:'' }}" />
-                </div>
-
-                <div class="form-group">
-                    <label>Mobile Number</label>
-                    <input type="tel" name="mobile_number" required placeholder="+91" />
-                </div>
-
-                <div class="form-group">
-                    <label>Street Address</label>
-                    <textarea name="shipping_address" rows="3" required></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>City</label>
-                        <input type="text" name="city" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Postal Code</label>
-                        <input type="text" name="postal_code" required />
-                    </div>
-                </div>
-
-                <!-- Payment Method -->
-                <h3 class="payment-heading">Payment Method</h3>
-
-                <div style="margin-bottom: 20px;">
-                    <label class="radio-label">
-                        <input type="radio" name="payment_method" value="COD" checked onclick="toggleQR(false)" />
-                        Cash on Delivery (COD)
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="payment_method" value="PHONEPE" onclick="toggleQR(true)" />
-                        PhonePe UPI (Scan QR)
-                    </label>
-                </div>
-
-                <!-- QR Code Box (hidden by default) -->
-                <div id="qr-box" class="qr-box" style="display: none;">
-                    <p>Scan this QR code using your <strong>PhonePe</strong> app to pay <strong>₹{{ total }}</strong>.</p>
-                    <!-- Replace with your actual PhonePe QR image -->
-                    <img src="{% static 'phonepe_qr.jpeg' %}" alt="PhonePe QR Code" />
-                    <p>Please complete the transaction on PhonePe before clicking Place Order.</p>
-                </div>
-
-                <button type="submit" class="btn-primary">Place Order</button>
-            </form>
-        </div>
-
-        <!-- Right: Order Summary -->
-        <div class="order-summary">
-            <h2 class="checkout-title" style="font-size: 28px; margin-bottom: 25px;">Order Summary</h2>
-
-            {% for item in cart_items %}
-            <div class="summary-item">
-                <div class="item-details">
-                    <h4>{{ item.product.title }}</h4>
-                    <p>Qty: {{ item.quantity }}</p>
-                </div>
-                <div>₹{{ item.sub_total }}</div>
-            </div>
+    <main class="checkout-section container">
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert"><i class="fas fa-circle-exclamation"></i> {{ message }}</div>
             {% endfor %}
-
-            <div class="summary-total">
-                <span>Total</span>
-                <span>₹{{ total }}</span>
-            </div>
         </div>
-    </div>
+        {% endif %}
 
-    <script>
-        function toggleQR(show) {
-            const qrBox = document.getElementById('qr-box');
-            qrBox.style.display = show ? 'block' : 'none';
-        }
+        <form method="POST" action="{% url 'store:checkout' %}">
+            {% csrf_token %}
+            <input type="hidden" name="expected_total" value="{{ total|stringformat:'s' }}" />
+            
+            <div class="checkout-grid">
+                
+                <!-- Left Column: Forms -->
+                <div class="checkout-forms">
+                    <div class="form-section">
+                        <h2>Delivery Details</h2>
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label for="full_name">Full Name</label>
+                                <input type="text" id="full_name" name="full_name" value="{{ user.get_full_name|default:user.username }}" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" value="{{ user.email }}" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile_number">Phone Number</label>
+                                <input type="tel" id="mobile_number" name="mobile_number" value="{{ form_data.mobile_number }}" required />
+                            </div>
+                            <div class="form-group full">
+                                <label for="shipping_address">Street Address</label>
+                                <input type="text" id="shipping_address" name="shipping_address" value="{{ form_data.shipping_address }}" required placeholder="House number and street name" />
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" value="{{ form_data.city }}" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="postal_code">Postal Code</label>
+                                <input type="text" id="postal_code" name="postal_code" value="{{ form_data.postal_code }}" required />
+                            </div>
+                        </div>
+                    </div>
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var toggle = document.getElementById('navToggle');
-            var links = document.querySelector('.nav-links');
-            if (toggle && links) {
-                toggle.addEventListener('click', function () {
-                    var isOpen = links.classList.toggle('open');
-                    toggle.setAttribute('aria-expanded', isOpen);
-                    toggle.innerHTML = isOpen
-                        ? '<i class="fas fa-times"></i>'
-                        : '<i class="fas fa-bars"></i>';
-                });
-            }
-        });
-    </script>
+                    <div class="form-section">
+                        <h2>Payment</h2>
+                        <input type="hidden" name="payment_method" value="PAYTM" />
+                        <div class="pay-option" style="cursor: default;">
+                            <div style="display:flex; align-items:center;">
+                                <span class="pay-label"><i class="fas fa-qrcode" style="margin-right:10px;"></i>Pay by Paytm QR code</span>
+                            </div>
+                            <div class="pay-icons"><i class="fas fa-mobile-screen-button"></i></div>
+                        </div>
+                        <p style="font-size: 13.5px; color: var(--muted); margin: 14px 0 0; line-height: 1.6;">
+                            After you press <b>Place Order</b> you will see our Paytm QR code. Scan it with any UPI app,
+                            pay the amount, then upload your payment screenshot and share your order with us on WhatsApp.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Order Summary -->
+                <div class="summary-box">
+                    <h3>In Your Bag</h3>
+                    
+                    <div class="summary-items">
+                        {% for item in cart_items %}
+                        <div class="s-item">
+                            {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="s-img" />
+                            {% else %}
+                            <div class="s-img" style="display:grid;place-items:center;font-size:10px;">No Image</div>
+                            {% endif %}
+                            
+                            <div class="s-details">
+                                <h4 class="s-title">{{ item.product.title }}</h4>
+                                <div class="s-meta">
+                                    <span>Qty: {{ item.quantity }}</span>
+                                    <span>₹{{ item.line_total }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% for gift in gifts %}
+                        <div class="s-item">
+                            {% if gift.product.image %}
+                            <img src="{{ gift.product.image.url }}" alt="{{ gift.product.title }}" class="s-img" />
+                            {% else %}
+                            <div class="s-img" style="display:grid;place-items:center;font-size:10px;">No Image</div>
+                            {% endif %}
+                            <div class="s-details">
+                                <h4 class="s-title">{{ gift.product.title }}</h4>
+                                <div class="s-meta">
+                                    <span>Qty: {{ gift.quantity }}</span>
+                                    <span><s>₹{{ gift.original_total }}</s> <b style="color: var(--green);">FREE</b></span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--green); font-weight: 600; margin-top: 4px;">Free gift</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="totals">
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span>₹{{ subtotal }}</span>
+                        </div>
+                        {% for offer in applied_offers %}
+                        <div class="summary-line savings">
+                            <span>Free gift ({{ offer.name }})</span>
+                            <span>-₹{{ offer.discount }}</span>
+                        </div>
+                        {% endfor %}
+                        <div class="summary-line">
+                            <span>Shipping</span>
+                            <span>Free</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Amount to Pay</span>
+                            <span>₹{{ total }}</span>
+                        </div>
+                        <button type="submit" class="btn-dark">Place Order &amp; Pay</button>
+                        <p style="text-align: center; margin: 16px 0 0; font-size: 12px; color: var(--muted);">
+                            <i class="fas fa-lock"></i> Your order is confirmed after we verify your payment.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </main>
 
 </body>
 </html>

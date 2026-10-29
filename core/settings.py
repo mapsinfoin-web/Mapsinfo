@@ -38,7 +38,7 @@ ALLOWED_HOSTS = ['.vercel.app', '*']
 
 INSTALLED_APPS = [
    
-    'jazzmin',
+   
     'cloudinary_storage',
     'store',
     'django.contrib.admin',
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    
 
 ]
 SITE_ID = 1
@@ -134,28 +135,6 @@ USE_TZ = True
 
 
 # --- JAZZMIN ADMIN DASHBOARD SETTINGS ---
-JAZZMIN_SETTINGS = {
-    "site_title": "MAPSKART Admin",
-    "site_header": "MAPSKART",
-    "site_brand": "MAPSKART Admin",
-    "welcome_sign": "Welcome to the MAPSKART Dashboard",
-
-    # Adds a global search bar at the top for Orders and Products
-    "search_model": ["store.Order", "store.Product"],
-
-    # Graphic Icons for the side menu (Uses FontAwesome)
-    "icons": {
-        "auth.User": "fas fa-users",
-        "auth.Group": "fas fa-users-cog",
-        "store.Category": "fas fa-tags",
-        "store.Product": "fas fa-box-open",
-        "store.Order": "fas fa-shopping-cart",
-        "store.Cart": "fas fa-shopping-basket",
-    },
-
-    # Allows you to change the colors of the admin panel instantly
-    "show_ui_builder": True,
-}
 
 
 # Static files (CSS, JavaScript, Images)

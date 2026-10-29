@@ -152,6 +152,7 @@
         .tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .3px; background: #fff; color: var(--ink); }
         .tag.sale { background: var(--red); color: #fff; }
         .tag.new { background: var(--navy); color: #fff; }
+        .tag.bogo { background: var(--green); color: #fff; }
         .tag.best { background: var(--accent); color: var(--ink); }
         .wish { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; background: #fff; border: none; display: grid; place-items: center; cursor: pointer; font-size: 15px; color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,.1); transition: all .2s; }
         .wish:hover { color: var(--red); transform: scale(1.1); }
@@ -349,10 +350,10 @@
             </form>
 
             <div class="actions">
-                <button class="icon-btn" aria-label="Wishlist">
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
                     <i class="far fa-heart"></i>
                     <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
-                </button>
+                </a>
 
                 {% if user.is_authenticated %}
                 <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
@@ -402,7 +403,7 @@
             </div>
         </section>
 
-     
+        
 
         <!-- ===== SHOP BY CATEGORY ===== -->
         <section class="section">
@@ -449,7 +450,7 @@
                                 <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
                             {% else %}
                                 <!-- Normal new/sale tag -->
-                                <span class="tag new">NEW</span>
+                                {% if product.offer %}<span class="tag bogo">{{ product.offer.badge_text|upper }}</span>{% else %}<span class="tag new">NEW</span>{% endif %}
                             {% endif %}
 
                             <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
@@ -504,6 +505,8 @@
                         <div class="thumb">
                             {% if not product.in_stock %}
                                 <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
+                            {% elif product.offer %}
+                                <span class="tag bogo">{{ product.offer.badge_text|upper }}</span>
                             {% endif %}
 
                             <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
@@ -643,15 +646,15 @@
             <div class="container">
                 <div class="sec-head reveal">
                     <div><span class="eyebrow">@mapskart</span><h2>Styled by you</h2></div>
-                    <a href="#" class="view-all">Follow us <i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="view-all">Follow us <i class="fab fa-instagram"></i></a>
                 </div>
                 <div class="insta-grid reveal">
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=60&w=400&auto=format&fit=crop')"></a>
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=60&w=400&auto=format&fit=crop')"></a>
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=60&w=400&auto=format&fit=crop')"></a>
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=60&w=400&auto=format&fit=crop')"></a>
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=60&w=400&auto=format&fit=crop')"></a>
-                    <a href="#" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1573408301185-9146fe634ad0?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=60&w=400&auto=format&fit=crop')"></a>
+                    <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="insta" aria-label="Instagram post" style="background-image:url('https://images.unsplash.com/photo-1573408301185-9146fe634ad0?q=60&w=400&auto=format&fit=crop')"></a>
                 </div>
             </div>
         </section>
@@ -684,10 +687,10 @@
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
                 <div class="fcol">
@@ -716,7 +719,7 @@
             <div class="footer-bottom">
                 <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
                 <div class="pay" aria-label="Payment methods">
-                    <i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-google-pay"></i><i class="fas fa-money-bill-wave"></i>
+                    <i class="fas fa-qrcode"></i><i class="fab fa-google-pay"></i> <span style="font-size:12px;letter-spacing:.5px;">Pay securely by Paytm QR / UPI</span>
                 </div>
                 <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
             </div>
@@ -750,49 +753,69 @@
 
         /* Wishlist hearts with Backend Integration */
         var wishCount = document.getElementById('wishCount'), n = {{ user_wishlist|length|default:0 }};
-        var csrfToken = '{{ csrf_token }}';
+
+        var toggleBase = "{% url 'store:toggle_wishlist' 0 %}".replace(/0\/$/, '');
+
+        /* Read the CSRF token: form input first, then cookie, then the template's own token string */
+        function getCsrfToken() {
+            var el = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (el && el.value) return el.value;
+            var m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+            if (m) return decodeURIComponent(m[1]);
+            return '{{ csrf_token }}';
+        }
+
+        function goToLogin() {
+            window.location.href = "{% url 'store:login_user' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+        }
 
         document.querySelectorAll('.wish').forEach(function (b) {
             b.addEventListener('click', function (e) {
                 e.preventDefault();
                 var btn = this;
-                var productId = btn.getAttribute('data-id');
+                if (btn.disabled) return;
+                btn.disabled = true;
 
-                fetch('/wishlist/toggle/' + productId + '/', {
+                fetch(toggleBase + btn.getAttribute('data-id') + '/', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
-                        'X-CSRFToken': csrfToken,
+                        'X-CSRFToken': getCsrfToken(),
                         'Content-Type': 'application/json'
                     }
                 })
                 .then(function (response) {
-                    if (response.status === 401) {
-                        window.location.href = '/accounts/login/?next=' + window.location.pathname;
-                        throw new Error('Not logged in');
-                    }
+                    // Not logged in: a 401, or Django's login redirect (which returns an HTML page, not JSON)
+                    if (response.status === 401 || response.redirected) { goToLogin(); throw new Error('login'); }
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
                     return response.json();
                 })
                 .then(function (data) {
-                    if (data.status === 'added' || data.status === 'removed') {
-                        var isAdded = (data.status === 'added');
+                    if (data.status !== 'added' && data.status !== 'removed') throw new Error('Unexpected response');
+                    var isAdded = (data.status === 'added');
 
-                        // Toggle UI visuals
-                        if (isAdded) {
-                            btn.classList.add('on');
-                            btn.querySelector('i').className = 'fas fa-heart';
-                            n++;
-                        } else {
-                            btn.classList.remove('on');
-                            btn.querySelector('i').className = 'far fa-heart';
-                            n--;
-                        }
+                    // Toggle UI visuals
+                    if (isAdded) {
+                        btn.classList.add('on');
+                        btn.querySelector('i').className = 'fas fa-heart';
+                        n++;
+                    } else {
+                        btn.classList.remove('on');
+                        btn.querySelector('i').className = 'far fa-heart';
+                        n--;
+                    }
 
-                        wishCount.textContent = n;
-                        wishCount.style.display = n > 0 ? 'grid' : 'none';
-                        showToast(isAdded ? 'Saved to wishlist' : 'Removed from wishlist');
+                    wishCount.textContent = n;
+                    wishCount.style.display = n > 0 ? 'grid' : 'none';
+                    showToast(isAdded ? 'Saved to wishlist' : 'Removed from wishlist');
+                })
+                .catch(function (error) {
+                    if (error.message !== 'login') {
+                        console.error('Wishlist toggle failed:', error);
+                        showToast('Could not update wishlist. Please try again.');
                     }
                 })
-                .catch(function (error) { console.log(error); });
+                .then(function () { btn.disabled = false; });
             });
         });
 
