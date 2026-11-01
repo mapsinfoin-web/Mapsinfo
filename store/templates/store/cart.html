@@ -62,6 +62,7 @@
         .summary-line.savings { color: var(--green); font-weight: 600; }
         .summary-total { display: flex; justify-content: space-between; font-size: 22px; font-weight: 700; color: var(--ink); padding-top: 20px; border-top: 1px solid var(--line); margin-top: 20px; margin-bottom: 30px; }
         
+        .no-return { display: flex; align-items: center; gap: 8px; justify-content: center; margin: 16px 0 0; font-size: 13px; font-weight: 600; color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 10px 12px; text-align: center; }
         .btn-dark { display: block; width: 100%; padding: 18px; text-align: center; background: var(--navy); color: #fff; border-radius: 999px; font-size: 16px; font-weight: 600; transition: all .25s ease; border: none; cursor: pointer; }
         .btn-dark:hover { background: var(--navy-2); transform: translateY(-2px); }
         
@@ -237,6 +238,7 @@
                 </div>
                 
                 <a href="{% url 'store:checkout' %}" class="btn-dark">Proceed to Checkout</a>
+                <p class="no-return"><i class="fas fa-ban"></i> No returns. All products are non-returnable.</p>
             </div>
             
         </div>

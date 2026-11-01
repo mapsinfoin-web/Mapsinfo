@@ -88,9 +88,11 @@
         .site-footer { background: var(--navy-2); color: #fff; padding: 60px 24px 26px; }
         .footer-inner { max-width: 1100px; margin: 0 auto; }
         .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 44px; padding-bottom: 38px; border-bottom: 1px solid rgba(255,255,255,.12); }
-        .footer-brand .f-logo { display: flex; align-items: center; margin-bottom: 16px; --logo-h: 64px; }
-        .footer-brand .f-logo img { height: var(--logo-h); width: auto; filter: brightness(0) invert(1); }
-        .footer-brand .f-logo img + img { margin-left: calc(var(--logo-h) * -.3); }
+        /* Footer logo: same method as the home page (the two logo files, unchanged) */
+        .footer-brand .f-logo { --logo-h: 56px; --m-up: .12; --m-gap: .3; display: flex; align-items: center; width: fit-content; margin-bottom: 18px; }
+        .footer-brand .f-logo img { display: block; height: var(--logo-h); width: auto; }
+        .footer-brand .f-logo img:first-child { transform: translateY(calc(var(--logo-h) * var(--m-up) * -1)); }
+        .footer-brand .f-logo img + img { margin-left: calc(var(--logo-h) * var(--m-gap) * -1); }
         .footer-brand p { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,.72); max-width: 320px; margin: 0 0 18px; }
         .social { display: flex; gap: 10px; }
         .social a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); display: grid; place-items: center; font-size: 16px; transition: all .25s; }

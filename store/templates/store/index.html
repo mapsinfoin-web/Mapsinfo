@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MAPSKART | A Think Trend</title>
-    <meta name="description" content="MAPSKART – considered jewellery for people who choose once and wear often. Free shipping over ₹999, easy 7-day returns." />
+    <meta name="description" content="MAPSKART – considered jewellery for people who choose once and wear often. Free shipping over ₹999. All products are non-returnable." />
     <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -321,9 +321,11 @@
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
         </div>
     </div>
 
@@ -394,7 +396,7 @@
                         <h3>Everyday Earrings</h3>
                         <span class="link">Shop now <i class="fas fa-arrow-right"></i></span>
                     </a>
-                    <a href="{% url 'store:collection_detail' 'Necklaces' %}" class="promo reveal" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=800&auto=format&fit=crop')">
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}" class="promo reveal" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=800&auto=format&fit=crop')">
                         <small>Bestsellers</small>
                         <h3>Layered Necklaces</h3>
                         <span class="link">Explore <i class="fas fa-arrow-right"></i></span>
@@ -417,7 +419,7 @@
                         <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop')"></div>
                         <div class="cat-info"><div><h3>Earrings</h3><p>Light-catching halos &amp; drops</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
                     </a>
-                    <a href="{% url 'store:collection_detail' 'Necklaces' %}" class="cat reveal">
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}" class="cat reveal">
                         <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=600&auto=format&fit=crop')"></div>
                         <div class="cat-info"><div><h3>Necklaces</h3><p>Pendants for every story</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
                     </a>
@@ -696,14 +698,14 @@
                 <div class="fcol">
                     <h4>Shop</h4>
                     <a href="{% url 'store:collection_detail' 'earrings' %}">Earrings</a>
-                    <a href="{% url 'store:collection_detail' 'Necklaces' %}">Necklaces</a>
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}">Necklaces</a>
                     <a href="{% url 'store:collection_detail' 'rings' %}">Rings</a>
                     <a href="{% url 'store:collection_detail' 'bracelets' %}">Bracelets</a>
                 </div>
                 <div class="fcol">
                     <h4>Help</h4>
                     <a href="#">Track Order</a>
-                    <a href="#">Shipping &amp; Returns</a>
+                    <span style="display:block;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:12px;"><i class="fas fa-ban" style="margin-right:6px;"></i>No returns. All products are non-returnable.</span>
                     <a href="#">Size Guide</a>
                     <a href="#">FAQs</a>
                     <a href="{% url 'store:contact' %}">Contact Support</a>
