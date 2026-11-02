@@ -628,3 +628,29 @@ def toggle_wishlist(request, product_id):
         return JsonResponse({'status': 'removed'})
 
     return JsonResponse({'status': 'added'})
+
+
+# ---------------------------------------------------------------------------
+# ERROR PAGES (400 / 403 / 404 / 500)
+# Shown with the real status code, then the page sends the visitor to the home page.
+# These only run when DEBUG = False.
+# ---------------------------------------------------------------------------
+
+def _error_page(request, status):
+    return render(request, 'store/error.html', {'status': status}, status=status)
+
+
+def bad_request(request, exception=None):
+    return _error_page(request, 400)
+
+
+def permission_denied(request, exception=None):
+    return _error_page(request, 403)
+
+
+def page_not_found(request, exception=None):
+    return _error_page(request, 404)
+
+
+def server_error(request):
+    return _error_page(request, 500)
