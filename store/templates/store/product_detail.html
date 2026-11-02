@@ -56,8 +56,13 @@
 
         /* Gallery */
         .gallery { display: flex; flex-direction: column; gap: 14px; }
-        .main-image { background: #fff; border-radius: 26px; box-shadow: var(--shadow); aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden; padding: 14px; }
-        .main-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 16px; }
+        /* Main photo: the whole photo is always visible (no cropping); any empty space is filled
+           with a soft blurred copy of the same photo, so every shape of photo looks properly set. */
+        .main-image { position: relative; isolation: isolate; background: #fff; border-radius: 26px; box-shadow: var(--shadow); aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden; cursor: zoom-in; }
+        .main-image::before { content: ''; position: absolute; inset: -30px; background: var(--bg) center / cover no-repeat; filter: blur(28px) saturate(1.15); opacity: .55; z-index: -1; }
+        .main-image img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .4s ease; }
+        .main-image:hover img { transform: scale(1.03); }
+        .zoom-hint { position: absolute; right: 14px; bottom: 14px; display: inline-flex; align-items: center; gap: 8px; background: rgba(19, 38, 57, .82); color: #fff; font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 999px; pointer-events: none; backdrop-filter: blur(6px); }
         .no-image { color: var(--muted); font-size: 15px; }
         .thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; }
         .thumb { width: 74px; height: 74px; flex-shrink: 0; object-fit: cover; border-radius: 14px; border: 2px solid transparent; background: #fff; cursor: pointer; box-shadow: var(--shadow); transition: border-color .2s, transform .2s; }
@@ -103,6 +108,35 @@
 
         .no-return { display: flex; align-items: center; gap: 10px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 13.5px; font-weight: 600; padding: 11px 14px; border-radius: 14px; margin: 0 0 18px; }
         .no-return i { font-size: 15px; }
+        /* Trust words */
+        .trust { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+        .trust li { display: inline-flex; align-items: center; gap: 8px; background: #eef4fb; color: var(--navy); border: 1px solid var(--accent); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 700; }
+        .trust li i { color: var(--blue); }
+
+        /* Zoom viewer */
+        .lb { position: fixed; inset: 0; z-index: 3000; background: rgba(8, 16, 28, .95); display: flex; align-items: center; justify-content: center; }
+        .lb[hidden] { display: none; }
+        .lb-stage { position: absolute; inset: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; cursor: zoom-in; }
+        .lb-stage.zoomed { cursor: grab; }
+        .lb-stage.dragging { cursor: grabbing; }
+        .lb-stage img { max-width: 92%; max-height: 82%; object-fit: contain; transform-origin: center center; will-change: transform; -webkit-user-drag: none; border-radius: 6px; }
+        .lb-btn { position: absolute; z-index: 2; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .12); color: #fff; font-size: 18px; cursor: pointer; display: grid; place-items: center; transition: background .2s; }
+        .lb-btn:hover { background: rgba(255, 255, 255, .28); }
+        .lb-close { top: 16px; right: 16px; }
+        .lb-prev { left: 16px; top: 50%; transform: translateY(-50%); }
+        .lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
+        .lb-counter { position: absolute; top: 24px; left: 20px; z-index: 2; color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 1px; }
+        .lb-tools { position: absolute; z-index: 2; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .25); border-radius: 999px; padding: 6px 10px; backdrop-filter: blur(8px); }
+        .lb-tools .lb-btn { position: static; width: 40px; height: 40px; font-size: 16px; }
+        .lb-level { min-width: 52px; text-align: center; color: #fff; font-size: 13.5px; font-weight: 700; }
+        .lb-reset { width: auto !important; border-radius: 999px !important; padding: 0 14px; font-size: 13px !important; font-weight: 600; }
+        .lb-help { position: absolute; z-index: 2; bottom: 82px; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, .65); font-size: 12.5px; pointer-events: none; padding: 0 16px; }
+        @media (max-width: 760px) {
+            .lb-prev, .lb-next { width: 40px; height: 40px; }
+            .lb-prev { left: 8px; } .lb-next { right: 8px; }
+            .lb-stage img { max-width: 100%; max-height: 74%; }
+        }
+
         .notes { margin-top: 22px; display: grid; gap: 10px; }
         .note { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--muted); }
         .note i { width: 34px; height: 34px; border-radius: 50%; background: var(--soft); color: var(--navy); display: grid; place-items: center; font-size: 14px; flex-shrink: 0; }
@@ -184,9 +218,10 @@
 
         <!-- Left: gallery -->
         <div class="gallery animate-up">
-            <div class="main-image">
+            <div class="main-image" id="main-wrap" {% if product.image %}style="--bg: url('{{ product.image.url }}')" role="button" tabindex="0" aria-label="Click to zoom the photo"{% endif %}>
                 {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" id="main-image" />
+                <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to zoom</span>
                 {% else %}
                 <div class="no-image">No image available</div>
                 {% endif %}
@@ -212,6 +247,16 @@
             <span class="sku">SKU: {{ product.sku }}</span>
             <h1 class="title">{{ product.title }}</h1>
             <p class="price">{% if product.mrp %}<s>₹{{ product.mrp }}</s>{% endif %}₹{{ product.price }}</p>
+
+            <ul class="trust">
+                {% for icon, word in trust_words %}
+                <li><i class="fas {{ icon }}"></i> {{ word }}</li>
+                {% empty %}
+                <li><i class="fas fa-gem"></i> Best Quality</li>
+                <li><i class="fas fa-shield-halved"></i> Quality Assurance</li>
+                <li><i class="fas fa-tags"></i> Best Price</li>
+                {% endfor %}
+            </ul>
 
             {% if product.description %}
             <div class="desc">{{ product.description|linebreaks }}</div>
@@ -302,13 +347,200 @@
         </div>
     </footer>
 
+    <!-- Zoom viewer: click the main photo to open. Wheel / + - buttons / pinch / double-tap to zoom, drag to move. -->
+    <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+        <div class="lb-stage" id="lb-stage"><img id="lb-img" alt="{{ product.title }}" draggable="false" /></div>
+        <div class="lb-counter" id="lb-counter"></div>
+        <button type="button" class="lb-btn lb-close" id="lb-close" aria-label="Close"><i class="fas fa-times"></i></button>
+        <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+        <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-help">Scroll or pinch to zoom &middot; double-tap to zoom in/out &middot; drag to move</div>
+        <div class="lb-tools">
+            <button type="button" class="lb-btn" id="lb-out" aria-label="Zoom out"><i class="fas fa-minus"></i></button>
+            <span class="lb-level" id="lb-level">100%</span>
+            <button type="button" class="lb-btn" id="lb-in" aria-label="Zoom in"><i class="fas fa-plus"></i></button>
+            <button type="button" class="lb-btn lb-reset" id="lb-reset">Reset</button>
+        </div>
+    </div>
+
     <script>
         function swapImage(thumbnail) {
             var main = document.getElementById('main-image');
             if (main) { main.src = thumbnail.src; }
+            var wrap = document.getElementById('main-wrap');
+            if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
             document.querySelectorAll('.thumb').forEach(function (img) { img.classList.remove('active'); });
             thumbnail.classList.add('active');
         }
+
+        // ===== Photo viewer with zoom =====
+        (function () {
+            var MIN = 1, MAX = 6;
+            var box = document.getElementById('lightbox');
+            if (!box) { return; }
+            var stage = document.getElementById('lb-stage'), img = document.getElementById('lb-img');
+            var counter = document.getElementById('lb-counter'), levelEl = document.getElementById('lb-level');
+            var urls = [], index = 0, scale = 1, tx = 0, ty = 0;
+            var pointers = {}, startDist = 0, startScale = 1, dragStart = null, moved = false, lastTap = 0, lastFocus = null;
+
+            function collect() {
+                urls = Array.prototype.map.call(document.querySelectorAll('.thumbs .thumb'), function (t) { return t.src; });
+                if (!urls.length) { var m = document.getElementById('main-image'); if (m) { urls = [m.src]; } }
+            }
+            function clampPan() {
+                var w = img.clientWidth * scale, h = img.clientHeight * scale;
+                var maxX = Math.max(0, (w - stage.clientWidth) / 2), maxY = Math.max(0, (h - stage.clientHeight) / 2);
+                tx = Math.min(maxX, Math.max(-maxX, tx));
+                ty = Math.min(maxY, Math.max(-maxY, ty));
+            }
+            function apply() {
+                if (scale <= MIN) { scale = MIN; tx = 0; ty = 0; } else { clampPan(); }
+                img.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+                levelEl.textContent = Math.round(scale * 100) + '%';
+                stage.classList.toggle('zoomed', scale > MIN);
+            }
+            // zoom so that the point (cx, cy), measured from the centre of the screen, stays under the finger/cursor
+            function zoomAt(newScale, cx, cy) {
+                newScale = Math.min(MAX, Math.max(MIN, newScale));
+                var ratio = newScale / scale;
+                tx = cx - (cx - tx) * ratio;
+                ty = cy - (cy - ty) * ratio;
+                scale = newScale;
+                apply();
+            }
+            function centreOf(x, y) {
+                var r = stage.getBoundingClientRect();
+                return { x: x - (r.left + r.width / 2), y: y - (r.top + r.height / 2) };
+            }
+            function show(i) {
+                index = (i + urls.length) % urls.length;
+                img.src = urls[index];
+                counter.textContent = urls.length > 1 ? (index + 1) + ' / ' + urls.length : '';
+                document.getElementById('lb-prev').style.display = urls.length > 1 ? '' : 'none';
+                document.getElementById('lb-next').style.display = urls.length > 1 ? '' : 'none';
+                scale = 1; tx = 0; ty = 0; apply();
+            }
+            function activeIndex() {
+                var thumbs = document.querySelectorAll('.thumbs .thumb'), found = 0;
+                thumbs.forEach(function (t, i) { if (t.classList.contains('active')) { found = i; } });
+                return found;
+            }
+            function open(i) {
+                collect();
+                if (!urls.length) { return; }
+                lastFocus = document.activeElement;
+                box.hidden = false;
+                document.body.style.overflow = 'hidden';
+                show(i);
+                document.getElementById('lb-close').focus();
+            }
+            function close() {
+                box.hidden = true;
+                document.body.style.overflow = '';
+                pointers = {}; dragStart = null; startDist = 0;
+                if (lastFocus && lastFocus.focus) { lastFocus.focus(); }
+            }
+            function toggleZoom(x, y) {
+                if (scale > MIN) { scale = MIN; apply(); } else { var c = centreOf(x, y); zoomAt(2.5, c.x, c.y); }
+            }
+            function dist() {
+                var ids = Object.keys(pointers), a = pointers[ids[0]], b = pointers[ids[1]];
+                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+            }
+
+            // open from the main photo (click, or Enter / Space when focused)
+            var wrap = document.getElementById('main-wrap');
+            if (wrap) {
+                wrap.addEventListener('click', function () { open(activeIndex()); });
+                wrap.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(activeIndex()); }
+                });
+            }
+
+            document.getElementById('lb-close').addEventListener('click', close);
+            document.getElementById('lb-prev').addEventListener('click', function () { show(index - 1); });
+            document.getElementById('lb-next').addEventListener('click', function () { show(index + 1); });
+            document.getElementById('lb-in').addEventListener('click', function () { zoomAt(scale * 1.5, 0, 0); });
+            document.getElementById('lb-out').addEventListener('click', function () { zoomAt(scale / 1.5, 0, 0); });
+            document.getElementById('lb-reset').addEventListener('click', function () { scale = 1; apply(); });
+
+            document.addEventListener('keydown', function (e) {
+                if (box.hidden) { return; }
+                if (e.key === 'Escape') { close(); }
+                else if (e.key === 'ArrowLeft') { show(index - 1); }
+                else if (e.key === 'ArrowRight') { show(index + 1); }
+                else if (e.key === '+' || e.key === '=') { zoomAt(scale * 1.5, 0, 0); }
+                else if (e.key === '-' || e.key === '_') { zoomAt(scale / 1.5, 0, 0); }
+                else if (e.key === '0') { scale = 1; apply(); }
+            });
+
+            // mouse wheel / trackpad: zoom towards the cursor
+            stage.addEventListener('wheel', function (e) {
+                e.preventDefault();
+                var c = centreOf(e.clientX, e.clientY);
+                zoomAt(scale * (e.deltaY < 0 ? 1.2 : 1 / 1.2), c.x, c.y);
+            }, { passive: false });
+
+            // mouse + touch: drag to move, pinch to zoom, double-tap to zoom, swipe to change photo
+            stage.addEventListener('pointerdown', function (e) {
+                var id = e.pointerId === undefined ? 1 : e.pointerId;
+                pointers[id] = { x: e.clientX, y: e.clientY };
+                if (stage.setPointerCapture && e.pointerId !== undefined) { try { stage.setPointerCapture(e.pointerId); } catch (err) {} }
+                moved = false;
+                if (Object.keys(pointers).length === 2) { startDist = dist(); startScale = scale; dragStart = null; }
+                else { dragStart = { x: e.clientX, y: e.clientY, tx: tx, ty: ty }; if (scale > MIN) { stage.classList.add('dragging'); } }
+            });
+            stage.addEventListener('pointermove', function (e) {
+                var id = e.pointerId === undefined ? 1 : e.pointerId;
+                if (!pointers[id]) { return; }
+                pointers[id] = { x: e.clientX, y: e.clientY };
+                var ids = Object.keys(pointers);
+                if (ids.length === 2 && startDist) {
+                    var a = pointers[ids[0]], b = pointers[ids[1]];
+                    var c = centreOf((a.x + b.x) / 2, (a.y + b.y) / 2);
+                    zoomAt(startScale * dist() / startDist, c.x, c.y);
+                    moved = true;
+                    return;
+                }
+                if (dragStart) {
+                    var dx = e.clientX - dragStart.x, dy = e.clientY - dragStart.y;
+                    if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; }
+                    if (scale > MIN) { tx = dragStart.tx + dx; ty = dragStart.ty + dy; apply(); }
+                }
+            });
+            function endPointer(e) {
+                var id = e.pointerId === undefined ? 1 : e.pointerId;
+                if (!pointers[id]) { return; }
+                var wasSingle = Object.keys(pointers).length === 1;
+                delete pointers[id];
+                startDist = 0;
+                stage.classList.remove('dragging');
+                if (!wasSingle) {                       // one finger left after a pinch: keep moving with it
+                    var left = pointers[Object.keys(pointers)[0]];
+                    dragStart = left ? { x: left.x, y: left.y, tx: tx, ty: ty } : null;
+                    moved = true;
+                    return;
+                }
+                if (dragStart) {
+                    var dx = e.clientX - dragStart.x, dy = e.clientY - dragStart.y;
+                    if (scale === MIN && Math.abs(dx) > 60 && Math.abs(dy) < 60 && urls.length > 1) {
+                        show(index + (dx < 0 ? 1 : -1));                       // swipe
+                    } else if (!moved) {
+                        if (e.target === stage && scale === MIN) { close(); }  // tap on the dark background
+                        else {
+                            var now = Date.now();
+                            if (now - lastTap < 300) { toggleZoom(e.clientX, e.clientY); lastTap = 0; } else { lastTap = now; }
+                        }
+                    }
+                }
+                dragStart = null;
+            }
+            stage.addEventListener('pointerup', endPointer);
+            stage.addEventListener('pointercancel', endPointer);
+
+            // exposed so swapImage() can keep the viewer in step
+            window.__lightboxOpen = open;
+        })();
 
         // Mobile menu
         var toggle = document.getElementById('navToggle'), nav = document.getElementById('nav');
@@ -319,4 +551,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

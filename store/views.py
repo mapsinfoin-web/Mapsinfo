@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+import random
 from decimal import Decimal, InvalidOperation
 
 from django.db import transaction
@@ -68,6 +69,37 @@ def home(request):
         'recent_products': recent_products,
     })
 
+# Trust words shown on every product page.
+# The first three are shown on EVERY product. Each product also gets a few extra words picked
+# from the pool below. The pick is "random" but fixed per product (it does not change on refresh).
+# Edit the wording here whenever you like: (font-awesome icon, text)
+TRUST_CORE = [
+    ('fa-gem', 'Best Quality'),
+    ('fa-shield-halved', 'Quality Assurance'),
+    ('fa-tags', 'Best Price'),
+]
+TRUST_POOL = [
+    ('fa-wand-magic-sparkles', 'Premium Finish'),
+    ('fa-hand-holding-heart', 'Handpicked Design'),
+    ('fa-lock', 'Secure Payment'),
+    ('fa-gift', 'Gift Ready'),
+    ('fa-heart', 'Customer Favourite'),
+    ('fa-box-open', 'Carefully Packed'),
+    ('fa-ring', 'Elegant Design'),
+    ('fa-sun', 'Everyday Wear'),
+    ('fa-circle-check', 'Durable Finish'),
+    ('fa-fire', 'Trending Now'),
+    ('fa-handshake', 'Trusted Seller'),
+    ('fa-hourglass-half', 'Made to Last'),
+]
+
+
+def _trust_words(product, extra=3):
+    """The 3 core words + `extra` more picked from the pool; the same words for the same product every time."""
+    picks = random.Random(product.pk).sample(TRUST_POOL, extra)
+    return TRUST_CORE + picks
+
+
 def product_detail(request, pk):
     # Prevents users from accessing hidden products via direct URL links
     product = get_object_or_404(Product, pk=pk, is_active=True)
@@ -78,6 +110,7 @@ def product_detail(request, pk):
         'product': product,
         'offer': product.offer,
         'gift_choices': gift_choices,   # free gifts the customer can pick (active + in stock)
+        'trust_words': _trust_words(product),   # [(icon, text), ...] shown under the price
     })
 # ---------------------------------------------------------------------------
 # CART HELPERS
@@ -454,8 +487,9 @@ class PaymentScreenshotForm(forms.Form):
 
     def clean_screenshot(self):
         image = self.cleaned_data['screenshot']
-        if image.size > 5 * 1024 * 1024:
-            raise forms.ValidationError('The screenshot is too big. Please upload an image under 5 MB.')
+        # Vercel refuses request bodies over ~4.5 MB before Django even sees them, so stay below that
+        if image.size > 4 * 1024 * 1024:
+            raise forms.ValidationError('The screenshot is too big. Please upload an image under 4 MB.')
         return image
 
 

@@ -28,8 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-lpy=so(759tzfz))(_6c)sek8oeh3awyhc#t8qu&q(h$qjnq!g'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=True in the environment for local development. Keep production errors
+# on the configured error handlers by default.
+DEBUG = os.environ.get('DEBUG', 'False').strip().lower() in {'1', 'true', 'yes', 'on'}
 
 ALLOWED_HOSTS = ['.vercel.app', '*']
 
