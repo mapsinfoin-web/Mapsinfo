@@ -195,7 +195,7 @@
                 <!-- No QR saved in Admin > Payment settings: use the file store/static/paytm.png.
                      If that file is missing too, the picture is replaced by a short message. -->
                 <div class="qr-box">
-                    <img src="{% static '/paytm.png' %}" alt="Paytm QR code"
+                     <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png" alt="Paytm QR code"
                          onerror="this.parentNode.innerHTML='<div class=&quot;qr-missing&quot;><i class=&quot;fas fa-qrcode&quot; style=&quot;font-size:40px;&quot;></i><br><br>The shop has not added its Paytm QR code yet. Please contact us to pay.</div>';" />
                 </div>
                 {% endif %}
