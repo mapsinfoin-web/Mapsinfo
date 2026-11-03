@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pay for Order #{{ order.id }} | MAPSKART</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/c_crop,w_230,h_190,x_140,y_55/c_fill,w_128,h_128,g_center/v1788764065/logo.png" />
+    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
@@ -79,6 +79,7 @@
         .uploaded { display: flex; gap: 16px; align-items: center; background: #f0fdf4; border-radius: 14px; padding: 12px; margin-bottom: 14px; }
         .uploaded img { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
         .errorlist { color: var(--red); font-size: 13.5px; margin: 0 0 8px; padding: 0; list-style: none; }
+        .msg-info { color: var(--muted); } .msg-ok { color: var(--green); font-weight: 600; } .msg-error { color: var(--red); font-weight: 600; }
         .hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }
 
         @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .qr-card { position: static; order: -1; } h1 { font-size: 28px; } }
@@ -88,7 +89,8 @@
     <header class="header">
         <div class="container header-main">
             <a href="{% url 'store:all_products' %}" class="logo">
-                <img src="https://res.cloudinary.com/dddvvn0s/image/upload/c_crop,w_500,h_100,x_0,y_240/c_scale,w_600/v1788764065/logo.png" alt="MAPSKART logo" />
+                <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
+                <img src="{% static '/2.png' %}" alt="MAPSKART logo2" />
             </a>
             <div class="nav-right">
                 <a href="{% url 'store:my_orders' %}">My Orders</a>
@@ -145,6 +147,7 @@
                         {{ form.screenshot.errors }}
                         <input type="file" name="screenshot" id="screenshot" accept="image/*" required />
                         <img id="preview" class="preview" alt="Preview" />
+                        <p id="upload-msg" class="hint" style="margin: 0;" aria-live="polite"></p>
                         <button type="submit" class="btn btn-navy"><i class="fas fa-upload"></i> {% if order.payment_screenshot %}Replace screenshot{% else %}Upload screenshot{% endif %}</button>
                     </form>
                 </div>
@@ -192,7 +195,7 @@
                 <!-- No QR saved in Admin > Payment settings: use the file store/static/paytm.png.
                      If that file is missing too, the picture is replaced by a short message. -->
                 <div class="qr-box">
-                    <img src="{% static 'paytm.png' %}" alt="Paytm QR code"
+                    <img src="{% static '/paytm.png' %}" alt="Paytm QR code"
                          onerror="this.parentNode.innerHTML='<div class=&quot;qr-missing&quot;><i class=&quot;fas fa-qrcode&quot; style=&quot;font-size:40px;&quot;></i><br><br>The shop has not added its Paytm QR code yet. Please contact us to pay.</div>';" />
                 </div>
                 {% endif %}
@@ -214,16 +217,94 @@
         <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-facebook"></i> Facebook</a>
     </p>
     <script>
-        // Show a preview of the chosen screenshot
-        var input = document.getElementById('screenshot'), preview = document.getElementById('preview');
-        if (input) {
-            input.addEventListener('change', function () {
-                if (input.files && input.files[0]) {
-                    preview.src = URL.createObjectURL(input.files[0]);
-                    preview.style.display = 'block';
-                }
+        // ---- Payment screenshot: shrink it in the browser before uploading ----
+        // The host refuses uploads over ~4.5 MB, and phone screenshots are often bigger than that.
+        // A 4000px photo becomes a ~300 KB JPEG here, which is still perfectly readable.
+        var MAX_SIDE = 1600, TARGET = 1000 * 1024, HARD = 4 * 1024 * 1024, SKIP_BELOW = 700 * 1024;
+
+        // BEGIN shrinkLoop
+        async function shrinkLoop(width, height, encode) {
+            var scale = Math.min(1, MAX_SIDE / Math.max(width, height));
+            var quality = 0.85, blob = null;
+            for (var i = 0; i < 8; i++) {
+                blob = await encode(scale, quality);
+                if (blob.size <= TARGET) return blob;
+                if (quality > 0.55) { quality -= 0.1; } else { scale *= 0.8; }
+            }
+            return blob;
+        }
+        // END shrinkLoop
+
+        async function loadImage(file) {
+            if (window.createImageBitmap) {
+                try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e1) {}
+                try { return await createImageBitmap(file); } catch (e2) {}
+            }
+            return await new Promise(function (resolve, reject) {
+                var img = new Image();
+                img.onload = function () { resolve(img); };
+                img.onerror = reject;
+                img.src = URL.createObjectURL(file);
             });
         }
+
+        function makeEncoder(src, w, h) {
+            return function (scale, quality) {
+                return new Promise(function (resolve, reject) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(w * scale));
+                    canvas.height = Math.max(1, Math.round(h * scale));
+                    var ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff';                       // PNG transparency -> white
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error('encode failed')); }, 'image/jpeg', quality);
+                });
+            };
+        }
+
+        var input = document.getElementById('screenshot'), preview = document.getElementById('preview');
+        if (input) {
+            var msg = document.getElementById('upload-msg'), form = input.form;
+            var button = form.querySelector('button[type=submit]'), busy = false;
+            var mb = function (n) { return (n / 1048576).toFixed(1) + ' MB'; };
+            var say = function (text, cls) { msg.textContent = text; msg.className = 'hint msg-' + cls; };
+
+            input.addEventListener('change', async function () {
+                var file = input.files && input.files[0];
+                preview.style.display = 'none';
+                say('', 'info');
+                if (!file) { return; }
+
+                busy = true; button.disabled = true;
+                say('Preparing your screenshot...', 'info');
+                try {
+                    var plain = /^image\/(jpeg|png)$/.test(file.type);
+                    if (file.size > SKIP_BELOW || !plain) {
+                        var src = await loadImage(file);
+                        var w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+                        var blob = await shrinkLoop(w, h, makeEncoder(src, w, h));
+                        if (!plain || blob.size < file.size) {
+                            var small = new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'screenshot') + '.jpg', { type: 'image/jpeg' });
+                            var dt = new DataTransfer(); dt.items.add(small); input.files = dt.files;
+                        }
+                    }
+                } catch (err) { /* browser could not read it: the size check below decides */ }
+
+                file = input.files[0];
+                busy = false; button.disabled = false;
+                if (file.size > HARD) {
+                    input.value = '';
+                    say('This file is too large (' + mb(file.size) + '). Please upload a normal screenshot of the payment screen.', 'error');
+                    return;
+                }
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                say('Ready to upload (' + mb(file.size) + ').', 'ok');
+            });
+            form.addEventListener('submit', function (e) { if (busy || !input.files.length) { e.preventDefault(); } });
+        }
+
         // Copy the UPI ID
         var copy = document.getElementById('copy');
         if (copy) {

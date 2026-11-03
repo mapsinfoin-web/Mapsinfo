@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | MAPSKART</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dddvvn0s/image/upload/c_crop,w_230,h_190,x_140,y_55/c_fill,w_128,h_128,g_center/v1788764065/logo.png" />
+    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
@@ -28,14 +28,6 @@
         .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
         
         /* Header */
-        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
-        .header-main { display: flex; align-items: center; justify-content: center; padding: 14px 0; position: relative; }
-        .logo { --logo-h: 65px; display: flex; align-items: center; }
-        .logo img { height: var(--logo-h); width: auto; }
-        .logo img:first-child { transform: translateY(calc(var(--logo-h) * .12 * -1)); }
-        .logo img + img { margin-left: calc(var(--logo-h) * .3 * -1); }
-        .back-link { position: absolute; left: 24px; font-weight: 500; font-size: 14px; color: var(--muted); }
-        .back-link:hover { color: var(--brand); }
 
         /* Checkout Layout */
         .checkout-section { padding: 40px 0 80px; }
@@ -90,18 +82,130 @@
         }
         @media (max-width: 600px) {
             .form-row { grid-template-columns: 1fr; }
-            .back-link { display: none; }
+        }
+    
+
+        /* ===== SITE CHROME: announcement bar, header, footer (shared on every page) ===== */
+        :root { --brand: #1F3A66; --blue: #295CA3; --accent: #B3E0FF; --secondary: #C2D6E8; --soft: #E1E9F0; --soft-2: #C2D6E8; --line: #D1DEE8; --ink: #132639; --muted: #52637A; --red: #e5484d; --navy: #1F3A66; --navy-2: #132639; --shadow-lg: 0 20px 50px rgba(19, 38, 57, .16); }
+        .announce { background: var(--navy); color: #fff; font-size: 12.5px; letter-spacing: .4px; overflow: hidden; white-space: nowrap; }
+        .announce-track { display: inline-flex; gap: 60px; padding: 10px 0; animation: marquee 28s linear infinite; }
+        .announce:hover .announce-track { animation-play-state: paused; }
+        .announce span i { color: var(--accent); margin-right: 8px; }
+        @keyframes marquee { to { transform: translateX(-50%); } }
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); transition: box-shadow .3s; }
+        .header.scrolled { box-shadow: 0 6px 24px rgba(19,38,57,.08); }
+        .header .container, .footer .container { max-width: 1280px; margin: 0 auto; }
+        .header-main { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
+        .logo, .brand-logo { --logo-h: 65px; --m-up: .12; --m-gap: .3; display: flex; align-items: center; }
+        .logo { flex-shrink: 0; }
+        .logo img, .brand-logo img { display: block; height: var(--logo-h); width: auto; }
+        .logo img:first-child, .brand-logo img:first-child { transform: translateY(calc(var(--logo-h) * var(--m-up) * -1)); }
+        .logo img + img, .brand-logo img + img { margin-left: calc(var(--logo-h) * var(--m-gap) * -1); }
+        .nav { display: flex; gap: 6px; }
+        .nav a { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--ink); border-radius: 999px; transition: background .2s, color .2s; }
+        .nav a:hover, .nav a.active { background: var(--soft); color: var(--brand); }
+        .nav a.sale { color: var(--red); font-weight: 600; }
+        .search { flex: 1; max-width: 460px; position: relative; margin-left: auto; }
+        .search input { width: 100%; padding: 12px 18px 12px 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--soft); font-size: 14px; font-family: inherit; color: var(--ink); transition: all .2s; }
+        .search input:focus { background: #fff; border-color: var(--brand); outline: none; box-shadow: 0 0 0 4px rgba(31,58,102,.14); }
+        .search i { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+        .actions { display: flex; align-items: center; gap: 4px; }
+        .icon-btn { position: relative; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); font-size: 18px; background: none; border: none; cursor: pointer; transition: background .2s, color .2s; }
+        .icon-btn:hover { background: var(--soft); color: var(--brand); }
+        .header .badge { position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; letter-spacing: 0; text-transform: none; }
+        .nav-toggle { display: none; }
+        .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
+        .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
+        .footer-brand .brand-logo { --logo-h: 56px; margin-bottom: 18px; }
+        .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
+        .socials { display: flex; gap: 10px; }
+        .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); display: grid; place-items: center; transition: all .3s; }
+        .socials a:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); transform: translateY(-3px); }
+        .fcol h4 { color: #fff; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 20px; font-weight: 600; }
+        .fcol a { display: block; margin-bottom: 12px; font-size: 14.5px; font-weight: 300; transition: color .2s, padding .2s; }
+        .fcol a:hover { color: var(--accent); padding-left: 5px; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 26px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+        .pay { display: flex; gap: 14px; font-size: 26px; color: rgba(194,214,232,.6); }
+        .legal { display: flex; gap: 22px; }
+        .legal a:hover { color: var(--accent); }
+        @media (max-width: 1100px) {
+            .nav { display: none; }
+            .nav.open { display: flex; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: #fff; padding: 12px 24px 20px; border-bottom: 1px solid var(--line); box-shadow: 0 10px 30px rgba(19, 38, 57, .08); }
+            .nav-toggle { display: grid; }
+            .search { max-width: none; }
+        }
+        @media (max-width: 900px) {
+            .footer-top { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
+            .logo { --logo-h: 60px; flex-basis: 100%; justify-content: center; }
+            .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
+            .actions { order: 3; margin-left: 0; gap: 0; }
+            .icon-btn { width: 38px; height: 38px; font-size: 17px; }
+            .footer-top { grid-template-columns: 1fr; gap: 30px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
-    <header class="header">
+    <!-- ===== ANNOUNCEMENT BAR ===== -->
+    <div class="announce" aria-label="Offers">
+        <div class="announce-track">
+            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
+            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header" id="header">
         <div class="container header-main">
-            <a href="{% url 'store:cart_detail' %}" class="back-link">&larr; Back to Cart</a>
-            <a href="{% url 'store:all_products' %}" class="logo">
-                <img src="https://res.cloudinary.com/dddvvn0s/image/upload/c_crop,w_500,h_100,x_0,y_240/c_scale,w_600/v1788764065/logo.png" alt="MAPSKART logo" />
+            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
+                <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
+                <img src="{% static '/2.png' %}" alt="" />
             </a>
+
+            <nav class="nav" id="nav">
+                <a href="{% url 'store:all_products' %}">Shop</a>
+                <a href="{% url 'store:collections' %}">Collections</a>
+                <a href="{% url 'store:collections' %}">New Arrivals</a>
+                <a href="{% url 'store:about' %}">About</a>
+                <a href="{% url 'store:contact' %}">Contact</a>
+                <a href="{% url 'store:collections' %}" class="sale">Sale 🔥</a>
+            </nav>
+
+            <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" placeholder="Search earrings, rings, necklaces…" aria-label="Search products" required />
+            </form>
+
+            <div class="actions">
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
+                    <i class="far fa-heart"></i>
+                    <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
+                <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
+                {% endif %}
+
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+                </a>
+
+                <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
         </div>
     </header>
 
@@ -242,5 +346,69 @@
         </form>
     </main>
 
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
+                        <img src="{% static '/2.png' %}" alt="" />
+                    </div>
+                    <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
+                    <div class="socials">
+                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="fcol">
+                    <h4>Shop</h4>
+                    <a href="{% url 'store:collection_detail' 'earrings' %}">Earrings</a>
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}">Necklaces</a>
+                    <a href="{% url 'store:collection_detail' 'rings' %}">Rings</a>
+                    <a href="{% url 'store:collection_detail' 'bracelets' %}">Bracelets</a>
+                </div>
+                <div class="fcol">
+                    <h4>Help</h4>
+                    <a href="#">Track Order</a>
+                    <span style="display:block;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:12px;"><i class="fas fa-ban" style="margin-right:6px;"></i>No returns. All products are non-returnable.</span>
+                    <a href="#">Size Guide</a>
+                    <a href="#">FAQs</a>
+                    <a href="{% url 'store:contact' %}">Contact Support</a>
+                </div>
+                <div class="fcol">
+                    <h4>Company</h4>
+                    <a href="{% url 'store:about' %}">Our Story</a>
+                    <a href="#">Sustainability</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
+                <div class="pay" aria-label="Payment methods">
+                    <i class="fas fa-qrcode"></i><i class="fab fa-google-pay"></i> <span style="font-size:12px;letter-spacing:.5px;">Pay securely by Paytm QR / UPI</span>
+                </div>
+                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        (function () {
+            var t = document.getElementById('navToggle'), n = document.getElementById('nav'), h = document.getElementById('header');
+            if (t && n) {
+                t.addEventListener('click', function () {
+                    var o = n.classList.toggle('open');
+                    t.setAttribute('aria-expanded', o);
+                    t.innerHTML = o ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                });
+            }
+            if (h) {
+                window.addEventListener('scroll', function () { h.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            }
+        })();
+    </script>
 </body>
 </html>

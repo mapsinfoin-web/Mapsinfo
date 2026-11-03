@@ -1,4 +1,3 @@
-
 __pycache__/
 *.py[cod]
 *$py.class
@@ -12,5 +11,18 @@ env/
 db.sqlite3
 media/
 
+# Secrets: passwords and API keys must never be uploaded to GitHub
+.env
+.env.*
+
+# Tools / editor / hosting folders
+.vscode/
+.vercel/
+*.log
+
 # OS Files
 .DS_Store
+
+# Only add the next line if Vercel creates the "staticfiles" folder itself when it deploys
+# (if you upload that folder to GitHub on purpose, leave this line out):
+# staticfiles/
