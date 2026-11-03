@@ -57,8 +57,6 @@ if not DEBUG:
 # ---------------------------------------------------------------------------
 
 INSTALLED_APPS = [
-    # 'jazzmin' must come BEFORE django.contrib.admin
-    'jazzmin',
     'cloudinary_storage',
     'store',
     'django.contrib.admin',
@@ -120,7 +118,8 @@ if DATABASE_URL:
         'default': dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,
-            ssl_require=True,
+            # Neon/Postgres needs SSL; a local sqlite DATABASE_URL does not
+            ssl_require=DATABASE_URL.startswith(('postgres://', 'postgresql://')),
         )
     }
 elif DEBUG:
@@ -151,6 +150,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+LOGIN_URL = 'store:login_user'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -179,7 +179,7 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Lets WhiteNoise find admin/jazzmin/your static files at request time,
+# Lets WhiteNoise find admin/your static files at request time,
 # so no collectstatic step is needed on Vercel.
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = True
@@ -191,10 +191,11 @@ WHITENOISE_AUTOREFRESH = True
 
 MEDIA_URL = '/media/'
 
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+    'CLOUD_NAME': 'dddvvn0s', 
+    'API_KEY': '272412746889333',
+    'API_SECRET': '38TzwinefOoLBMRsVx8R-oC1tTc',
 }
 
 STORAGES = {
@@ -207,16 +208,5 @@ STORAGES = {
     },
 }
 
-
-# ---------------------------------------------------------------------------
-# Jazzmin admin theme
-# ---------------------------------------------------------------------------
-
-JAZZMIN_SETTINGS = {
-    'site_title': 'Maps Info Admin',
-    'site_header': 'Maps Info',
-    'welcome_sign': 'Welcome to Maps Info admin',
-    'copyright': 'Maps Info',
-}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
