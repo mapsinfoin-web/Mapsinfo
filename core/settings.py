@@ -68,7 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-
+    
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -149,7 +149,7 @@ STATICFILES_DIRS = [
 ]
 
 # The single destination folder for Vercel
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles_build' / 'static'
 
 MEDIA_URL = '/media/'
 
@@ -183,3 +183,5 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+WHITENOISE_USE_FINDERS = True
