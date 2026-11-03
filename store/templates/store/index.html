@@ -147,7 +147,10 @@
         .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
         .card.hide { display: none; }
         .thumb { position: relative; aspect-ratio: 1/1.1; border-radius: var(--radius); overflow: hidden; background: var(--soft-2); }
-        .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+        .thumb > a { display: block; position: relative; isolation: isolate; width: 100%; height: 100%; }
+        /* Show the WHOLE product photo (no cropping); empty space is filled with a soft blurred copy of the same photo */
+        .thumb > a::before { content: ''; position: absolute; inset: -20px; background: var(--bg) center / cover no-repeat; filter: blur(22px) saturate(1.1); opacity: .5; z-index: -1; }
+        .thumb img { width: 100%; height: 100%; object-fit: contain; transition: transform .6s ease; }
         .card:hover .thumb img { transform: scale(1.07); }
         .tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .3px; background: #fff; color: var(--ink); }
         .tag.sale { background: var(--red); color: #fff; }
@@ -459,7 +462,7 @@
                                 <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
                             </button>
 
-                            <a href="{% url 'store:product_detail' product.pk %}">
+                            <a href="{% url 'store:product_detail' product.pk %}"{% if product.image %} style="--bg: url('{{ product.image.url }}')"{% endif %}>
                                 {% if product.image %}
                                 <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
                                 {% else %}
@@ -515,7 +518,7 @@
                                 <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
                             </button>
 
-                            <a href="{% url 'store:product_detail' product.pk %}">
+                            <a href="{% url 'store:product_detail' product.pk %}"{% if product.image %} style="--bg: url('{{ product.image.url }}')"{% endif %}>
                                 {% if product.image %}
                                 <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
                                 {% else %}
