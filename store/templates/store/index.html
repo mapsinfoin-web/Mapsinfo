@@ -4,9 +4,63 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MAPSKART | A Think Trend</title>
-    <meta name="description" content="MAPSKART – considered jewellery for people who choose once and wear often. Free shipping over ₹999. All products are non-returnable." />
+    <title>MAPSKART | Handcrafted &amp; Trending Jewellery in Delhi NCR, India</title>
+    <meta name="description" content="Shop exquisite handcrafted jewellery, everyday earrings, bridal sets &amp; layered necklaces in Delhi NCR from MAPSKART. Fast delivery across Delhi, Noida, Gurgaon, Ghaziabad &amp; Faridabad. Free shipping above ₹999." />
+    <meta name="keywords" content="jewellery Delhi NCR, artificial jewellery online Delhi, fashion jewellery Noida, designer jewellery Gurgaon, bridal jewellery sets Delhi, earrings, necklaces, MAPSKART" />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Geo Tags for Delhi NCR Local SEO -->
+    <meta name="geo.region" content="IN-DL" />
+    <meta name="geo.placename" content="Delhi NCR, New Delhi" />
+    <meta name="geo.position" content="28.6139;77.2090" />
+    <meta name="ICBM" content="28.6139, 77.2090" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="MAPSKART | Trending &amp; Handcrafted Jewellery in Delhi NCR" />
+    <meta property="og:description" content="Exquisite handcrafted jewellery in Delhi NCR. Free shipping above ₹999 across Delhi, Gurgaon, Noida, Ghaziabad &amp; Faridabad." />
+    <meta property="og:image" content="{% static 'hero.png' %}" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MAPSKART | Handcrafted Jewellery in Delhi NCR" />
+    <meta name="twitter:description" content="Trending jewellery, everyday earrings, and layered necklaces in Delhi NCR. Free shipping above ₹999." />
+    <meta name="twitter:image" content="{% static 'hero.png' %}" />
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
+
+    <!-- Schema.org Structured Data for Delhi NCR Jewellery Store -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "JewelryStore",
+      "name": "MAPSKART",
+      "image": "{{ request.scheme }}://{{ request.get_host }}{% static '1.png' %}",
+      "url": "{{ request.scheme }}://{{ request.get_host }}/",
+      "priceRange": "₹₹",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Delhi NCR",
+        "addressRegion": "Delhi",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 28.6139,
+        "longitude": 77.2090
+      },
+      "areaServed": [
+        "Delhi", "New Delhi", "Noida", "Greater Noida", "Gurgaon", "Gurugram", "Ghaziabad", "Faridabad", "Delhi NCR", "India"
+      ],
+      "description": "MAPSKART is an online jewellery boutique offering handcrafted pieces, earrings, necklaces, and bridal sets across Delhi NCR and India."
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,6 +229,261 @@
         .off { font-size: 12.5px; color: var(--green); font-weight: 600; }
         .empty { grid-column: 1 / -1; text-align: center; padding: 50px 0; color: var(--muted); }
 
+        /* ===== SHOP ALL COLLECTION (NEW DISTINCT CARDS) ===== */
+        .collection-tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .col-tab { padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .25s ease; font-family: inherit; }
+        .col-tab:hover { border-color: var(--brand); color: var(--brand); background: var(--bg); }
+        .col-tab.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(31,58,102,.2); }
+
+        .collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .col-card {
+            background: #fff;
+            border: 1px solid rgba(209, 222, 232, 0.85);
+            border-radius: 22px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 18px rgba(19, 38, 57, 0.05);
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease, border-color .35s ease;
+            position: relative;
+        }
+        .col-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--blue);
+            box-shadow: 0 20px 44px rgba(19, 38, 57, 0.12);
+        }
+        .col-card.hide { display: none; }
+
+        .col-thumb {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #F8FAFD 0%, #EEF4FA 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .col-img-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding: 14px;
+        }
+        .col-img-link img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform .55s cubic-bezier(.2, .8, .2, 1);
+        }
+        .col-card:hover .col-img-link img {
+            transform: scale(1.08);
+        }
+        .col-no-image {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .col-badges {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-start;
+        }
+        .col-tag {
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .col-category {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 4px 0 2px;
+            display: block;
+        }
+        .col-tag.sale { background: var(--red); color: #fff; }
+        .col-tag.bogo { background: var(--green); color: #fff; }
+        .col-tag.out { background: var(--navy-2); color: #fff; }
+
+        .col-wish {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid var(--line);
+            display: grid;
+            place-items: center;
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+            transition: all .2s;
+        }
+        .col-wish:hover { transform: scale(1.1); color: var(--red); }
+        .col-wish.on { color: var(--red); }
+
+        .col-body {
+            padding: 14px 4px 2px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .col-rating-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11.5px;
+        }
+        .col-stars {
+            color: #e89e24;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .col-score {
+            color: var(--muted);
+            font-weight: 600;
+            margin-left: 4px;
+            font-size: 11px;
+        }
+        .col-stock-badge {
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .col-stock-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .col-stock-badge.in { color: var(--green); }
+        .col-stock-badge.in .dot { background: var(--green); box-shadow: 0 0 0 2px rgba(31,157,99,.2); }
+        .col-stock-badge.out { color: var(--red); }
+        .col-stock-badge.out .dot { background: var(--red); }
+
+        .col-title {
+            margin: 2px 0 10px;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--ink);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+        }
+        .col-title a:hover { color: var(--brand); }
+
+        .col-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-bottom: 12px;
+        }
+        .col-prices { display: flex; align-items: baseline; gap: 8px; }
+        .col-price { font-size: 18px; font-weight: 800; color: var(--navy); }
+        .col-mrp { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+        .col-discount-pill {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+            letter-spacing: .3px;
+        }
+
+        .col-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .col-btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s ease;
+            border: none;
+            font-family: inherit;
+        }
+        .col-btn-action.add {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--navy);
+            color: #fff;
+        }
+        .col-btn-action.add:hover {
+            background: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(41,92,163,.28);
+        }
+        .col-btn-action.detail {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            background: var(--soft);
+            color: var(--navy);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+        .col-btn-action.detail:hover {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+            transform: translateX(2px);
+        }
+        .col-btn-action.disabled {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--soft);
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .collection-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        }
+        @media (max-width: 768px) {
+            .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .col-card { padding: 10px; border-radius: 16px; }
+            .col-title { font-size: 13.5px; min-height: 36px; }
+            .col-price { font-size: 16px; }
+            .col-discount-pill { display: none; }
+            .collection-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; }
+            .col-tab { white-space: nowrap; }
+        }
+
         /* ===== DEAL BANNER ===== */
         .deal { margin-top: 72px; }
         .deal-box { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; border-radius: 32px; overflow: hidden; background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%); color: #fff; }
@@ -321,14 +630,12 @@
     <!-- ===== ANNOUNCEMENT BAR ===== -->
     <div class="announce" aria-label="Offers">
         <div class="announce-track">
-            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
-            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
-            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
-            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
         </div>
     </div>
 
@@ -343,10 +650,10 @@
             <nav class="nav" id="nav">
                 <a href="{% url 'store:all_products' %}">Shop</a>
                 <a href="{% url 'store:collections' %}">Collections</a>
-                <a href="{% url 'store:collections' %}">New Arrivals</a>
+                <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:collections' %}" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -439,7 +746,7 @@
         </section>
 
         <!-- ===== LATEST ARRIVALS (real products from Django) ===== -->
-        <section class="section" id="shop">
+        <section class="section" id="latest-arrivals" style="scroll-margin-top: 90px;"><a id="shop" style="display:none;"></a>
             <div class="container">
                 <div class="sec-head reveal">
                     <div><span class="eyebrow">Just in</span><h2>Latest Arrivals</h2></div>
@@ -471,11 +778,12 @@
                             </a>
 
                             {% if not product.in_stock %}
-                                <!-- Disabled button if out of stock -->
                                 <button class="quick" style="background: var(--muted); cursor: not-allowed;" disabled>Out of Stock</button>
                             {% else %}
-                                <!-- Normal button if in stock -->
-                                <a class="quick" href="{% url 'store:product_detail' product.pk %}">View Details</a>
+                                <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="quick"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+                                </form>
                             {% endif %}
                         </div>
                         <div class="card-body">
@@ -498,53 +806,96 @@
             <div class="container">
                 <div class="sec-head reveal">
                     <div>
-                        <span class="eyebrow">Discover</span>
+                        <span class="eyebrow">Curated Catalog</span>
                         <h2>Shop All Collection</h2>
                     </div>
+                    {% if categories %}
+                    <div class="collection-tabs">
+                        <button class="col-tab active" type="button" data-filter="all">All ({{ page_obj.paginator.count }})</button>
+                        <button class="col-tab" type="button" data-filter="sale" style="color:var(--red); font-weight:700;"><i class="fas fa-fire"></i> Sale Deals</button>
+                        {% for cat in categories %}
+                        <button class="col-tab" type="button" data-filter="{{ cat.slug|lower }}">{{ cat.name }}</button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
 
-                <!-- Main Paginated Grid -->
-                <div class="grid">
+                <!-- Main Paginated Grid with Distinct Collection Cards -->
+                <div class="collection-grid">
                     {% for product in page_obj %}
-                    <article class="card reveal">
-                        <div class="thumb">
-                            {% if not product.in_stock %}
-                                <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
-                            {% elif product.offer %}
-                                <span class="tag bogo">{{ product.offer.badge_text|upper }}</span>
-                            {% endif %}
+                    <article class="col-card reveal" data-category="{{ product.category.slug|lower }}" {% if product.mrp and product.mrp > product.price %}data-is-sale="true"{% endif %}>
+                        <div class="col-thumb">
+                            <div class="col-badges">
+                                {% if not product.in_stock %}
+                                    <span class="col-tag out">SOLD OUT</span>
+                                {% elif product.offer %}
+                                    <span class="col-tag bogo">{{ product.offer.badge_text|upper }}</span>
+                                {% elif product.mrp and product.mrp > product.price %}
+                                    <span class="col-tag sale">SALE</span>
+                                {% endif %}
+                            </div>
 
-                            <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
+                            <button class="col-wish wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
                                 <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
                             </button>
 
-                            <a href="{% url 'store:product_detail' product.pk %}"{% if product.image %} style="--bg: url('{{ product.image.url }}')"{% endif %}>
+                            <a class="col-img-link" href="{% url 'store:product_detail' product.pk %}">
                                 {% if product.image %}
                                 <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
                                 {% else %}
-                                <div style="height:100%;display:grid;place-items:center;color:var(--muted);">No Image</div>
+                                <div class="col-no-image">No Image</div>
                                 {% endif %}
                             </a>
-
-                            {% if not product.in_stock %}
-                                <button class="quick" style="background: var(--muted); cursor: not-allowed;" disabled>Out of Stock</button>
-                            {% else %}
-                                <form action="{% url 'store:buy_now' product.pk %}" method="POST" style="margin:0; padding:0;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="quick">+ Quick Add</button>
-                                </form>
-                            {% endif %}
                         </div>
 
-                        <div class="card-body">
-                            <span class="cat-label">{{ product.category.name }}</span>
-                            <h3><a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a></h3>
-                            <div class="price-row">
-                                <span class="price">₹{{ product.price }}</span>
-                                {% if product.mrp %}
-                                    <span class="mrp">₹{{ product.mrp }}</span>
-                                    <span class="off">Sale</span>
+                        <div class="col-body">
+                            <div class="col-rating-row">
+                                <div class="col-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span class="col-score">4.9</span>
+                                </div>
+                                {% if product.in_stock %}
+                                <span class="col-stock-badge in"><span class="dot"></span> In Stock</span>
+                                {% else %}
+                                <span class="col-stock-badge out"><span class="dot"></span> Out of Stock</span>
                                 {% endif %}
+                            </div>
+
+                            <span class="col-category">{{ product.category.name }}</span>
+                            <h3 class="col-title">
+                                <a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a>
+                            </h3>
+
+                            <div class="col-price-row">
+                                <div class="col-prices">
+                                    <span class="col-price">₹{{ product.price }}</span>
+                                    {% if product.mrp and product.mrp > product.price %}
+                                    <span class="col-mrp">₹{{ product.mrp }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if product.offer %}
+                                <span class="col-discount-pill">{{ product.offer.badge_text }}</span>
+                                {% elif product.mrp and product.mrp > product.price %}
+                                <span class="col-discount-pill">SALE</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-actions">
+                                {% if not product.in_stock %}
+                                <button class="col-btn-action disabled" disabled><i class="fas fa-ban"></i> Out of Stock</button>
+                                {% else %}
+                                <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0; flex:1;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="col-btn-action add"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+                                </form>
+                                {% endif %}
+                                <a href="{% url 'store:product_detail' product.pk %}" class="col-btn-action detail" title="View Details" aria-label="View Details">
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </article>
@@ -576,7 +927,7 @@
         </section>
 
         <!-- ===== DEAL BANNER ===== -->
-        <section class="deal">
+        <section class="deal" id="sale" style="scroll-margin-top: 90px;">
             <div class="container">
                 <div class="deal-box reveal">
                     <div class="deal-copy">
@@ -589,7 +940,7 @@
                             <div><strong id="tM">00</strong><span>Mins</span></div>
                             <div><strong id="tS">00</strong><span>Secs</span></div>
                         </div>
-                        <a href="{% url 'store:collections' %}" class="btn btn-gold">Grab the deal <i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'store:sale' %}" class="btn btn-gold">Grab the deal <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <div class="deal-img" role="img" aria-label="Gold jewellery on display"></div>
                 </div>
@@ -849,6 +1200,102 @@
             }, { threshold: .12 });
             items.forEach(function (el) { io.observe(el); });
         } else { items.forEach(function (el) { el.classList.add('in'); }); }
+        /* AJAX Add to Cart for all product cards */
+        document.querySelectorAll('.add-to-cart-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var btn = form.querySelector('button[type="submit"]');
+                if (btn.disabled) return;
+                var origHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.status === 'success') {
+                        // Update cart count badge in header
+                        var badges = document.querySelectorAll('.actions a[href*="cart"] .badge');
+                        if (badges.length) {
+                            badges.forEach(function (b) { b.textContent = data.cart_count; b.style.display = 'grid'; });
+                        } else {
+                            var cartLink = document.querySelector('.actions a[href*="cart"]');
+                            if (cartLink) {
+                                var span = document.createElement('span');
+                                span.className = 'badge';
+                                span.textContent = data.cart_count;
+                                cartLink.appendChild(span);
+                            }
+                        }
+                        btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+                        showToast(data.message || 'Added to cart');
+                        setTimeout(function () {
+                            btn.innerHTML = origHtml;
+                            btn.disabled = false;
+                        }, 1800);
+                    } else {
+                        showToast(data.error || 'Could not add to cart');
+                        btn.innerHTML = origHtml;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(function () {
+                    form.submit();
+                });
+            });
+        });
+
+        
+        // Smooth scroll for in-page anchors like #latest-arrivals or #sale
+        document.querySelectorAll('a[href*="#latest-arrivals"], a[href*="#sale"]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                var href = this.getAttribute('href');
+                var hash = href.substring(href.indexOf('#'));
+                var target = document.querySelector(hash);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    history.pushState(null, null, hash);
+                    if (nav && nav.classList.contains('open')) {
+                        nav.classList.remove('open');
+                    }
+                }
+            });
+        });
+
+        /* Category filter tabs for Shop All Collection */
+        var colTabs = document.querySelectorAll('.col-tab');
+        var colCards = document.querySelectorAll('.col-card');
+        if (colTabs.length && colCards.length) {
+            colTabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    colTabs.forEach(function (t) { t.classList.remove('active'); });
+                    tab.classList.add('active');
+                    var filter = tab.getAttribute('data-filter');
+                    colCards.forEach(function (card) {
+                        if (filter === 'all') {
+                            card.classList.remove('hide');
+                        } else if (filter === 'sale') {
+                            if (card.getAttribute('data-is-sale') === 'true') {
+                                card.classList.remove('hide');
+                            } else {
+                                card.classList.add('hide');
+                            }
+                        } else if (card.getAttribute('data-category') === filter) {
+                            card.classList.remove('hide');
+                        } else {
+                            card.classList.add('hide');
+                        }
+                    });
+                });
+            });
+        }
     });
      </script>
 </body>

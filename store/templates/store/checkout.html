@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | MAPSKART</title>
-    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
@@ -175,10 +177,10 @@
             <nav class="nav" id="nav">
                 <a href="{% url 'store:all_products' %}">Shop</a>
                 <a href="{% url 'store:collections' %}">Collections</a>
-                <a href="{% url 'store:collections' %}">New Arrivals</a>
+                <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:collections' %}" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}"" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">

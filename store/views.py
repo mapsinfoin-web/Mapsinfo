@@ -39,13 +39,22 @@ class OutOfStock(Exception):
 
 def all_products(request):
     # Only fetch active products
-    product_list = Product.objects.filter(is_active=True)
+    all_active = Product.objects.filter(is_active=True)
+    # 4 newest active products for Latest Arrivals
+    recent_products = list(all_active.order_by('-created')[:4])
+    recent_ids = [p.pk for p in recent_products]
+
+    # Don't duplicate the 4 recent items in "Shop All Collection" if more products exist
+    if all_active.count() > len(recent_ids):
+        product_list = all_active.exclude(pk__in=recent_ids)
+    else:
+        product_list = all_active
     paginator = Paginator(product_list, 12) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Only show active products in Latest Arrivals
-    recent_products = list(Product.objects.filter(is_active=True).order_by('-created')[:4])
+    # Categories for filter tabs
+    categories = list(Category.objects.all())
 
     # Offer badges ("Buy 1 Get 1 Free") for every card on the page
     offers = live_offers()
@@ -59,7 +68,9 @@ def all_products(request):
 
     return render(request, 'store/index.html', {
         'page_obj': page_obj,
+        'categories': categories,
         'recent_products': recent_products,
+
         'user_wishlist': user_wishlist,
     })
 
@@ -67,6 +78,7 @@ def home(request):
     recent_products = attach_offers(list(Product.objects.filter(is_active=True).order_by('-created')[:4]))
     return render(request, 'store/home.html', {
         'recent_products': recent_products,
+
     })
 
 # Trust words shown on every product page.
@@ -191,8 +203,11 @@ def _handle_gift_after_add(request, cart, product):
 
 def add_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id, is_active=True)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json'
 
     if not product.in_stock:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'error': f"Sorry, {product.title} is out of stock."}, status=400)
         messages.error(request, f"Sorry, {product.title} is out of stock.")
         return redirect('store:product_detail', pk=product.pk)
 
@@ -201,6 +216,8 @@ def add_cart(request, product_id):
     current_qty = cart_item.quantity if cart_item else 0
 
     if current_qty + 1 > product.stock:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'error': f"Only {product.stock} of {product.title} available."}, status=400)
         messages.error(request, f"Only {product.stock} of {product.title} available. "
                                 f"You already have {current_qty} in your cart.")
         return redirect('store:product_detail', pk=product.pk)
@@ -211,7 +228,17 @@ def add_cart(request, product_id):
     else:
         CartItem.objects.create(product=product, cart=cart, quantity=1)
 
-    if _handle_gift_after_add(request, cart, product):
+    went_to_gifts = _handle_gift_after_add(request, cart, product)
+
+    if is_ajax:
+        total_items = sum(CartItem.objects.filter(cart=cart).values_list('quantity', flat=True))
+        return JsonResponse({
+            'status': 'success',
+            'cart_count': total_items,
+            'message': f"{product.title} added to cart!"
+        })
+
+    if went_to_gifts:
         return redirect(_cart_url())
     return redirect('store:cart_detail')
 
@@ -627,9 +654,46 @@ def search_products(request):
     if request.user.is_authenticated:
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
+    categories = list(Category.objects.all())
     return render(request, 'store/search.html', {
         'page_obj': page_obj,
+        'categories': categories,
         'query': query,
+        'user_wishlist': user_wishlist,
+    })
+
+def sale_products(request):
+    all_active = Product.objects.filter(is_active=True).select_related('category')
+    # Filter products where MRP is greater than price (on sale)
+    sale_list = all_active.filter(
+        Q(mrp__isnull=False) & Q(mrp__gt=F('price'))
+    ).order_by('-id')
+
+    if not sale_list.exists():
+        sale_list = all_active.order_by('-id')
+
+    # Category filter support
+    category_slug = request.GET.get('category', '').strip()
+    selected_category = None
+    if category_slug:
+        selected_category = Category.objects.filter(slug__iexact=category_slug).first()
+        if selected_category:
+            sale_list = sale_list.filter(category=selected_category)
+
+    paginator = Paginator(sale_list, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    attach_offers(page_obj)
+
+    user_wishlist = []
+    if request.user.is_authenticated:
+        user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
+
+    categories = list(Category.objects.all())
+    return render(request, 'store/sale.html', {
+        'page_obj': page_obj,
+        'categories': categories,
+        'selected_category': selected_category,
         'user_wishlist': user_wishlist,
     })
 

@@ -5,8 +5,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>{{ status }} | MAPSKART</title>
-    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <title>{{ status|default:404 }} | MAPSKART</title>
+    <link rel="icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
     <meta http-equiv="refresh" content="4;url={% url 'store:all_products' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
     <style>
@@ -28,8 +30,8 @@
 </head>
 <body>
     <div class="box">
-        <p class="code">{{ status }}</p>
-        {% if status == 404 %}
+        <p class="code">{{ status|default:404 }}</p>
+        {% if not status or status == 404 or status == '404' %}
             <h1>Page Not Found</h1>
             <p>We couldn't find the page you're looking for. We'll take you back to the home page in a few seconds.</p>
         {% else %}

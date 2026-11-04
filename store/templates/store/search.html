@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Search Results | MAPSKART</title>
     <meta name="description" content="Search MAPSKART collections." />
-    <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
+    <link rel="icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -204,10 +206,10 @@
             <nav class="nav" id="nav">
                 <a href="{% url 'store:all_products' %}">Shop</a>
                 <a href="{% url 'store:collections' %}">Collections</a>
-                <a href="{% url 'store:collections' %}">New Arrivals</a>
+                <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:collections' %}" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}"" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -272,9 +274,9 @@
                             {% if not product.in_stock %}
                                 <button class="quick" style="background: var(--muted); cursor: not-allowed;" disabled>Out of Stock</button>
                             {% else %}
-                                <form action="{% url 'store:buy_now' product.pk %}" method="POST" style="margin:0; padding:0;">
+                                <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0;">
                                     {% csrf_token %}
-                                    <button type="submit" class="quick">+ Quick Add</button>
+                                    <button type="submit" class="quick"><i class="fas fa-shopping-bag" style="margin-right:6px;"></i>+ Quick Add</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -458,6 +460,65 @@
                         }
                     })
                     .then(function () { btn.disabled = false; });
+                });
+            });
+
+            
+            // AJAX Add to Cart
+            document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var f = this;
+                    var btn = f.querySelector('button[type="submit"]');
+                    var origHtml = btn ? btn.innerHTML : '';
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+                    }
+                    var formData = new FormData(f);
+                    fetch(f.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(function(res) {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.json();
+                    })
+                    .then(function(data) {
+                        if (data.status === 'success') {
+                            var cartBadge = document.querySelector('a[href*="cart"] .badge, a[aria-label="Cart"] .badge');
+                            if (cartBadge) {
+                                cartBadge.textContent = data.cart_count;
+                                cartBadge.style.display = data.cart_count > 0 ? 'grid' : 'none';
+                            } else if (data.cart_count > 0) {
+                                var cartLink = document.querySelector('a[href*="cart"], a[aria-label="Cart"]');
+                                if (cartLink) {
+                                    var b = document.createElement('span');
+                                    b.className = 'badge';
+                                    b.textContent = data.cart_count;
+                                    cartLink.appendChild(b);
+                                }
+                            }
+                            if (typeof showToast === 'function') {
+                                showToast(data.message || 'Added to cart successfully!');
+                            }
+                        } else {
+                            f.submit();
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Cart add error:', err);
+                        f.submit();
+                    })
+                    .finally(function() {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    });
                 });
             });
 

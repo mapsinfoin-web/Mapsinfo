@@ -8,3 +8,9 @@ class ErrorPageTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertContains(response, 'Page Not Found', status_code=404)
+
+    def test_direct_404_url_displays_custom_not_found_page(self):
+        response = self.client.get('/404/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'Page Not Found', status_code=404)

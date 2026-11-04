@@ -25,12 +25,12 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('buy/<int:pk>/', views.buy_now, name='buy_now'),
     path('search/', views.search_products, name='search'),
+    path('sale/', views.sale_products, name='sale'),
     # Wishlist
     path('wishlist/', views.wishlist, name='wishlist'),
     path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),
     path('cart/gift/choose/', views.choose_gift, name='choose_gift'),
-path('cart/gift/remove/<int:gift_id>/', views.remove_gift, name='remove_gift'),
-    path('order/<int:order_id>/pay/', views.order_payment, name='order_payment'),
-    path('cart/gift/choose/', views.choose_gift, name='choose_gift'),
     path('cart/gift/remove/<int:gift_id>/', views.remove_gift, name='remove_gift'),
+    path('order/<int:order_id>/pay/', views.order_payment, name='order_payment'),
+    path('404/', views.page_not_found, name='404'),
 ]
