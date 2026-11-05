@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.utils.html import format_html, format_html_join
+from urllib.parse import quote
 
 from .models import (
     BogoOffer, Cart, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product,
@@ -228,15 +229,67 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'status', 'get_total_items', 'get_purchased_skus', 'full_name', 'mobile_number',
         'email', 'shipping_address', 'city', 'postal_code', 'discount_amount', 'amount_paid',
-        'payment_status', 'screenshot_link', 'is_paid', 'tracking_number',
+        'payment_status', 'screenshot_link', 'is_paid', 'tracking_number', 'whatsapp_customer_action',
     ]
     list_editable = ['status', 'is_paid', 'tracking_number']
     date_hierarchy = 'date_ordered'
     list_filter = [PaymentStatusFilter, 'status', 'is_paid', 'city']
     search_fields = ['full_name', 'email', 'mobile_number', 'shipping_address', 'id', 'tracking_number']
     inlines = [OrderItemInline]
-    readonly_fields = ['discount_amount', 'offers_applied', 'screenshot_preview', 'payment_submitted_at']
+    readonly_fields = ['discount_amount', 'offers_applied', 'screenshot_preview', 'payment_submitted_at', 'whatsapp_customer_action']
     actions = ['mark_payment_verified', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'cancel_and_restore_stock']
+
+    @admin.display(description='WhatsApp Customer')
+    def whatsapp_customer_action(self, obj):
+        if not obj or not obj.pk:
+            return '-'
+        digits = ''.join(ch for ch in (obj.mobile_number or '') if ch.isdigit())
+        if not digits:
+            return format_html('<span style="color:#94a3b8;">No mobile</span>')
+        phone = '91' + digits if len(digits) == 10 else digits
+
+        if obj.status == 'SHIPPED':
+            if obj.tracking_number:
+                msg = (
+                    f"Hi {obj.full_name}, great news! ✨\n"
+                    f"Your MAPSKART order #{obj.pk} has been shipped! 🚀\n\n"
+                    f"📦 Tracking Details: {obj.tracking_number}\n\n"
+                    f"Your jewelry is on its way. Thank you for shopping with MAPSKART! 💎"
+                )
+                btn_text = "📦 Send Tracking"
+                bg = "#059669"
+            else:
+                msg = (
+                    f"Hi {obj.full_name}, your MAPSKART order #{obj.pk} has been dispatched! 🚀\n"
+                    f"We will share the tracking number shortly."
+                )
+                btn_text = "🚚 Send Shipped"
+                bg = "#0284c7"
+        elif obj.is_paid:
+            msg = (
+                f"Hi {obj.full_name}, thank you! 🎉\n"
+                f"Your payment of Rs.{obj.amount_paid} for MAPSKART order #{obj.pk} has been verified.\n\n"
+                f"We are packing your jewelry with care. We will update you as soon as it ships! ✨"
+            )
+            btn_text = "✅ Send Paid Confirm"
+            bg = "#16a34a"
+        else:
+            msg = (
+                f"Hi {obj.full_name}, this is MAPSKART regarding your order #{obj.pk} (Total: Rs.{obj.amount_paid}).\n"
+                f"Please let us know if you need any assistance completing your payment screenshot upload."
+            )
+            btn_text = "💬 WhatsApp"
+            bg = "#25D366"
+
+        link = f"https://wa.me/{phone}?text={quote(msg)}"
+        return format_html(
+            '<a href="{}" target="_blank" rel="noopener" style="'
+            'background:{};color:#fff;padding:5px 10px;border-radius:4px;font-weight:600;'
+            'font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;'
+            'box-shadow:0 1px 3px rgba(0,0,0,0.12);">'
+            '{}</a>',
+            link, bg, btn_text
+        )
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('items__product')

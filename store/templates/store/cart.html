@@ -189,7 +189,7 @@
                 <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:sale' %}"" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -246,7 +246,7 @@
                 {% for item in cart_items %}
                 <div class="cart-item">
                     {% if item.product.image %}
-                    <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="item-img" />
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="item-img" loading="lazy" />
                     {% else %}
                     <div class="item-img" style="display:grid;place-items:center;color:var(--muted);">No Image</div>
                     {% endif %}
@@ -275,7 +275,7 @@
 
                     {% for gift in item.my_gifts %}
                     <div class="gift-row chosen">
-                        {% if gift.product.image %}<img src="{{ gift.product.image.url }}" alt="{{ gift.product.title }}" class="gift-img" />{% endif %}
+                        {% if gift.product.image %}<img src="{{ gift.product.image.url }}" alt="{{ gift.product.title }}" class="gift-img" loading="lazy" />{% endif %}
                         <div class="gift-info">
                             <strong>{{ gift.product.title }}</strong> {% if gift.quantity > 1 %}&times; {{ gift.quantity }}{% endif %}
                             <div><span class="free-tag">FREE</span> <s>₹{{ gift.original_total }}</s> <b>₹0</b></div>
@@ -297,7 +297,7 @@
                     </p>
                     {% for choice in item.gift_choices %}
                     <div class="gift-row">
-                        {% if choice.image %}<img src="{{ choice.image.url }}" alt="{{ choice.title }}" class="gift-img" />{% endif %}
+                        {% if choice.image %}<img src="{{ choice.image.url }}" alt="{{ choice.title }}" class="gift-img" loading="lazy" />{% endif %}
                         <div class="gift-info">
                             <strong>{{ choice.title }}</strong>
                             <div><s>₹{{ choice.price }}</s> <b style="color:var(--green);">FREE</b></div>

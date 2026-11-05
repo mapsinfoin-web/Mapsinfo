@@ -180,7 +180,7 @@
                 <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:sale' %}"" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -283,7 +283,7 @@
                         {% for item in cart_items %}
                         <div class="s-item">
                             {% if item.product.image %}
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="s-img" />
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="s-img" loading="lazy" />
                             {% else %}
                             <div class="s-img" style="display:grid;place-items:center;font-size:10px;">No Image</div>
                             {% endif %}
@@ -301,7 +301,7 @@
                         {% for gift in gifts %}
                         <div class="s-item">
                             {% if gift.product.image %}
-                            <img src="{{ gift.product.image.url }}" alt="{{ gift.product.title }}" class="s-img" />
+                            <img src="{{ gift.product.image.url }}" alt="{{ gift.product.title }}" class="s-img" loading="lazy" />
                             {% else %}
                             <div class="s-img" style="display:grid;place-items:center;font-size:10px;">No Image</div>
                             {% endif %}

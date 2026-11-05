@@ -196,6 +196,83 @@
         @media (max-width: 900px) {
             .footer-top { grid-template-columns: 1fr 1fr; }
         }
+        /* Jewelry Care & Guarantee Badges */
+        .guarantee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0 24px;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(19, 38, 57, .04);
+        }
+        .g-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 2px;
+        }
+        .g-badge-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #F0F5FA;
+            color: var(--navy);
+            display: grid;
+            place-items: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .g-badge h4 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.25;
+        }
+        .g-badge p {
+            margin: 2px 0 0;
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.2;
+        }
+
+        /* Floating WhatsApp Support Button */
+        .floating-wa {
+            position: fixed;
+            bottom: 26px;
+            right: 26px;
+            z-index: 999;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: #fff;
+            padding: 12px 18px 12px 14px;
+            border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(37, 211, 102, .35);
+            font-size: 13.5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .25s ease;
+        }
+        .floating-wa i {
+            font-size: 22px;
+        }
+        .floating-wa:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(37, 211, 102, .45);
+            color: #fff;
+        }
+        @media (max-width: 640px) {
+            .guarantee-grid { grid-template-columns: 1fr; gap: 8px; }
+            .floating-wa span { display: none; }
+            .floating-wa { width: 50px; height: 50px; padding: 0; display: grid; place-items: center; bottom: 20px; right: 20px; }
+            .floating-wa i { font-size: 26px; }
+        }
+
         @media (max-width: 640px) {
             .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
             .logo { --logo-h: 60px; flex-basis: 100%; justify-content: center; }
@@ -236,7 +313,7 @@
                 <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
                 <a href="{% url 'store:about' %}">About</a>
                 <a href="{% url 'store:contact' %}">Contact</a>
-                <a href="{% url 'store:sale' %}"" class="sale">Sale 🔥</a>
+                <a href="{% url 'store:sale' %}" class="sale">Sale 🔥</a>
             </nav>
 
             <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -284,10 +361,10 @@
             {% if product.image or product.gallery_images.all %}
             <div class="thumbs">
                 {% if product.image %}
-                <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" />
+                <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" loading="lazy" />
                 {% endif %}
                 {% for gallery_img in product.gallery_images.all %}
-                <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" />
+                <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                 {% endfor %}
             </div>
             {% endif %}
@@ -329,6 +406,38 @@
 
             <p class="no-return"><i class="fas fa-ban"></i> No returns. All products are non-returnable.</p>
 
+            <!-- Jewelry Care & Anti-Tarnish Guarantee Badges -->
+            <div class="guarantee-grid">
+                <div class="g-badge">
+                    <div class="g-badge-icon"><i class="fas fa-shield-halved"></i></div>
+                    <div>
+                        <h4>Anti-Tarnish Coating</h4>
+                        <p>Radiant shine that lasts</p>
+                    </div>
+                </div>
+                <div class="g-badge">
+                    <div class="g-badge-icon"><i class="fas fa-droplet"></i></div>
+                    <div>
+                        <h4>Water-Resistant</h4>
+                        <p>Safe for daily wear & splashes</p>
+                    </div>
+                </div>
+                <div class="g-badge">
+                    <div class="g-badge-icon"><i class="fas fa-feather"></i></div>
+                    <div>
+                        <h4>Hypoallergenic</h4>
+                        <p>100% skin safe & nickel-free</p>
+                    </div>
+                </div>
+                <div class="g-badge">
+                    <div class="g-badge-icon"><i class="fas fa-box-open"></i></div>
+                    <div>
+                        <h4>Luxury Gift Ready</h4>
+                        <p>Includes velvet jewelry pouch</p>
+                    </div>
+                </div>
+            </div>
+
             {% if product.in_stock %}
                 {% if product.is_low_stock %}
                 <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
@@ -344,7 +453,7 @@
                         {% for g in gift_choices %}
                         <label class="gift-choice">
                             <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
-                            {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" />{% endif %}
+                            {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" loading="lazy" />{% endif %}
                             <span class="gift-name">{{ g.title }}</span>
                             <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
                         </label>
@@ -638,5 +747,11 @@
             }
         })();
     </script>
+    <!-- Floating WhatsApp Support Widget -->
+    <a href="https://wa.me/919953595557?text=Hi%20MAPSKART!%20I%20have%20a%20question%20about%20{{ product.title|urlencode }}%20(SKU:%20{{ product.sku }})%20-%20{{ request.build_absolute_uri|urlencode }}"
+       target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+        <span>Need help? Chat with us</span>
+    </a>
 </body>
 </html>

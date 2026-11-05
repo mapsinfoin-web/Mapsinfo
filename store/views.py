@@ -49,7 +49,7 @@ def all_products(request):
         product_list = all_active.exclude(pk__in=recent_ids)
     else:
         product_list = all_active
-    paginator = Paginator(product_list, 12) 
+    paginator = Paginator(product_list, 20) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -561,11 +561,17 @@ def order_payment(request, order_id):
             messages.success(request, "Screenshot uploaded. Now tap the green button to share your order with us on WhatsApp.")
             return redirect('store:order_payment', order_id=order.pk)
 
+    upi_id = shop.get_upi_id() if shop else 'maps536969@sbi'
+    payee_name = (shop.payee_name if shop and shop.payee_name else 'MAPSKART').strip()
+    upi_intent_url = f"upi://pay?pa={upi_id}&pn={quote(payee_name)}&am={order.amount_paid}&cu=INR&tn={quote(f'Order_{order.pk}')}"
+
     return render(request, 'store/order_payment.html', {
         'order': order,
         'items': order.items.select_related('product'),
         'shop': shop,
         'form': form,
+        'upi_id': upi_id,
+        'upi_intent_url': upi_intent_url,
         'whatsapp_url': _whatsapp_link(request, order, shop) if order.payment_screenshot else '',
     })
 
@@ -599,7 +605,7 @@ def collections(request):
     return render(request, 'store/collections.html', {'categories': categories})
 
 def collection_detail(request, slug):
-    category = get_object_or_404(Category, slug=slug)
+    category = Category.objects.filter(slug__iexact=slug).first() or get_object_or_404(Category, slug=slug)
     # Filter out hidden products from category pages
     products = attach_offers(list(Product.objects.filter(category=category, is_active=True)))
     return render(request, 'store/collection_detail.html', {
@@ -645,7 +651,7 @@ def search_products(request):
     else:
         product_list = Product.objects.none()
 
-    paginator = Paginator(product_list, 12)
+    paginator = Paginator(product_list, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     attach_offers(page_obj)

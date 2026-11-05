@@ -289,15 +289,16 @@ class Wishlist(models.Model):
 
 # Orders are sent to this WhatsApp number unless a different one is saved in Admin > Payment settings
 DEFAULT_VENDOR_WHATSAPP = '919953595557'
+DEFAULT_UPI_ID = 'maps536969@sbi'
 
 
 class PaymentSettings(models.Model):
     """The shop's Paytm details. Only ONE row; edit it in the admin under 'Payment settings'."""
     paytm_qr = models.ImageField(upload_to='payment/', blank=True, null=True, verbose_name='Paytm QR code image',
                                  help_text="Upload the QR code image from your Paytm for Business app.")
-    payee_name = models.CharField(max_length=120, blank=True, help_text="Name shown on the Paytm QR, e.g. MAPSKART.")
-    upi_id = models.CharField(max_length=120, blank=True, verbose_name='UPI ID',
-                              help_text="Optional. Shown under the QR code, e.g. mapskart@paytm.")
+    payee_name = models.CharField(max_length=120, blank=True, default='MAPSKART', help_text="Name shown on the Paytm QR, e.g. MAPSKART.")
+    upi_id = models.CharField(max_length=120, blank=True, default=DEFAULT_UPI_ID, verbose_name='UPI ID',
+                              help_text="Shown under the QR code and used for one-click UPI payments, e.g. maps536969@sbi.")
     vendor_whatsapp = models.CharField(
         max_length=20, blank=True, verbose_name='Vendor WhatsApp number',
         help_text="With country code, digits only. Example for India: 919876543210. "
@@ -311,6 +312,14 @@ class PaymentSettings(models.Model):
     @classmethod
     def get(cls):
         return cls.objects.first()
+
+    def get_upi_id(self):
+        return (self.upi_id or '').strip() or DEFAULT_UPI_ID
+
+    @classmethod
+    def shop_upi_id(cls):
+        shop = cls.get()
+        return shop.get_upi_id() if shop else DEFAULT_UPI_ID
 
     def whatsapp_number(self):
         digits = ''.join(ch for ch in self.vendor_whatsapp if ch.isdigit())
