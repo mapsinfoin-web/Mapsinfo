@@ -301,7 +301,7 @@
                             {% elif product.offer %}
                                 <span class="sale-tag" style="background: var(--brand);">{{ product.offer.badge_text|upper }}</span>
                             {% elif product.mrp and product.mrp > product.price %}
-                                <span class="sale-tag">SALE</span>
+                                <span class="sale-tag">{{ product.discount_percent }}% OFF</span>
                             {% endif %}
 
                             <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
@@ -335,7 +335,7 @@
                                 <span class="price">₹{{ product.price }}</span>
                                 {% if product.mrp %}
                                     <span class="mrp">₹{{ product.mrp }}</span>
-                                    <span class="save-pill">SAVE</span>
+                                    <span class="save-pill">{{ product.discount_percent }}% SALE</span>
                                 {% endif %}
                             </div>
                         </div>

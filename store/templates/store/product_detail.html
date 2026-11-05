@@ -301,7 +301,15 @@
 
             <span class="sku">SKU: {{ product.sku }}</span>
             <h1 class="title">{{ product.title }}</h1>
-            <p class="price">{% if product.mrp %}<s>₹{{ product.mrp }}</s>{% endif %}₹{{ product.price }}</p>
+            <p class="price">
+                ₹{{ product.price }}
+                {% if product.mrp and product.mrp > product.price %}
+                    <s>₹{{ product.mrp }}</s>
+                    <span style="font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #C8E6C9; padding: 3px 10px; border-radius: 8px; margin-left: 8px; vertical-align: middle;">{{ product.discount_percent }}% SALE</span>
+                {% elif product.mrp %}
+                    <s>₹{{ product.mrp }}</s>
+                {% endif %}
+            </p>
 
             <ul class="trust">
                 {% for icon, word in trust_words %}

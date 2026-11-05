@@ -479,7 +479,7 @@
             .col-card { padding: 10px; border-radius: 16px; }
             .col-title { font-size: 13.5px; min-height: 36px; }
             .col-price { font-size: 16px; }
-            .col-discount-pill { display: none; }
+            .col-discount-pill { font-size: 9.5px; padding: 2px 5px; }
             .collection-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; }
             .col-tab { white-space: nowrap; }
         }
@@ -762,7 +762,7 @@
                                 <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
                             {% else %}
                                 <!-- Normal new/sale tag -->
-                                {% if product.offer %}<span class="tag bogo">{{ product.offer.badge_text|upper }}</span>{% else %}<span class="tag new">NEW</span>{% endif %}
+                                {% if product.offer %}<span class="tag bogo">{{ product.offer.badge_text|upper }}</span>{% elif product.mrp and product.mrp > product.price %}<span class="tag sale">{{ product.discount_percent }}% OFF</span>{% else %}<span class="tag new">NEW</span>{% endif %}
                             {% endif %}
 
                             <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
@@ -790,7 +790,12 @@
                             <h3><a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a></h3>
                             <div class="price-row">
                                 <span class="price">₹{{ product.price }}</span>
-                                {% if product.mrp %}<span class="mrp">₹{{ product.mrp }}</span>{% endif %}
+                                {% if product.mrp and product.mrp > product.price %}
+                                <span class="mrp">₹{{ product.mrp }}</span>
+                                <span class="col-discount-pill" style="margin-left: auto;">{{ product.discount_percent }}% SALE</span>
+                                {% elif product.mrp %}
+                                <span class="mrp">₹{{ product.mrp }}</span>
+                                {% endif %}
                             </div>
                         </div>
                     </article>
@@ -831,7 +836,7 @@
                                 {% elif product.offer %}
                                     <span class="col-tag bogo">{{ product.offer.badge_text|upper }}</span>
                                 {% elif product.mrp and product.mrp > product.price %}
-                                    <span class="col-tag sale">SALE</span>
+                                    <span class="col-tag sale">{{ product.discount_percent }}% OFF</span>
                                 {% endif %}
                             </div>
 
@@ -880,7 +885,7 @@
                                 {% if product.offer %}
                                 <span class="col-discount-pill">{{ product.offer.badge_text }}</span>
                                 {% elif product.mrp and product.mrp > product.price %}
-                                <span class="col-discount-pill">SALE</span>
+                                <span class="col-discount-pill">{{ product.discount_percent }}% SALE</span>
                                 {% endif %}
                             </div>
 

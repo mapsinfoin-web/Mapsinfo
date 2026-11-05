@@ -51,6 +51,20 @@ class Product(models.Model):
     def is_low_stock(self):
         return 0 < self.stock <= self.LOW_STOCK_THRESHOLD
 
+    @property
+    def discount_percent(self):
+        """Returns the percentage discount if mrp > price, rounded to whole number (e.g. 20)."""
+        if self.mrp and self.mrp > self.price and self.mrp > 0:
+            return round(((self.mrp - self.price) / self.mrp) * 100)
+        return 0
+
+    @property
+    def discount_amount(self):
+        """Returns the amount saved in rupees."""
+        if self.mrp and self.mrp > self.price:
+            return self.mrp - self.price
+        return 0
+
     def save(self, *args, **kwargs):
         if not self.sku:
             self.sku = uuid.uuid4().hex[:8].upper()
