@@ -145,9 +145,40 @@ class BogoOffer(models.Model):
 class Cart(models.Model):
     cart_id = models.CharField(max_length=250, blank=True)
     date_added = models.DateField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Customer & user details for admin follow-up
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='carts')
+    customer_name = models.CharField(max_length=200, blank=True, default='', help_text="Customer name for follow-up")
+    customer_email = models.CharField(max_length=200, blank=True, default='', help_text="Customer email for follow-up")
+    customer_phone = models.CharField(max_length=30, blank=True, default='', help_text="Mobile number for follow-up")
+
+    # Purchase state
+    is_purchased = models.BooleanField(default=False, help_text="True if order was completed, False if abandoned/active")
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='source_carts')
+
+    class Meta:
+        ordering = ['-updated_at']
+        verbose_name = 'Cart / Abandoned Cart'
+        verbose_name_plural = 'Carts & Abandoned Follow-Ups'
 
     def __str__(self):
-        return self.cart_id
+        user_info = self.customer_name or (self.user.username if self.user else f"Guest ({self.cart_id[:8]})")
+        return f"Cart #{self.pk} - {user_info}"
+
+    def total_items(self):
+        qs = self.cartitem_set.filter(is_active=True) if not self.is_purchased else self.cartitem_set.all()
+        return sum(item.quantity for item in qs)
+
+    def total_value(self):
+        qs = self.cartitem_set.filter(is_active=True) if not self.is_purchased else self.cartitem_set.all()
+        return sum(item.sub_total() for item in qs)
+
+    def product_summary(self):
+        items = list(self.cartitem_set.select_related('product'))
+        if not items:
+            return "Empty"
+        return ", ".join(f"{item.quantity}x {item.product.title}" for item in items[:3])
 
 
 class CartItem(models.Model):

@@ -1,3 +1,4 @@
+import uuid
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -130,24 +131,55 @@ def product_detail(request, pk):
 
 def _cart_id(request):
     """
-    Return this visitor's cart id and remember it in the session.
-    Django changes session_key when a user logs in, so we store our own
-    'cart_id' value to keep the cart from disappearing at login.
+    Return this visitor's active cart id and remember it in the session.
     """
     cart_id = request.session.get('cart_id')
     if not cart_id:
-        if not request.session.session_key:
-            request.session.create()
-        cart_id = request.session.session_key
+        if request.session.session_key:
+            cart_id = request.session.session_key
+        else:
+            cart_id = uuid.uuid4().hex
         request.session['cart_id'] = cart_id
     return cart_id
 
 
+def _sync_cart_user(request, cart):
+    """Sync authenticated user and latest customer details to cart for admin follow-ups."""
+    if not cart:
+        return
+    changed = False
+    if request.user.is_authenticated:
+        if cart.user_id != request.user.id:
+            cart.user = request.user
+            changed = True
+        full_name = request.user.get_full_name() or request.user.first_name or request.user.username
+        if not cart.customer_name and full_name:
+            cart.customer_name = full_name
+            changed = True
+        if not cart.customer_email and request.user.email:
+            cart.customer_email = request.user.email
+            changed = True
+        if not cart.customer_phone:
+            latest_order = Order.objects.filter(user=request.user).exclude(mobile_number='').order_by('-date_ordered').first()
+            if latest_order and latest_order.mobile_number:
+                cart.customer_phone = latest_order.mobile_number
+                changed = True
+    if changed:
+        cart.save(update_fields=['user', 'customer_name', 'customer_email', 'customer_phone', 'updated_at'])
+
+
 def _get_cart(request, create=False):
     cart_id = _cart_id(request)
-    cart = Cart.objects.filter(cart_id=cart_id).first()
+    cart = Cart.objects.filter(cart_id=cart_id, is_purchased=False).first()
+    if cart is None and request.user.is_authenticated:
+        user_cart = Cart.objects.filter(user=request.user, is_purchased=False).first()
+        if user_cart:
+            cart = user_cart
+            request.session['cart_id'] = cart.cart_id
     if cart is None and create:
         cart = Cart.objects.create(cart_id=cart_id)
+    if cart:
+        _sync_cart_user(request, cart)
     return cart
 
 
@@ -366,6 +398,9 @@ def register_user(request):
             user = form.save()
             # Two login systems are installed (Django + allauth), so say which one to use
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            cart = _get_cart(request)
+            if cart:
+                _sync_cart_user(request, cart)
             return redirect('store:all_products')
     else:
         form = CustomRegistrationForm()
@@ -379,6 +414,9 @@ def login_user(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
+            cart = _get_cart(request)
+            if cart:
+                _sync_cart_user(request, cart)
             # Send the customer back to where they were going (e.g. checkout)
             if next_url and url_has_allowed_host_and_scheme(
                     next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
@@ -429,6 +467,16 @@ def checkout(request):
         payment_method = 'PAYTM'   # the only payment method: Paytm QR (never trust the browser for this)
 
         context['form_data'] = request.POST
+
+        # Save customer contact info immediately to cart for admin follow-up
+        if cart:
+            if full_name:
+                cart.customer_name = full_name
+            if email:
+                cart.customer_email = email
+            if mobile_number:
+                cart.customer_phone = mobile_number
+            cart.save(update_fields=['customer_name', 'customer_email', 'customer_phone', 'updated_at'])
 
         # 1. Validate the form
         required = [full_name, email, mobile_number, shipping_address, city, postal_code]
@@ -493,8 +541,18 @@ def checkout(request):
             messages.error(request, f"Sorry, {exc} just sold out. Please update your cart.")
             return redirect('store:cart_detail')
 
-        cart_items.delete()
-        cart.delete()   # also deletes the cart's gifts
+        # Mark cart as purchased and link to order for complete history
+        cart.is_purchased = True
+        cart.order = order
+        if full_name:
+            cart.customer_name = full_name
+        if email:
+            cart.customer_email = email
+        if mobile_number:
+            cart.customer_phone = mobile_number
+        cart.save()
+        cart_items.update(is_active=False)
+        request.session.pop('cart_id', None)
         request.session['last_order_id'] = order.id
 
         # Next: the Paytm QR page, where the customer pays and uploads the screenshot
@@ -758,3 +816,36 @@ def page_not_found(request, exception=None):
 
 def server_error(request):
     return _error_page(request, 500)
+
+@require_POST
+def save_cart_contact(request):
+    """
+    Real-time AJAX endpoint called on checkout page when user fills in contact details.
+    Allows capturing customer name, email, and mobile number even if they abandon checkout.
+    """
+    cart = _get_cart(request, create=False)
+    if not cart:
+        return JsonResponse({'status': 'no_cart'})
+
+    full_name = (request.POST.get('full_name') or '').strip()
+    email = (request.POST.get('email') or '').strip()
+    mobile_number = (request.POST.get('mobile_number') or '').strip()
+
+    changed = False
+    if full_name and cart.customer_name != full_name:
+        cart.customer_name = full_name
+        changed = True
+    if email and cart.customer_email != email:
+        cart.customer_email = email
+        changed = True
+    if mobile_number and cart.customer_phone != mobile_number:
+        cart.customer_phone = mobile_number
+        changed = True
+    if request.user.is_authenticated and not cart.user:
+        cart.user = request.user
+        changed = True
+
+    if changed:
+        cart.save(update_fields=['customer_name', 'customer_email', 'customer_phone', 'user', 'updated_at'])
+
+    return JsonResponse({'status': 'saved'})

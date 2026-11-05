@@ -410,6 +410,51 @@
             if (h) {
                 window.addEventListener('scroll', function () { h.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
             }
+
+            // Real-time Cart Lead Auto-Capture for Store Owner Follow-Up
+            var nameInput = document.getElementById('full_name');
+            var emailInput = document.getElementById('email');
+            var phoneInput = document.getElementById('mobile_number');
+            var csrfEl = document.querySelector('input[name="csrfmiddlewaretoken"]');
+            var saveTimer = null;
+
+            function autoSaveCartContact() {
+                var csrf = csrfEl ? csrfEl.value : '';
+                var name = nameInput ? nameInput.value.trim() : '';
+                var email = emailInput ? emailInput.value.trim() : '';
+                var phone = phoneInput ? phoneInput.value.trim() : '';
+
+                if (!name && !email && !phone) return;
+
+                var formData = new FormData();
+                formData.append('csrfmiddlewaretoken', csrf);
+                formData.append('full_name', name);
+                formData.append('email', email);
+                formData.append('mobile_number', phone);
+
+                fetch("{% url 'store:save_cart_contact' %}", {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                }).catch(function (err) { /* silent catch */ });
+            }
+
+            function scheduleAutoSave() {
+                clearTimeout(saveTimer);
+                saveTimer = setTimeout(autoSaveCartContact, 750);
+            }
+
+            [nameInput, emailInput, phoneInput].forEach(function (inp) {
+                if (inp) {
+                    inp.addEventListener('input', scheduleAutoSave);
+                    inp.addEventListener('blur', autoSaveCartContact);
+                }
+            });
+
+            // Initial capture if inputs are prefilled (e.g. from user profile)
+            if (nameInput && nameInput.value || emailInput && emailInput.value || phoneInput && phoneInput.value) {
+                setTimeout(autoSaveCartContact, 500);
+            }
         })();
     </script>
 </body>

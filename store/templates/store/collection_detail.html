@@ -230,9 +230,6 @@
                 <h3>{{ product.title }}</h3>
                 <p class="price">
                     {% if product.mrp and product.mrp > product.price %}<s>₹{{ product.mrp }}</s>{% endif %}₹{{ product.price }}
-                    {% if product.mrp and product.mrp > product.price %}
-                    <span style="font-size: 11px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #C8E6C9; padding: 2px 7px; border-radius: 6px; margin-left: 6px; display: inline-block;">{{ product.discount_percent }}% SALE</span>
-                    {% endif %}
                 </p>
                 <a href="{% url 'store:product_detail' product.pk %}" class="btn-view">View Details</a>
             </div>

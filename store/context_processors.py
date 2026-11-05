@@ -9,9 +9,11 @@ def cart_item_count(request):
 
     count = 0
     try:
-        cart = Cart.objects.filter(cart_id=_cart_id(request))
-        if cart.exists():
-            cart_items = CartItem.objects.filter(cart=cart.first())
+        cart = Cart.objects.filter(cart_id=_cart_id(request), is_purchased=False).first()
+        if not cart and hasattr(request, 'user') and request.user.is_authenticated:
+            cart = Cart.objects.filter(user=request.user, is_purchased=False).first()
+        if cart:
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
             for cart_item in cart_items:
                 count += cart_item.quantity
     except Exception:

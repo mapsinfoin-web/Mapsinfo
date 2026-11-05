@@ -835,10 +835,7 @@
                             <h3><a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a></h3>
                             <div class="price-row">
                                 <span class="price">₹{{ product.price }}</span>
-                                {% if product.mrp and product.mrp > product.price %}
-                                <span class="mrp">₹{{ product.mrp }}</span>
-                                <span class="col-discount-pill" style="margin-left: auto;">{{ product.discount_percent }}% SALE</span>
-                                {% elif product.mrp %}
+                                {% if product.mrp %}
                                 <span class="mrp">₹{{ product.mrp }}</span>
                                 {% endif %}
                             </div>
@@ -929,8 +926,6 @@
                                 </div>
                                 {% if product.offer %}
                                 <span class="col-discount-pill">{{ product.offer.badge_text }}</span>
-                                {% elif product.mrp and product.mrp > product.price %}
-                                <span class="col-discount-pill">{{ product.discount_percent }}% SALE</span>
                                 {% endif %}
                             </div>
 

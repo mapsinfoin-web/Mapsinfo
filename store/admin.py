@@ -5,10 +5,11 @@ from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
 from urllib.parse import quote
 
 from .models import (
-    BogoOffer, Cart, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product,
+    BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product,
     ProductGallery,
 )
 
@@ -182,9 +183,7 @@ class BogoOfferAdmin(admin.ModelAdmin):
         self.message_user(request, f"{queryset.update(is_active=False)} offer(s) turned off.", messages.SUCCESS)
 
 
-# --- CART ---
-admin.site.register(Cart)
-admin.site.register(CartItem)
+# --- CART (Registered below with full abandoned cart tracking & WhatsApp follow-up) ---
 
 
 # --- ORDERS & CHECKOUT ---
@@ -392,3 +391,269 @@ class PaymentSettingsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+# --- CART & ABANDONED CART TRACKING ---
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    fields = ['product_preview', 'product', 'quantity', 'unit_price', 'subtotal_display', 'is_active']
+    readonly_fields = ['product_preview', 'unit_price', 'subtotal_display']
+
+    @admin.display(description='Preview')
+    def product_preview(self, obj):
+        if obj.product and obj.product.image:
+            return format_html(
+                '<img src="{}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;" />',
+                obj.product.image.url
+            )
+        return "-"
+
+    @admin.display(description='Unit Price')
+    def unit_price(self, obj):
+        return f"₹{obj.product.price}" if obj.product else "-"
+
+    @admin.display(description='Subtotal')
+    def subtotal_display(self, obj):
+        return f"₹{obj.sub_total()}" if obj.product else "-"
+
+
+class CartGiftInline(admin.TabularInline):
+    model = CartGift
+    extra = 0
+    fields = ['product', 'offer', 'quantity']
+    readonly_fields = ['product', 'offer', 'quantity']
+
+
+class CartStatusFilter(admin.SimpleListFilter):
+    title = 'Cart Status'
+    parameter_name = 'cart_status'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('abandoned', '🔴 Abandoned (Unpurchased with items)'),
+            ('abandoned_phone', '💬 Abandoned with Phone (WhatsApp ready)'),
+            ('abandoned_email', '✉️ Abandoned with Email'),
+            ('purchased', '🟢 Purchased (Converted to Order)'),
+            ('empty', '⚪ Empty Cart'),
+        ]
+
+    def queryset(self, request, queryset):
+        val = self.value()
+        if val == 'abandoned':
+            return queryset.filter(is_purchased=False, cartitem__isnull=False).distinct()
+        if val == 'abandoned_phone':
+            return queryset.filter(is_purchased=False, cartitem__isnull=False).exclude(customer_phone='').distinct()
+        if val == 'abandoned_email':
+            return queryset.filter(is_purchased=False, cartitem__isnull=False).exclude(customer_email='').distinct()
+        if val == 'purchased':
+            return queryset.filter(is_purchased=True)
+        if val == 'empty':
+            return queryset.filter(cartitem__isnull=True)
+        return queryset
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = [
+        'status_badge',
+        'customer_display',
+        'contact_display',
+        'products_preview',
+        'total_items_col',
+        'total_value_col',
+        'followup_actions',
+        'updated_at',
+    ]
+    list_filter = [CartStatusFilter, 'is_purchased', 'updated_at', 'date_added']
+    search_fields = [
+        'customer_name', 'customer_phone', 'customer_email',
+        'user__username', 'user__first_name', 'user__last_name', 'user__email',
+        'cartitem__product__title', 'cart_id',
+    ]
+    readonly_fields = [
+        'cart_id', 'date_added', 'updated_at', 'status_badge',
+        'customer_display', 'whatsapp_followup_button', 'total_cart_value_display',
+    ]
+    inlines = [CartItemInline, CartGiftInline]
+    date_hierarchy = 'updated_at'
+
+    fieldsets = (
+        ('Customer Details', {
+            'fields': ('user', 'customer_name', 'customer_email', 'customer_phone', 'whatsapp_followup_button')
+        }),
+        ('Cart State & Value', {
+            'fields': ('status_badge', 'is_purchased', 'order', 'total_cart_value_display')
+        }),
+        ('Technical Data', {
+            'fields': ('cart_id', 'date_added', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'order').prefetch_related(
+            'cartitem_set__product', 'gifts__product'
+        )
+
+    @admin.display(description='Status')
+    def status_badge(self, obj):
+        if obj.is_purchased:
+            if obj.order_id:
+                order_url = reverse('admin:store_order_change', args=[obj.order_id])
+                return format_html(
+                    '<a href="{}" style="background:#e6f4ea;color:#137333;padding:4px 8px;border-radius:999px;font-weight:600;text-decoration:none;font-size:11px;">'
+                    '🟢 Order #{}</a>',
+                    order_url, obj.order_id
+                )
+            return mark_safe(
+                '<span style="background:#e6f4ea;color:#137333;padding:4px 8px;border-radius:999px;font-weight:600;font-size:11px;">'
+                '🟢 Purchased</span>'
+            )
+        
+        items_count = obj.total_items()
+        if items_count > 0:
+            return mark_safe(
+                '<span style="background:#fce8e6;color:#c5221f;padding:4px 8px;border-radius:999px;font-weight:700;font-size:11px;">'
+                '🔴 Abandoned Cart</span>'
+            )
+        return mark_safe(
+            '<span style="background:#f1f3f4;color:#5f6368;padding:4px 8px;border-radius:999px;font-size:11px;">'
+            '⚪ Empty</span>'
+        )
+
+    @admin.display(description='Customer')
+    def customer_display(self, obj):
+        name = obj.customer_name
+        if obj.user:
+            user_url = reverse('admin:auth_user_change', args=[obj.user_id])
+            username_part = f'<a href="{user_url}"><b>{obj.user.username}</b></a>'
+            if name and name.lower() != obj.user.username.lower():
+                return format_html('{} <span style="color:#5f6368;">({})</span>', format_html(username_part), name)
+            return format_html(username_part)
+        if name:
+            return format_html('<b>{}</b> <span style="font-size:11px;color:#888;">(Guest)</span>', name)
+        return format_html('<span style="color:#888;">Guest ({})</span>', obj.cart_id[:8] if obj.cart_id else "No ID")
+
+    @admin.display(description='Contact')
+    def contact_display(self, obj):
+        parts = []
+        if obj.customer_phone:
+            parts.append(format_html('📞 <b>{}</b>', obj.customer_phone))
+        if obj.customer_email:
+            parts.append(format_html('✉️ <a href="mailto:{}">{}</a>', obj.customer_email, obj.customer_email))
+        elif obj.user and obj.user.email:
+            parts.append(format_html('✉️ <a href="mailto:{}">{}</a>', obj.user.email, obj.user.email))
+        
+        if not parts:
+            return mark_safe('<span style="color:#999;font-style:italic;">No contact info</span>')
+        return mark_safe(f'<div style="line-height:1.4;">{"<br>".join(parts)}</div>')
+
+    @admin.display(description='Products in Cart')
+    def products_preview(self, obj):
+        items = list(obj.cartitem_set.select_related('product'))
+        if not items:
+            return mark_safe('<span style="color:#888;">No items</span>')
+        
+        preview_html = []
+        for item in items[:3]:
+            if item.product and item.product.image:
+                img_tag = f'<img src="{item.product.image.url}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:6px;" />'
+            else:
+                img_tag = '<span style="display:inline-block;width:28px;height:28px;background:#eee;border-radius:4px;vertical-align:middle;margin-right:6px;"></span>'
+            preview_html.append(f'<div>{img_tag}<span>{item.quantity}x {item.product.title}</span></div>')
+        
+        if len(items) > 3:
+            preview_html.append(f'<div style="color:#888;font-size:11px;">+{len(items) - 3} more</div>')
+            
+        return mark_safe(f'<div style="display:flex;flex-direction:column;gap:4px;">{"".join(preview_html)}</div>')
+
+    @admin.display(description='Items')
+    def total_items_col(self, obj):
+        return obj.total_items()
+
+    @admin.display(description='Cart Value')
+    def total_value_col(self, obj):
+        val = obj.total_value()
+        return format_html('<b>₹{}</b>', val)
+
+    @admin.display(description='Quick Follow-Up')
+    def followup_actions(self, obj):
+        buttons = []
+        phone = (obj.customer_phone or '').strip()
+        name = obj.customer_name or (obj.user.get_full_name() or obj.user.username if obj.user else 'there')
+        summary = obj.product_summary()
+
+        if phone:
+            clean_phone = ''.join(ch for ch in phone if ch.isdigit())
+            if len(clean_phone) == 10:
+                clean_phone = '91' + clean_phone
+            
+            msg = (
+                f"Hi {name}, we noticed you were looking at {summary} on MAPSKART! "
+                f"We wanted to check if you had any questions about the product, quality, or delivery? "
+                f"We would be delighted to assist you!"
+            )
+            wa_url = f"https://wa.me/{clean_phone}?text={quote(msg)}"
+            buttons.append(
+                format_html(
+                    '<a href="{}" target="_blank" style="background:#25D366;color:#ffffff;padding:5px 10px;'
+                    'border-radius:6px;font-weight:700;font-size:11.5px;text-decoration:none;'
+                    'display:inline-flex;align-items:center;gap:4px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);">'
+                    '💬 WhatsApp</a>',
+                    wa_url
+                )
+            )
+
+        email = obj.customer_email or (obj.user.email if obj.user else '')
+        if email:
+            email_body = (
+                f"Hi {name},\n\n"
+                f"We noticed you added {summary} to your shopping cart at MAPSKART.\n\n"
+                f"Please let us know if you need help completing your order or have questions about our products.\n\n"
+                f"Best regards,\nMAPSKART Team"
+            )
+            mail_url = f"mailto:{email}?subject={quote('Your MAPSKART Shopping Bag')}&body={quote(email_body)}"
+            buttons.append(
+                format_html(
+                    '<a href="{}" style="background:#1a73e8;color:#ffffff;padding:5px 10px;'
+                    'border-radius:6px;font-weight:700;font-size:11.5px;text-decoration:none;'
+                    'display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">'
+                    '✉️ Email</a>',
+                    mail_url
+                )
+            )
+
+        if not buttons:
+            return mark_safe('<span style="color:#aaa;font-size:11px;">No contact</span>')
+        return mark_safe(f'<div style="display:flex;gap:6px;align-items:center;">{"".join(buttons)}</div>')
+
+    @admin.display(description='WhatsApp Follow-Up')
+    def whatsapp_followup_button(self, obj):
+        phone = (obj.customer_phone or '').strip()
+        if not phone:
+            return mark_safe('<span style="color:#888;">No phone number provided yet</span>')
+        
+        name = obj.customer_name or (obj.user.get_full_name() or obj.user.username if obj.user else 'Customer')
+        summary = obj.product_summary()
+        clean_phone = ''.join(ch for ch in phone if ch.isdigit())
+        if len(clean_phone) == 10:
+            clean_phone = '91' + clean_phone
+
+        msg = (
+            f"Hi {name}, we noticed you were looking at {summary} on MAPSKART! "
+            f"We wanted to check if you had any questions about the product, quality, or delivery? "
+            f"We would be delighted to assist you!"
+        )
+        wa_url = f"https://wa.me/{clean_phone}?text={quote(msg)}"
+        return format_html(
+            '<a href="{}" target="_blank" style="background:#25D366;color:#ffffff;padding:8px 16px;'
+            'border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;'
+            'display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(0,0,0,0.15);">'
+            '💬 Open WhatsApp Chat with Customer ({})</a>',
+            wa_url, phone
+        )
+
+    @admin.display(description='Total Cart Value')
+    def total_cart_value_display(self, obj):
+        return f"₹{obj.total_value()} ({obj.total_items()} items)"
