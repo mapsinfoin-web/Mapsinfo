@@ -90,7 +90,7 @@
         .nav-toggle { display: none; }
         .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
         .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
-        .footer-brand .brand-logo { --logo-h: 56px; margin-bottom: 18px; }
+        .footer-brand .brand-logo { margin-bottom: 18px; }
         .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
         .socials { display: flex; gap: 10px; }
         .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); display: grid; place-items: center; transition: all .3s; }
@@ -113,7 +113,8 @@
         }
         @media (max-width: 640px) {
             .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
-            .logo { --logo-h: 60px; flex-basis: 100%; justify-content: center; }
+            .logo { flex-basis: 100%; justify-content: center; }
+            .logo img { height: 40px; }
             .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
             .actions { order: 3; margin-left: 0; gap: 0; }
             .icon-btn { width: 38px; height: 38px; font-size: 17px; }
@@ -127,11 +128,11 @@
     <div class="announce" aria-label="Offers">
         <div class="announce-track">
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
-            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
-            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
         </div>
@@ -141,8 +142,7 @@
     <header class="header" id="header">
         <div class="container header-main">
             <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
-                <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
-                <img src="{% static '/2.png' %}" alt="" />
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
             </a>
 
             <nav class="nav" id="nav">
@@ -160,7 +160,9 @@
             </form>
 
             <div class="actions">
-                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
+                {% include 'store/includes/notification_bell.html' %}
+
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
                     <i class="far fa-heart"></i>
                     <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
                 </a>
@@ -172,8 +174,8 @@
                 <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
                 {% endif %}
 
-                <a href="{% url 'store:cart_detail' %}" class="icon-btn" aria-label="Cart">
-                    <i class="fas fa-shopping-bag"></i>
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" title="Cart" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
                     {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
                 </a>
 
@@ -233,7 +235,7 @@
         </section>
         {% empty %}
         <div class="empty">
-            <i class="fas fa-bag-shopping"></i>
+            <i class="fas fa-shopping-cart"></i>
             <h3 style="color: var(--ink); margin: 0 0 8px;">No orders yet</h3>
             <p style="margin: 0 0 22px;">When you buy something it will show up here.</p>
             <a href="{% url 'store:all_products' %}" class="btn">Start Shopping</a>
@@ -247,8 +249,7 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
-                        <img src="{% static '/2.png' %}" alt="" />
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
@@ -268,7 +269,6 @@
                 <div class="fcol">
                     <h4>Help</h4>
                     <a href="#">Track Order</a>
-                    <span style="display:block;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:12px;"><i class="fas fa-ban" style="margin-right:6px;"></i>No returns. All products are non-returnable.</span>
                     <a href="#">Size Guide</a>
                     <a href="#">FAQs</a>
                     <a href="{% url 'store:contact' %}">Contact Support</a>

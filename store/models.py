@@ -65,6 +65,14 @@ class Product(models.Model):
             return self.mrp - self.price
         return 0
 
+    @property
+    def available_colors(self):
+        """Returns active colors for this product if defined, otherwise empty list."""
+        try:
+            return list(self.colors.filter(is_available=True))
+        except Exception:
+            return []
+
     def save(self, *args, **kwargs):
         if not self.sku:
             self.sku = uuid.uuid4().hex[:8].upper()
@@ -220,6 +228,22 @@ class ProductGallery(models.Model):
         verbose_name_plural = 'Product Galleries'
 
 
+class ProductColor(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='colors')
+    name = models.CharField(max_length=60, help_text="Color name, e.g. Rose Gold, Yellow Gold, Silver, Emerald Green")
+    hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
+    image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Photo for this color variant (switches main image when selected)")
+    is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Product Color Option'
+        verbose_name_plural = 'Product Color Options'
+
+    def __str__(self):
+        return f"{self.product.title} - {self.name}"
+
+
 class Order(models.Model):
     # New orders are always PAYTM (QR code). COD / PHONEPE stay in the list only so old orders still display.
     PAYMENT_CHOICES = (
@@ -364,3 +388,121 @@ class PaymentSettings(models.Model):
 
     def __str__(self):
         return 'Payment settings'
+
+
+class Notification(models.Model):
+    TYPE_CHOICES = [
+        ('restock', 'Restock Alert'),
+        ('collection', 'New Collection'),
+        ('sale', 'Special Offer / Sale'),
+        ('info', 'Announcement / Update'),
+    ]
+
+    title = models.CharField(
+        max_length=150,
+        help_text="Headline (e.g. 'Emerald Studs Restocked!', 'New Noor Bridal Collection Live!')"
+    )
+    message = models.TextField(
+        help_text="Detailed notification content for visitors and customers."
+    )
+    notification_type = models.CharField(
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default='restock',
+        verbose_name="Type"
+    )
+    badge_text = models.CharField(
+        max_length=40,
+        blank=True,
+        help_text="Optional custom badge text (e.g. 'RESTOCKED', 'NEW DROP', 'LIMITED'). Defaults based on type if empty."
+    )
+
+    # Optional destination targets
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Optional: link directly to a specific product."
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Optional: link directly to a collection."
+    )
+    link_url = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional custom URL (e.g. /sale/ or external URL). Overrides product/category."
+    )
+    link_text = models.CharField(
+        max_length=50,
+        blank=True,
+        default="View Now",
+        help_text="Button text (e.g. 'Shop Restock', 'Explore Collection', 'Shop Sale')."
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Turn ON to publish immediately to customers on the website."
+    )
+    show_in_announcement_bar = models.BooleanField(
+        default=False,
+        help_text="Also feature this notification in the scrolling announcement bar at the top."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
+
+    def __str__(self):
+        return f"[{self.get_notification_type_display()}] {self.title}"
+
+    @property
+    def display_badge(self):
+        if self.badge_text:
+            return self.badge_text
+        defaults = {
+            'restock': 'RESTOCKED',
+            'collection': 'NEW COLLECTION',
+            'sale': 'SPECIAL OFFER',
+            'info': 'ANNOUNCEMENT',
+        }
+        return defaults.get(self.notification_type, 'UPDATE')
+
+    def get_target_url(self):
+        if self.link_url:
+            return self.link_url
+        if self.product:
+            from django.urls import reverse
+            return reverse('store:product_detail', args=[self.product.pk])
+        if self.category:
+            from django.urls import reverse
+            return reverse('store:collection_detail', args=[self.category.slug])
+        return ""
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default='',
+        verbose_name='Mobile Number',
+        help_text="Customer 10-digit mobile number"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Customer Profile'
+        verbose_name_plural = 'Customer Profiles'
+
+    def __str__(self):
+        return f"{self.user.username} ({self.phone_number})"
+

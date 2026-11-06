@@ -60,8 +60,22 @@
         .info { background: #fff; border-radius: 26px; box-shadow: var(--shadow); padding: 34px 34px 30px; }
         .sku { display: inline-block; font-size: 11.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); font-weight: 700; margin-bottom: 12px; }
         .title { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600; color: var(--ink); margin: 0 0 14px; line-height: 1.18; letter-spacing: -.4px; }
-        .price { font-size: 28px; font-weight: 800; color: var(--ink); margin: 0 0 18px; }
-        .price s { color: var(--muted); font-size: 18px; font-weight: 400; margin-right: 12px; }
+        .price { font-size: 28px; font-weight: 800; color: var(--ink); margin: 0 0 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .price s { color: var(--muted); font-size: 18px; font-weight: 400; margin-right: 0; }
+        .discount-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--red);
+            padding: 3px 9px;
+            border-radius: 6px;
+            letter-spacing: .3px;
+            line-height: 1.2;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
         .desc { font-size: 15.5px; line-height: 1.85; color: var(--text); padding: 18px 0 22px; margin-bottom: 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
         .desc p { margin: 0 0 12px; }
         .desc p:last-child { margin-bottom: 0; }
@@ -175,7 +189,7 @@
         .nav-toggle { display: none; }
         .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
         .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
-        .footer-brand .brand-logo { --logo-h: 56px; margin-bottom: 18px; }
+        .footer-brand .brand-logo { margin-bottom: 18px; }
         .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
         .socials { display: flex; gap: 10px; }
         .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); display: grid; place-items: center; transition: all .3s; }
@@ -239,6 +253,92 @@
             line-height: 1.2;
         }
 
+        /* Multi-Colour Selector (Amazon / Flipkart Style) */
+        .color-picker-box {
+            margin: 0 0 22px;
+            padding: 16px 18px;
+            background: #F8FAFC;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+        }
+        .color-picker-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--ink);
+        }
+        .color-picker-label {
+            color: var(--muted);
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .color-picker-label i {
+            color: var(--brand);
+            font-size: 13px;
+        }
+        .color-picker-name {
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: .2px;
+        }
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .color-swatch-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px 7px 9px;
+            background: #fff;
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            transition: all .2s ease;
+            box-shadow: 0 2px 6px rgba(19, 38, 57, .04);
+            user-select: none;
+        }
+        .color-swatch-item:hover {
+            border-color: var(--brand);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(31, 58, 102, .1);
+        }
+        .color-swatch-item.active {
+            border-color: var(--navy);
+            background: #EFF6FF;
+            color: var(--navy);
+            box-shadow: 0 0 0 2px rgba(31, 58, 102, .18), 0 4px 12px rgba(31, 58, 102, .12);
+        }
+        .swatch-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, .2);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .swatch-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+        .swatch-title {
+            line-height: 1.2;
+        }
+
         /* Floating WhatsApp Support Button */
         .floating-wa {
             position: fixed;
@@ -275,7 +375,8 @@
 
         @media (max-width: 640px) {
             .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
-            .logo { --logo-h: 60px; flex-basis: 100%; justify-content: center; }
+            .logo { flex-basis: 100%; justify-content: center; }
+            .logo img { height: 40px; }
             .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
             .actions { order: 3; margin-left: 0; gap: 0; }
             .icon-btn { width: 38px; height: 38px; font-size: 17px; }
@@ -289,11 +390,11 @@
     <div class="announce" aria-label="Offers">
         <div class="announce-track">
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
-            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
             <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
-            <span><i class="fas fa-tag"></i>Festive Sale — Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
         </div>
@@ -303,8 +404,7 @@
     <header class="header" id="header">
         <div class="container header-main">
             <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
-                <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
-                <img src="{% static '/2.png' %}" alt="" />
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
             </a>
 
             <nav class="nav" id="nav">
@@ -322,7 +422,9 @@
             </form>
 
             <div class="actions">
-                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
+                {% include 'store/includes/notification_bell.html' %}
+
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
                     <i class="far fa-heart"></i>
                     <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
                 </a>
@@ -334,8 +436,8 @@
                 <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
                 {% endif %}
 
-                <a href="{% url 'store:cart_detail' %}" class="icon-btn" aria-label="Cart">
-                    <i class="fas fa-shopping-bag"></i>
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" title="Cart" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
                     {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
                 </a>
 
@@ -350,8 +452,11 @@
 
         <!-- Left: gallery -->
         <div class="gallery animate-up">
-            <div class="main-image" id="main-wrap" {% if product.image %}style="--bg: url('{{ product.image.url }}')" role="button" tabindex="0" aria-label="Click to zoom the photo"{% endif %}>
-                {% if product.image %}
+            <div class="main-image" id="main-wrap" {% if selected_color_obj.image %}style="--bg: url('{{ selected_color_obj.image.url }}')"{% elif product.image %}style="--bg: url('{{ product.image.url }}')"{% endif %} role="button" tabindex="0" aria-label="Click to zoom the photo">
+                {% if selected_color_obj.image %}
+                <img src="{{ selected_color_obj.image.url }}" alt="{{ product.title }} - {{ selected_color_obj.name }}" id="main-image" />
+                <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to zoom</span>
+                {% elif product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" id="main-image" />
                 <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to zoom</span>
                 {% else %}
@@ -379,14 +484,45 @@
             <span class="sku">SKU: {{ product.sku }}</span>
             <h1 class="title">{{ product.title }}</h1>
             <p class="price">
-                ₹{{ product.price }}
                 {% if product.mrp and product.mrp > product.price %}
                     <s>₹{{ product.mrp }}</s>
-                    <span style="font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #C8E6C9; padding: 3px 10px; border-radius: 8px; margin-left: 8px; vertical-align: middle;">{{ product.discount_percent }}% SALE</span>
+                    <span>₹{{ product.price }}</span>
+                    <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
                 {% elif product.mrp %}
                     <s>₹{{ product.mrp }}</s>
+                    <span>₹{{ product.price }}</span>
+                {% else %}
+                    <span>₹{{ product.price }}</span>
                 {% endif %}
             </p>
+
+            <!-- Multi-Colour Options (Amazon & Flipkart Style) - FIRST -->
+            {% if product.available_colors %}
+            <div class="color-picker-box">
+                <div class="color-picker-head">
+                    <span class="color-picker-label"><i class="fas fa-palette"></i> Colour:</span>
+                    <strong class="color-picker-name" id="selectedColorName">{{ selected_color_obj.name|default:product.available_colors.0.name }}</strong>
+                </div>
+                <div class="color-swatches" role="radiogroup" aria-label="Product Colours">
+                    {% for c in product.available_colors %}
+                    <button type="button"
+                            class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id or not selected_color_obj and forloop.first %}active{% endif %}"
+                            data-name="{{ c.name }}"
+                            data-image="{% if c.image %}{{ c.image.url }}{% endif %}"
+                            onclick="selectColor(this)"
+                            title="{{ c.name }}"
+                            aria-label="{{ c.name }}">
+                        {% if c.image %}
+                        <img src="{{ c.image.url }}" alt="{{ c.name }}" class="swatch-img" loading="lazy" />
+                        {% else %}
+                        <span class="swatch-dot" style="background-color: {{ c.hex_code }};"></span>
+                        {% endif %}
+                        <span class="swatch-title">{{ c.name }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
             <ul class="trust">
                 {% for icon, word in trust_words %}
@@ -397,14 +533,6 @@
                 <li><i class="fas fa-tags"></i> Best Price</li>
                 {% endfor %}
             </ul>
-
-            {% if product.description %}
-            <div class="desc">{{ product.description|linebreaks }}</div>
-            {% else %}
-            <div style="border-top: 1px solid var(--line); margin-bottom: 22px;"></div>
-            {% endif %}
-
-            <p class="no-return"><i class="fas fa-ban"></i> No returns. All products are non-returnable.</p>
 
             <!-- Jewelry Care & Anti-Tarnish Guarantee Badges -->
             <div class="guarantee-grid">
@@ -438,6 +566,12 @@
                 </div>
             </div>
 
+            {% if product.description %}
+            <div class="desc">{{ product.description|linebreaks }}</div>
+            {% else %}
+            <div style="border-top: 1px solid var(--line); margin-bottom: 22px;"></div>
+            {% endif %}
+
             {% if product.in_stock %}
                 {% if product.is_low_stock %}
                 <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
@@ -449,6 +583,9 @@
                     <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
                     <form action="{% url 'store:add_cart' product.id %}" method="POST">
                         {% csrf_token %}
+                        {% if product.available_colors %}
+                        <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                        {% endif %}
                         <p class="gift-offer-sub">Choose your FREE gift:</p>
                         {% for g in gift_choices %}
                         <label class="gift-choice">
@@ -465,10 +602,16 @@
                 {% else %}
                 <form action="{% url 'store:add_cart' product.id %}" method="POST">
                     {% csrf_token %}
+                    {% if product.available_colors %}
+                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                    {% endif %}
                     <button type="submit" class="btn btn-add">Add to Cart</button>
                 </form>
                 <form action="{% url 'store:buy_now' product.pk %}" method="POST">
                     {% csrf_token %}
+                    {% if product.available_colors %}
+                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                    {% endif %}
                     <button type="submit" class="btn btn-buy">Buy Now</button>
                 </form>
                 {% endif %}
@@ -491,8 +634,7 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static '/1.png' %}" alt="MAPSKART logo mark" />
-                        <img src="{% static '/2.png' %}" alt="" />
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
@@ -512,7 +654,6 @@
                 <div class="fcol">
                     <h4>Help</h4>
                     <a href="#">Track Order</a>
-                    <span style="display:block;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:12px;"><i class="fas fa-ban" style="margin-right:6px;"></i>No returns. All products are non-returnable.</span>
                     <a href="#">Size Guide</a>
                     <a href="#">FAQs</a>
                     <a href="{% url 'store:contact' %}">Contact Support</a>
@@ -552,6 +693,46 @@
     </div>
 
     <script>
+        function selectColor(btn) {
+            if (!btn) return;
+            document.querySelectorAll('.color-swatch-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            btn.classList.add('active');
+            var colorName = btn.getAttribute('data-name') || '';
+            var imgUrl = btn.getAttribute('data-image') || '';
+
+            var label = document.getElementById('selectedColorName');
+            if (label) {
+                label.textContent = colorName;
+            }
+
+            document.querySelectorAll('.productSelectedColor').forEach(function(input) {
+                input.value = colorName;
+            });
+
+            if (imgUrl) {
+                var main = document.getElementById('main-image');
+                if (main) { main.src = imgUrl; }
+                var wrap = document.getElementById('main-wrap');
+                if (wrap) { wrap.style.setProperty('--bg', "url('" + imgUrl + "')"); }
+                document.querySelectorAll('.thumb').forEach(function (img) {
+                    img.classList.remove('active');
+                });
+            }
+
+            var waBtn = document.querySelector('.floating-wa');
+            if (waBtn && waBtn.href) {
+                try {
+                    var url = new URL(waBtn.href);
+                    var currentText = url.searchParams.get('text') || '';
+                    var updatedText = currentText.replace(/\s*\(Colour:[^\)]+\)/i, '') + ' (Colour: ' + colorName + ')';
+                    url.searchParams.set('text', updatedText);
+                    waBtn.href = url.toString();
+                } catch(e) {}
+            }
+        }
+
         function swapImage(thumbnail) {
             var main = document.getElementById('main-image');
             if (main) { main.src = thumbnail.src; }

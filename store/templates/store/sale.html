@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Festive Jewellery Sale | Flat 20% OFF | MAPSKART Delhi NCR</title>
-    <meta name="description" content="Shop MAPSKART demi-fine jewellery sale in Delhi NCR. Up to 50% off earrings, necklaces, rings and bracelets. Extra 20% off with promo code MAPS20." />
+    <title>Festive Jewellery Sale | Up to 50% OFF | MAPSKART Delhi NCR</title>
+    <meta name="description" content="Shop MAPSKART demi-fine jewellery sale in Delhi NCR. Up to 50% off earrings, necklaces, rings and bracelets." />
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />
@@ -64,9 +64,10 @@
         /* ===== HEADER ===== */
         .header { position: sticky; top: 0; z-index: 100; background: rgba(245, 248, 252, .92); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid var(--line); transition: background .3s, box-shadow .3s; }
         .header-main { display: flex; align-items: center; justify-content: space-between; height: 78px; gap: 24px; }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: 2px; color: var(--ink); }
-        .logo img:first-child { width: 34px; height: 34px; border-radius: 8px; object-fit: contain; }
-        .logo img:last-child { height: 20px; width: auto; object-fit: contain; }
+                .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+        .logo img { display: block; height: 48px; width: auto; max-width: 100%; object-fit: contain; }
+        .brand-logo { display: inline-flex; align-items: center; margin-bottom: 18px; }
+        .brand-logo img { display: block; height: 50px; width: auto; max-width: 100%; object-fit: contain; }
         .nav { display: flex; align-items: center; gap: 32px; font-size: 14.5px; font-weight: 500; color: var(--ink); }
         .nav a { position: relative; padding: 6px 0; transition: color .2s ease; }
         .nav a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: var(--brand); transition: width .25s ease; border-radius: 2px; }
@@ -131,6 +132,7 @@
         .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
         .thumb { position: relative; aspect-ratio: 1/1.1; overflow: hidden; background: var(--soft-2); }
         .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+        .thumb form.add-to-cart-form { display: contents; }
         .card:hover .thumb img { transform: scale(1.07); }
         
         .sale-tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .5px; background: var(--red); color: #fff; box-shadow: 0 4px 10px rgba(229,72,77,.35); }
@@ -146,9 +148,42 @@
         .card-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
         .cat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
         .card-body h3 { margin: 6px 0 10px; font-size: 15.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
-        .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+        .card-color-swatches {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin: 4px 0 8px;
+        }
+        .card-swatch-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, .2);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
+            display: inline-block;
+        }
+        .card-color-count {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-left: 2px;
+        }
+        .price-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: auto; }
         .price { font-size: 18px; font-weight: 700; color: var(--ink); }
         .mrp { font-size: 13.5px; color: var(--muted); text-decoration: line-through; }
+        .discount-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--red);
+            padding: 2.5px 7px;
+            border-radius: 6px;
+            letter-spacing: .3px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
         .save-pill { font-size: 11px; font-weight: 700; color: var(--red); background: rgba(229,72,77,.1); padding: 2px 7px; border-radius: 6px; }
 
         .card.hide { display: none !important; }
@@ -161,9 +196,7 @@
         /* ===== FOOTER ===== */
         .footer { background: var(--navy-2); color: #fff; padding: 60px 0 30px; margin-top: 60px; }
         .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .brand-logo img:first-child { width: 34px; height: 34px; object-fit: contain; }
-        .brand-logo img:last-child { height: 20px; filter: brightness(0) invert(1); }
+        
         .footer-brand p { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.6; max-width: 320px; }
         .socials { display: flex; gap: 12px; margin-top: 15px; }
         .socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; color: #fff; font-size: 14px; transition: all .2s; }
@@ -173,18 +206,136 @@
         .fcol a:hover { color: var(--accent); }
         .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: rgba(255,255,255,.6); flex-wrap: wrap; gap: 15px; }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(3, 1fr); }
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
             .footer-top { grid-template-columns: 1fr 1fr; }
         }
+
         @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .header { z-index: 900; }
             .nav-toggle { display: grid; }
-            .nav { position: fixed; top: 78px; left: 0; right: 0; background: var(--bg); flex-direction: column; padding: 24px; gap: 16px; border-bottom: 1px solid var(--line); display: none; box-shadow: var(--shadow-lg); }
+            .nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #fff;
+                flex-direction: column;
+                padding: 18px 24px;
+                gap: 14px;
+                border-bottom: 1px solid var(--line);
+                display: none;
+                box-shadow: 0 10px 30px rgba(19, 38, 57, .12);
+                z-index: 999;
+            }
             .nav.open { display: flex; }
-            .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-            .sale-banner { padding: 30px 20px; }
-            .footer-top { grid-template-columns: 1fr; }
-            .quick { opacity: 1; transform: none; position: static; margin-top: 10px; width: 100%; }
+
+            /* Sale Hero */
+            .sale-hero { padding: 20px 0 10px; }
+            .sale-banner { padding: 26px 18px; border-radius: 20px; }
+            .sale-banner h1 { font-size: clamp(24px, 6vw, 32px); }
+            .sale-banner p { font-size: 13.5px; line-height: 1.5; margin: 0 0 16px; }
+            .sale-promo-row { gap: 12px; }
+            .timer-strip { padding: 8px 12px; gap: 8px; width: 100%; justify-content: space-around; }
+            .timer-strip .t-num { font-size: 16px; }
+            .timer-strip .t-lbl { font-size: 8.5px; }
+
+            /* Section Head & Filter Tabs */
+            .section { padding: 20px 0 50px; }
+            .sec-head { margin-bottom: 18px; gap: 12px; flex-direction: column; align-items: flex-start; }
+            .sec-head h2 { font-size: 24px; }
+            .filter-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                gap: 8px;
+                margin: 0 -16px;
+                padding: 4px 16px 10px;
+                width: calc(100% + 32px);
+            }
+            .filter-tabs::-webkit-scrollbar { display: none; }
+            .tab-btn { flex-shrink: 0; white-space: nowrap; padding: 7px 15px; font-size: 12.5px; }
+
+            /* Grid & Cards */
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .card { border-radius: 14px; }
+            .thumb { aspect-ratio: 1/1.05; }
+            .sale-tag { top: 8px; left: 8px; font-size: 9.5px; padding: 3px 7px; }
+            .wish { top: 8px; right: 8px; width: 32px; height: 32px; font-size: 13px; }
+
+            /* Mobile Quick Add Button stays visible, non-blocking */
+            .quick {
+                opacity: 1;
+                transform: none;
+                position: absolute;
+                bottom: 8px;
+                left: 8px;
+                right: 8px;
+                z-index: 4;
+                padding: 8px 6px;
+                font-size: 11.5px;
+                font-weight: 700;
+                border-radius: 8px;
+                background: rgba(31, 58, 102, 0.94);
+                color: #fff;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                box-shadow: 0 4px 10px rgba(0,0,0,.2);
+            }
+
+            .card-body { padding: 10px 8px 12px; }
+            .cat-label { font-size: 10px; }
+            .card-body h3 {
+                font-size: 13px;
+                line-height: 1.35;
+                margin: 4px 0 6px;
+                min-height: 34px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .card-color-swatches { margin: 2px 0 6px; gap: 4px; }
+            .card-swatch-dot { width: 11px; height: 11px; }
+            .card-color-count { font-size: 10px; }
+
+            .price-row { gap: 4px 6px; }
+            .price { font-size: 15px; }
+            .mrp { font-size: 11.5px; }
+            .discount-badge { font-size: 9px; padding: 2px 5px; }
+
+            /* Footer */
+            .footer { padding: 36px 0 20px; margin-top: 40px; }
+            .footer-top { grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 12px; }
+            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; height: auto; }
+            .logo { flex-basis: 100%; justify-content: center; }
+            .logo img { height: 38px; }
+            .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
+            .actions { order: 3; margin-left: 0; gap: 4px; }
+            .icon-btn { width: 38px; height: 38px; font-size: 16px; }
+
+            .filter-tabs { margin: 0 -12px; padding: 4px 12px 10px; width: calc(100% + 24px); }
+            .grid { gap: 10px; }
+        }
+
+        @media (max-width: 380px) {
+            .container { padding: 0 8px; }
+            .grid { gap: 7px; }
+            .card-body { padding: 8px 6px 10px; }
+            .card-body h3 { font-size: 12px; min-height: 32px; }
+            .price { font-size: 14px; }
+            .mrp { font-size: 10.5px; }
+            .quick { font-size: 10.5px; padding: 7px 4px; }
+            .filter-tabs { margin: 0 -8px; padding: 4px 8px 10px; width: calc(100% + 16px); }
         }
     </style>
 </head>
@@ -192,10 +343,10 @@
     <!-- ===== ANNOUNCEMENT BAR ===== -->
     <div class="bar">
         <div class="bar-inner">
-            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
             <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
             <span><i class="fas fa-gift"></i>Complimentary premium gift box with every order</span>
-            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Flat 20% OFF with code MAPS20</span>
+            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
             <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
         </div>
     </div>
@@ -204,8 +355,7 @@
     <header class="header">
         <div class="container header-main">
             <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
-                <img src="{% static '1.png' %}" alt="MAPSKART logo" />
-                <img src="{% static '2.png' %}" alt="MAPSKART" />
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
             </a>
 
             <nav class="nav" id="nav">
@@ -223,7 +373,9 @@
             </form>
 
             <div class="actions">
-                <a href="{% url 'store:wishlist' %}" class="icon-btn" aria-label="Wishlist">
+                {% include 'store/includes/notification_bell.html' %}
+
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
                     <i class="far fa-heart"></i>
                     <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
                 </a>
@@ -235,8 +387,8 @@
                 <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
                 {% endif %}
 
-                <a href="{% url 'store:cart_detail' %}" class="icon-btn" aria-label="Cart">
-                    <i class="fas fa-shopping-bag"></i>
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" title="Cart" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
                     {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
                 </a>
 
@@ -252,15 +404,9 @@
                 <div class="sale-banner">
                     <span class="sale-tag-top"><i class="fas fa-bolt"></i> Festive Flash Sale</span>
                     <h1>Curated Jewellery <em>On Sale</em></h1>
-                    <p>Discover handcrafted demi-fine jewellery at up to 50% off. Apply coupon code at checkout for an extra 20% discount on all orders across Delhi NCR.</p>
+                    <p>Discover handcrafted demi-fine jewellery at up to 50% off across Delhi NCR.</p>
                     
                     <div class="sale-promo-row">
-                        <div class="code-box" id="copyCoupon" title="Click to copy coupon code">
-                            <span>Use Coupon:</span>
-                            <strong id="couponCode">MAPS20</strong>
-                            <i class="far fa-copy" id="copyIcon"></i>
-                        </div>
-
                         <div class="timer-strip" id="saleTimer">
                             <div class="t-unit"><span class="t-num" id="sD">01</span><span class="t-lbl">Days</span></div>
                             <div class="t-unit"><span class="t-num" id="sH">18</span><span class="t-lbl">Hours</span></div>
@@ -300,11 +446,9 @@
                                 <span class="sale-tag" style="background: var(--navy);">OUT OF STOCK</span>
                             {% elif product.offer %}
                                 <span class="sale-tag" style="background: var(--brand);">{{ product.offer.badge_text|upper }}</span>
-                            {% elif product.mrp and product.mrp > product.price %}
-                                <span class="sale-tag">{{ product.discount_percent }}% OFF</span>
                             {% endif %}
 
-                            <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" aria-label="Add to wishlist">
+                            <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" title="Wishlist" aria-label="Add to wishlist">
                                 <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
                             </button>
 
@@ -321,7 +465,7 @@
                             {% else %}
                                 <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0;">
                                     {% csrf_token %}
-                                    <button type="submit" class="quick"><i class="fas fa-shopping-bag" style="margin-right:6px;"></i>+ Quick Add</button>
+                                    <button type="submit" class="quick"><i class="fas fa-shopping-cart" style="margin-right:6px;"></i>+ Quick Add</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -330,11 +474,32 @@
                             <div>
                                 <span class="cat-label">{{ product.category.name }}</span>
                                 <h3><a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a></h3>
+                                {% if product.available_colors %}
+                                <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
+                                    {% for c in product.available_colors|slice:":5" %}
+                                    <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+                                       class="card-swatch-dot"
+                                       style="background-color: {{ c.hex_code }};"
+                                       title="{{ c.name }}"
+                                       {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
+                                       onclick="event.stopPropagation();"></a>
+                                    {% endfor %}
+                                    {% if product.available_colors|length > 1 %}
+                                    <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
                             </div>
                             <div class="price-row">
-                                <span class="price">₹{{ product.price }}</span>
-                                {% if product.mrp %}
+                                {% if product.mrp and product.mrp > product.price %}
                                     <span class="mrp">₹{{ product.mrp }}</span>
+                                    <span class="price">₹{{ product.price }}</span>
+                                    <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
+                                {% elif product.mrp %}
+                                    <span class="mrp">₹{{ product.mrp }}</span>
+                                    <span class="price">₹{{ product.price }}</span>
+                                {% else %}
+                                    <span class="price">₹{{ product.price }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -377,8 +542,7 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static '1.png' %}" alt="MAPSKART logo" />
-                        <img src="{% static '2.png' %}" alt="MAPSKART" />
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
                     </div>
                     <p>Demi-fine jewellery designed for modern life. Curated in Delhi NCR with fast, insured delivery across India.</p>
                     <div class="socials">
@@ -397,7 +561,6 @@
                 </div>
                 <div class="fcol">
                     <h4>Help</h4>
-                    <span style="display:block;font-size:13px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:12px;"><i class="fas fa-ban" style="margin-right:6px;"></i>All sales are non-returnable.</span>
                     <a href="{% url 'store:contact' %}">Contact Support</a>
                     <a href="#">Size Guide</a>
                 </div>
@@ -421,7 +584,9 @@
             var nav = document.getElementById('nav');
             if (navToggle && nav) {
                 navToggle.addEventListener('click', function() {
-                    nav.classList.toggle('open');
+                    var o = nav.classList.toggle('open');
+                    navToggle.setAttribute('aria-expanded', o);
+                    navToggle.innerHTML = o ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
                 });
             }
 
@@ -439,23 +604,7 @@
                 }, 2400);
             }
 
-            // Copy Coupon Code
-            var copyBox = document.getElementById('copyCoupon');
-            if (copyBox) {
-                copyBox.addEventListener('click', function() {
-                    var code = document.getElementById('couponCode').textContent.trim();
-                    navigator.clipboard.writeText(code).then(function() {
-                        var icon = document.getElementById('copyIcon');
-                        if (icon) {
-                            icon.className = 'fas fa-check';
-                            setTimeout(function() { icon.className = 'far fa-copy'; }, 2000);
-                        }
-                        showToast('Coupon code MAPS20 copied to clipboard!');
-                    }).catch(function() {
-                        showToast('Coupon code: MAPS20');
-                    });
-                });
-            }
+
 
             // Countdown Timer (24h loop)
             var end = new Date().getTime() + (36 * 3600 * 1000);
@@ -601,6 +750,18 @@
                 });
             });
         });
+
+        function previewCardColor(dot) {
+            if (!dot) return;
+            var newSrc = dot.getAttribute('data-img');
+            if (!newSrc) return;
+            var card = dot.closest('.card, article');
+            if (!card) return;
+            var img = card.querySelector('img');
+            if (img) {
+                img.src = newSrc;
+            }
+        }
     </script>
 </body>
 </html>

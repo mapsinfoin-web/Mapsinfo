@@ -1,5 +1,5 @@
 # store/context_processors.py
-from .models import Cart, CartItem, Wishlist
+from .models import Cart, CartItem, Wishlist, Notification
 from .views import _cart_id
 
 def cart_item_count(request):
@@ -26,7 +26,20 @@ def cart_item_count(request):
         except Exception:
             user_wishlist = []
 
+    # Active Store Notifications & Announcements
+    notifications = []
+    announcements = []
+    try:
+        notifications = list(Notification.objects.filter(is_active=True).select_related('product', 'category')[:10])
+        announcements = [n for n in notifications if n.show_in_announcement_bar]
+    except Exception:
+        notifications = []
+        announcements = []
+
     return {
         'cart_count': count,
         'user_wishlist': user_wishlist,
+        'store_notifications': notifications,
+        'store_notifications_count': len(notifications),
+        'store_announcements': announcements,
     }

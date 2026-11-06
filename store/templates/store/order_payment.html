@@ -26,10 +26,8 @@
         .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
         .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.9); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
         .header-main { display: flex; align-items: center; padding: 12px 0; gap: 20px; }
-        .logo { --logo-h: 56px; display: flex; align-items: center; }
-        .logo img { height: var(--logo-h); width: auto; }
-        .logo img:first-child { transform: translateY(calc(var(--logo-h) * .12 * -1)); }
-        .logo img + img { margin-left: calc(var(--logo-h) * .3 * -1); }
+        .logo { display: inline-flex; align-items: center; }
+        .logo img { height: 48px; width: auto; max-width: 100%; object-fit: contain; }
         .nav-right { margin-left: auto; font-size: 14px; font-weight: 500; display: flex; gap: 20px; }
 
         main { padding: 36px 0 70px; }
@@ -90,9 +88,8 @@
 <body>
     <header class="header">
         <div class="container header-main">
-            <a href="{% url 'store:all_products' %}" class="logo">
-                <img src="{% static '/1.png' %}" alt="MAPSKART logo" />
-                <img src="{% static '/2.png' %}" alt="MAPSKART logo2" />
+            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
             </a>
             <div class="nav-right">
                 <a href="{% url 'store:my_orders' %}">My Orders</a>

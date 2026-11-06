@@ -8,16 +8,25 @@ from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from urllib.parse import quote
 
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
 from .models import (
-    BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product,
-    ProductGallery,
+    BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Notification, Order, OrderItem, PaymentSettings,
+    Product, ProductColor, ProductGallery, Profile,
 )
 
 
-# --- PRODUCT GALLERY ---
+# --- PRODUCT GALLERY & COLORS ---
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1  # Shows one blank row by default for a new image
+
+
+class ProductColorInline(admin.TabularInline):
+    model = ProductColor
+    extra = 1
+    fields = ['name', 'hex_code', 'image', 'is_available']
 
 
 # --- CATEGORY ---
@@ -57,7 +66,7 @@ class ProductAdmin(admin.ModelAdmin):
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku']
-    inlines = [ProductGalleryInline]
+    inlines = [ProductGalleryInline, ProductColorInline]
     fields = ['category', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active']
 
     def get_queryset(self, request):
@@ -81,6 +90,36 @@ class ProductAdmin(admin.ModelAdmin):
         if obj.is_low_stock:
             return format_html('<b style="color:{};">Low ({})</b>', '#d68910', obj.stock)
         return format_html('<span style="color:{};">{}</span>', '#1e8449', 'In stock')
+
+    def get_inline_instances(self, request, obj=None):
+        try:
+            from django.db import connection
+            tables = connection.introspection.table_names()
+        except Exception:
+            tables = []
+
+        inline_instances = []
+        for inline_class in self.inlines:
+            inline = inline_class(self.model, self.admin_site)
+            # If a model's table has not been created yet in the database, don't crash the change form
+            if tables and inline.model._meta.db_table not in tables:
+                continue
+            inline_instances.append(inline)
+        return inline_instances
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        try:
+            from django.db import connection
+            tables = connection.introspection.table_names()
+            if tables and ProductColor._meta.db_table not in tables:
+                messages.warning(
+                    request,
+                    "Note: Product colour options table is pending migration. "
+                    "Run 'python manage.py migrate' in your terminal to enable colour variants."
+                )
+        except Exception:
+            pass
+        return super().change_view(request, object_id, form_url, extra_context)
 
 
 # --- BOGO OFFERS ---
@@ -244,7 +283,7 @@ class OrderAdmin(admin.ModelAdmin):
             return '-'
         digits = ''.join(ch for ch in (obj.mobile_number or '') if ch.isdigit())
         if not digits:
-            return format_html('<span style="color:#94a3b8;">No mobile</span>')
+            return mark_safe('<span style="color:#94a3b8;">No mobile</span>')
         phone = '91' + digits if len(digits) == 10 else digits
 
         if obj.status == 'SHIPPED':
@@ -527,10 +566,10 @@ class CartAdmin(admin.ModelAdmin):
         name = obj.customer_name
         if obj.user:
             user_url = reverse('admin:auth_user_change', args=[obj.user_id])
-            username_part = f'<a href="{user_url}"><b>{obj.user.username}</b></a>'
+            username_part = mark_safe(f'<a href="{user_url}"><b>{obj.user.username}</b></a>')
             if name and name.lower() != obj.user.username.lower():
-                return format_html('{} <span style="color:#5f6368;">({})</span>', format_html(username_part), name)
-            return format_html(username_part)
+                return mark_safe(f'{username_part} <span style="color:#5f6368;">({name})</span>')
+            return username_part
         if name:
             return format_html('<b>{}</b> <span style="font-size:11px;color:#888;">(Guest)</span>', name)
         return format_html('<span style="color:#888;">Guest ({})</span>', obj.cart_id[:8] if obj.cart_id else "No ID")
@@ -657,3 +696,73 @@ class CartAdmin(admin.ModelAdmin):
     @admin.display(description='Total Cart Value')
     def total_cart_value_display(self, obj):
         return f"₹{obj.total_value()} ({obj.total_items()} items)"
+
+
+# --- NOTIFICATIONS & ANNOUNCEMENTS ---
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'type_badge', 'is_active', 'show_in_announcement_bar', 'destination_preview', 'created_at']
+    list_filter = ['notification_type', 'is_active', 'show_in_announcement_bar', 'created_at']
+    list_editable = ['is_active', 'show_in_announcement_bar']
+    search_fields = ['title', 'message', 'badge_text']
+    autocomplete_fields = ['product']
+    fieldsets = (
+        ('Notification Content', {
+            'fields': ('title', 'message', 'notification_type', 'badge_text')
+        }),
+        ('Link Destination (Optional)', {
+            'fields': ('product', 'category', 'link_url', 'link_text'),
+            'description': 'Choose a product or collection to auto-generate the link, or specify a custom URL.'
+        }),
+        ('Visibility Settings', {
+            'fields': ('is_active', 'show_in_announcement_bar'),
+            'description': 'Active notifications appear in the header notification bell. Check "show in announcement bar" to also scroll in the top ticker.'
+        }),
+    )
+
+    @admin.display(description='Type', ordering='notification_type')
+    def type_badge(self, obj):
+        styles = {
+            'restock': ('#059669', '#d1fae5', '🔄 Restock'),
+            'collection': ('#1d4ed8', '#dbeafe', '✨ New Collection'),
+            'sale': ('#dc2626', '#fee2e2', '🔥 Sale / Offer'),
+            'info': ('#4b5563', '#f3f4f6', '📢 Announcement'),
+        }
+        color, bg, label = styles.get(obj.notification_type, ('#1F3A66', '#e0f2fe', obj.notification_type))
+        return format_html(
+            '<span style="background:{}; color:{}; padding:4px 9px; border-radius:12px; font-weight:700; font-size:11.5px; display:inline-block;">{}</span>',
+            bg, color, label
+        )
+
+    @admin.display(description='Target Link')
+    def destination_preview(self, obj):
+        url = obj.get_target_url()
+        if not url:
+            return mark_safe('<span style="color:#9ca3af; font-size:12px;">None</span>')
+        return format_html('<a href="{}" target="_blank" style="font-weight:600; text-decoration:underline;">{} ↗</a>', url, obj.link_text or 'View')
+
+
+# --- CUSTOMER USER ADMIN WITH PHONE NUMBER PROFILE ---
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
+    verbose_name_plural = 'Customer Mobile & Profile'
+    fields = ['phone_number']
+
+try:
+    admin.site.unregister(User)
+except admin.sites.NotRegistered:
+    pass
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    inlines = [ProfileInline]
+    list_display = ['username', 'email', 'get_phone', 'first_name', 'last_name', 'is_staff']
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'profile__phone_number']
+
+    @admin.display(description='Mobile Number')
+    def get_phone(self, obj):
+        profile = getattr(obj, 'profile', None)
+        return profile.phone_number if profile and profile.phone_number else '-'
+
+

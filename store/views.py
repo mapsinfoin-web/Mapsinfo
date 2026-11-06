@@ -119,11 +119,25 @@ def product_detail(request, pk):
     attach_offers([product])
     # product.offer / offer: the live offer for this product (or None) - explain it on the page
     gift_choices = eligible_gifts(product.offer) if product.offer else []
+
+    # Check if a specific colour was requested via ?color=
+    requested_color = request.GET.get('color', '').strip()
+    selected_color_obj = None
+    colors = product.available_colors
+    if requested_color and colors:
+        for c in colors:
+            if c.name.lower() == requested_color.lower():
+                selected_color_obj = c
+                break
+    if not selected_color_obj and colors:
+        selected_color_obj = colors[0]
+
     return render(request, 'store/product_detail.html', {
         'product': product,
         'offer': product.offer,
         'gift_choices': gift_choices,   # free gifts the customer can pick (active + in stock)
         'trust_words': _trust_words(product),   # [(icon, text), ...] shown under the price
+        'selected_color_obj': selected_color_obj,
     })
 # ---------------------------------------------------------------------------
 # CART HELPERS
@@ -237,6 +251,14 @@ def add_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id, is_active=True)
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json'
 
+    # Save selected color variant in session
+    selected_color = (request.POST.get('selected_color') or request.GET.get('selected_color') or '').strip()
+    if selected_color:
+        cart_colors = request.session.get('cart_colors', {})
+        cart_colors[str(product.id)] = selected_color
+        request.session['cart_colors'] = cart_colors
+        request.session.modified = True
+
     if not product.in_stock:
         if is_ajax:
             return JsonResponse({'status': 'error', 'error': f"Sorry, {product.title} is out of stock."}, status=400)
@@ -291,6 +313,9 @@ def cart_detail(request):
     cart = _get_cart(request)
     if cart:
         cart_items, pricing, notes = _priced_cart(cart)
+        cart_colors = request.session.get('cart_colors', {})
+        for item in cart_items:
+            item.selected_color = cart_colors.get(str(item.product_id), '')
         for note in notes:
             messages.warning(request, note)
         for problem in _stock_problems(cart_items):
@@ -373,6 +398,14 @@ def buy_now(request, pk):
     """Put the product in the cart. Products with a free-gift offer go to the cart so the gift can be picked."""
     product = get_object_or_404(Product, pk=pk, is_active=True)
 
+    # Save selected color variant in session
+    selected_color = (request.POST.get('selected_color') or request.GET.get('selected_color') or '').strip()
+    if selected_color:
+        cart_colors = request.session.get('cart_colors', {})
+        cart_colors[str(product.id)] = selected_color
+        request.session['cart_colors'] = cart_colors
+        request.session.modified = True
+
     if not product.in_stock:
         messages.error(request, f"Sorry, {product.title} is out of stock.")
         return redirect('store:product_detail', pk=product.pk)
@@ -400,6 +433,10 @@ def register_user(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             cart = _get_cart(request)
             if cart:
+                phone = form.cleaned_data.get('phone_number')
+                if phone and not cart.customer_phone:
+                    cart.customer_phone = phone
+                    cart.save(update_fields=['customer_phone'])
                 _sync_cart_user(request, cart)
             return redirect('store:all_products')
     else:
@@ -445,6 +482,9 @@ def checkout(request):
 
     # Re-validate offers and gifts on the server on EVERY request (dates, switches, stock, quantities)
     cart_items, pricing, notes = _priced_cart(cart)
+    cart_colors = request.session.get('cart_colors', {})
+    for item in cart_items:
+        item.selected_color = cart_colors.get(str(item.product_id), '')
     for note in notes:
         messages.warning(request, note)
 
@@ -562,6 +602,20 @@ def checkout(request):
     for problem in _stock_problems(cart_items):
         messages.warning(request, problem)
 
+    if request.user.is_authenticated and 'form_data' not in context:
+        initial_phone = ''
+        if hasattr(request.user, 'profile') and request.user.profile.phone_number:
+            initial_phone = request.user.profile.phone_number
+        elif cart and cart.customer_phone:
+            initial_phone = cart.customer_phone
+
+        full_name = f"{request.user.first_name} {request.user.last_name}".strip()
+        context['form_data'] = {
+            'full_name': full_name or request.user.username,
+            'email': request.user.email,
+            'mobile_number': initial_phone,
+        }
+
     return render(request, 'store/checkout.html', context)
 
 
@@ -589,11 +643,14 @@ def _whatsapp_link(request, order, settings_obj=None):
         "",
         "*Products purchased:*",
     ]
+    cart_colors = request.session.get('cart_colors', {}) if request else {}
     for item in order.items.select_related('product'):
+        color_val = cart_colors.get(str(item.product_id), '')
+        color_tag = f" [Colour: {color_val}]" if color_val else ""
         if item.is_free_gift:
-            lines.append(f"- {item.quantity} x {item.product.title} (FREE GIFT)")
+            lines.append(f"- {item.quantity} x {item.product.title}{color_tag} (FREE GIFT)")
         else:
-            lines.append(f"- {item.quantity} x {item.product.title} - Rs.{item.price * item.quantity}")
+            lines.append(f"- {item.quantity} x {item.product.title}{color_tag} - Rs.{item.price * item.quantity}")
     lines += ["", f"*Amount paid (Paytm): Rs.{order.amount_paid}*"]
     if order.payment_screenshot:
         lines.append(f"Payment screenshot: {request.build_absolute_uri(order.payment_screenshot.url)}")
@@ -665,10 +722,29 @@ def collections(request):
 def collection_detail(request, slug):
     category = Category.objects.filter(slug__iexact=slug).first() or get_object_or_404(Category, slug=slug)
     # Filter out hidden products from category pages
-    products = attach_offers(list(Product.objects.filter(category=category, is_active=True)))
+    is_subcollection = (category.slug == 'layered-necklaces')
+    parent_category = Category.objects.filter(slug='necklaces').first() if is_subcollection else None
+
+    if is_subcollection:
+        # Include products directly categorized as layered-necklaces or necklaces matching layered/flow/chain styles
+        q_filter = Q(category=category) | (
+            Q(category__slug='necklaces') & (
+                Q(title__icontains='flow') | Q(title__icontains='layer') | Q(title__icontains='set') | Q(description__icontains='layer')
+            )
+        )
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).distinct()))
+    elif category.slug == 'necklaces':
+        # Necklaces page includes both main necklaces and layered-necklaces
+        q_filter = Q(category=category) | Q(category__slug='layered-necklaces')
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).distinct()))
+    else:
+        products = attach_offers(list(Product.objects.filter(category=category, is_active=True)))
+
     return render(request, 'store/collection_detail.html', {
         'category': category,
         'products': products,
+        'is_subcollection': is_subcollection,
+        'parent_category': parent_category,
     })
 
 
