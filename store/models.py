@@ -69,7 +69,7 @@ class Product(models.Model):
     def available_colors(self):
         """Returns active colors for this product if defined, otherwise empty list."""
         try:
-            return list(self.colors.filter(is_available=True))
+            return list(self.colors.filter(is_available=True).order_by('order', 'id'))
         except Exception:
             return []
 
@@ -239,13 +239,17 @@ class ProductGallery(models.Model):
 
 class ProductColor(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='colors')
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Position / display order (e.g. 1 for first, 2 for second, 3 for third)"
+    )
     name = models.CharField(max_length=60, help_text="Color name, e.g. Rose Gold, Yellow Gold, Silver, Emerald Green")
     hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
     image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Photo for this color variant (switches main image when selected)")
     is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
 
     class Meta:
-        ordering = ['id']
+        ordering = ['order', 'id']
         verbose_name = 'Product Color Option'
         verbose_name_plural = 'Product Color Options'
 

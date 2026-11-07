@@ -26,7 +26,17 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductColorInline(admin.TabularInline):
     model = ProductColor
     extra = 1
-    fields = ['name', 'hex_code', 'image', 'is_available']
+    fields = ['order', 'name', 'hex_code', 'image', 'is_available']
+    ordering = ['order', 'id']
+
+
+@admin.register(ProductColor)
+class ProductColorAdmin(admin.ModelAdmin):
+    list_display = ['product', 'order', 'name', 'hex_code', 'is_available']
+    list_editable = ['order', 'is_available']
+    list_filter = ['is_available', 'product__category']
+    search_fields = ['name', 'product__title', 'product__sku']
+    ordering = ['product', 'order', 'id']
 
 
 # --- CATEGORY ---
