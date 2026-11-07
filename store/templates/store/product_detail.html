@@ -42,14 +42,54 @@
         .product { flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; padding: 22px 24px 80px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 44px; align-items: start; }
 
         /* Gallery */
-        .gallery { display: flex; flex-direction: column; gap: 14px; }
-        /* Main photo: the whole photo is always visible (no cropping); any empty space is filled
-           with a soft blurred copy of the same photo, so every shape of photo looks properly set. */
-        .main-image { position: relative; isolation: isolate; background: #fff; border-radius: 26px; box-shadow: var(--shadow); aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden; cursor: zoom-in; }
-        .main-image::before { content: ''; position: absolute; inset: -30px; background: var(--bg) center / cover no-repeat; filter: blur(28px) saturate(1.15); opacity: .55; z-index: -1; }
-        .main-image img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .4s ease; }
-        .main-image:hover img { transform: scale(1.03); }
-        .zoom-hint { position: absolute; right: 14px; bottom: 14px; display: inline-flex; align-items: center; gap: 8px; background: rgba(19, 38, 57, .82); color: #fff; font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 999px; pointer-events: none; backdrop-filter: blur(6px); }
+        .gallery { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+        /* Main photo: clear luxury framing with breathing room, no blurry bleed or cutoffs */
+        .main-image {
+            position: relative;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(19, 38, 57, .06);
+            border: 1px solid rgba(19, 38, 57, .08);
+            aspect-ratio: 1 / 1;
+            max-height: 520px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: zoom-in;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .main-image img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px;
+            transition: transform .25s ease;
+        }
+        .main-image:hover img { transform: scale(1.015); }
+        .zoom-hint {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(19, 38, 57, .82);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 13px;
+            border-radius: 999px;
+            pointer-events: none;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+            z-index: 2;
+        }
         .no-image { color: var(--muted); font-size: 15px; }
         .thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; }
         .thumb { width: 74px; height: 74px; flex-shrink: 0; object-fit: contain; padding: 3px; border-radius: 14px; border: 2px solid transparent; background: #fff; cursor: pointer; box-shadow: var(--shadow); transition: border-color .2s, transform .2s; }
@@ -148,10 +188,13 @@
         /* ===== Responsive ===== */
         @media (max-width: 900px) {
             .product { grid-template-columns: 1fr; gap: 26px; padding-bottom: 60px; }
+            .gallery { max-width: 500px; margin: 0 auto; }
         }
         @media (max-width: 760px) {
             .crumb { padding: 18px 16px 0; }
             .product { padding: 16px 16px 50px; }
+            .main-image { padding: 12px; border-radius: 18px; max-height: 440px; }
+            .zoom-hint { top: 10px; right: 10px; font-size: 11px; padding: 5px 10px; }
             .info { padding: 24px 20px; }
             .title { font-size: 30px; }
             .price { font-size: 25px; }
@@ -501,12 +544,12 @@
             <div class="color-picker-box">
                 <div class="color-picker-head">
                     <span class="color-picker-label"><i class="fas fa-palette"></i> Colour:</span>
-                    <strong class="color-picker-name" id="selectedColorName">{{ selected_color_obj.name|default:product.available_colors.0.name }}</strong>
+                    <strong class="color-picker-name" id="selectedColorName">{% if selected_color_obj %}{{ selected_color_obj.name }}{% else %}Choose a colour{% endif %}</strong>
                 </div>
                 <div class="color-swatches" role="radiogroup" aria-label="Product Colours">
                     {% for c in product.available_colors %}
                     <button type="button"
-                            class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id or not selected_color_obj and forloop.first %}active{% endif %}"
+                            class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id %}active{% endif %}"
                             data-name="{{ c.name }}"
                             data-image="{% if c.image %}{{ c.image.url }}{% endif %}"
                             onclick="selectColor(this)"
@@ -561,7 +604,7 @@
                     <div class="g-badge-icon"><i class="fas fa-box-open"></i></div>
                     <div>
                         <h4>Luxury Gift Ready</h4>
-                        <p>Includes velvet jewelry pouch</p>
+                        <p>{% if product.packaging_text %}{{ product.packaging_text }}{% elif product.category and 'earring' in product.category.slug|lower or 'earring' in product.title|lower %}Includes velvet jewelry box{% else %}Includes velvet jewelry pouch{% endif %}</p>
                     </div>
                 </div>
             </div>
@@ -584,7 +627,7 @@
                     <form action="{% url 'store:add_cart' product.id %}" method="POST">
                         {% csrf_token %}
                         {% if product.available_colors %}
-                        <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                        <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                         {% endif %}
                         <p class="gift-offer-sub">Choose your FREE gift:</p>
                         {% for g in gift_choices %}
@@ -603,14 +646,14 @@
                 <form action="{% url 'store:add_cart' product.id %}" method="POST">
                     {% csrf_token %}
                     {% if product.available_colors %}
-                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                     {% endif %}
                     <button type="submit" class="btn btn-add">Add to Cart</button>
                 </form>
                 <form action="{% url 'store:buy_now' product.pk %}" method="POST">
                     {% csrf_token %}
                     {% if product.available_colors %}
-                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{{ selected_color_obj.name|default:product.available_colors.0.name }}" />
+                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                     {% endif %}
                     <button type="submit" class="btn btn-buy">Buy Now</button>
                 </form>
@@ -740,6 +783,17 @@
             if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
             document.querySelectorAll('.thumb').forEach(function (img) { img.classList.remove('active'); });
             thumbnail.classList.add('active');
+            // When returning to a gallery thumb, reset swatch active selection
+            document.querySelectorAll('.color-swatch-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            var label = document.getElementById('selectedColorName');
+            if (label) {
+                label.textContent = 'Choose a colour';
+            }
+            document.querySelectorAll('.productSelectedColor').forEach(function(input) {
+                input.value = '';
+            });
         }
 
         // ===== Photo viewer with zoom =====
@@ -754,7 +808,14 @@
 
             function collect() {
                 urls = Array.prototype.map.call(document.querySelectorAll('.thumbs .thumb'), function (t) { return t.src; });
-                if (!urls.length) { var m = document.getElementById('main-image'); if (m) { urls = [m.src]; } }
+                var m = document.getElementById('main-image');
+                if (m && m.src) {
+                    // Prepend current main image (e.g. chosen colour variant) if not in thumbs
+                    if (urls.indexOf(m.src) === -1) {
+                        urls.unshift(m.src);
+                    }
+                }
+                if (!urls.length && m && m.src) { urls = [m.src]; }
             }
             function clampPan() {
                 var w = img.clientWidth * scale, h = img.clientHeight * scale;
@@ -794,6 +855,19 @@
                 thumbs.forEach(function (t, i) { if (t.classList.contains('active')) { found = i; } });
                 return found;
             }
+            function openCurrent() {
+                collect();
+                if (!urls.length) { return; }
+                var m = document.getElementById('main-image');
+                var targetIdx = 0;
+                if (m && m.src) {
+                    var found = urls.indexOf(m.src);
+                    if (found !== -1) {
+                        targetIdx = found;
+                    }
+                }
+                open(targetIdx);
+            }
             function open(i) {
                 collect();
                 if (!urls.length) { return; }
@@ -807,6 +881,18 @@
                 box.hidden = true;
                 document.body.style.overflow = '';
                 pointers = {}; dragStart = null; startDist = 0;
+                if (urls[index]) {
+                    var m = document.getElementById('main-image');
+                    if (m && m.src !== urls[index]) {
+                        m.src = urls[index];
+                        var w = document.getElementById('main-wrap');
+                        if (w) { w.style.setProperty('--bg', "url('" + urls[index] + "')"); }
+                        var thumbs = document.querySelectorAll('.thumbs .thumb');
+                        thumbs.forEach(function (t) {
+                            t.classList.toggle('active', t.src === urls[index]);
+                        });
+                    }
+                }
                 if (lastFocus && lastFocus.focus) { lastFocus.focus(); }
             }
             function toggleZoom(x, y) {
@@ -820,9 +906,9 @@
             // open from the main photo (click, or Enter / Space when focused)
             var wrap = document.getElementById('main-wrap');
             if (wrap) {
-                wrap.addEventListener('click', function () { open(activeIndex()); });
+                wrap.addEventListener('click', function () { openCurrent(); });
                 wrap.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(activeIndex()); }
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCurrent(); }
                 });
             }
 

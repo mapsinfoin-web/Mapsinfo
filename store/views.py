@@ -129,8 +129,8 @@ def product_detail(request, pk):
             if c.name.lower() == requested_color.lower():
                 selected_color_obj = c
                 break
-    if not selected_color_obj and colors:
-        selected_color_obj = colors[0]
+    # If no ?color= query parameter was provided in the URL, selected_color_obj remains None
+    # so that the product's primary/main image (product.image) is displayed by default.
 
     return render(request, 'store/product_detail.html', {
         'product': product,
