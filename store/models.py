@@ -1,3 +1,4 @@
+import re
 import uuid
 
 from django.contrib.auth.models import User
@@ -244,6 +245,12 @@ class ProductColor(models.Model):
         help_text="Position / display order (e.g. 1 for first, 2 for second, 3 for third)"
     )
     name = models.CharField(max_length=60, help_text="Color name, e.g. Rose Gold, Yellow Gold, Silver, Emerald Green")
+    sku = models.CharField(
+        max_length=64,
+        blank=True,
+        null=True,
+        help_text="SKU ID for this color variant (e.g. MAPS-CSE-192-BLU). Auto-generated if left empty."
+    )
     hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
     image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Photo for this color variant (switches main image when selected)")
     is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
@@ -253,8 +260,25 @@ class ProductColor(models.Model):
         verbose_name = 'Product Color Option'
         verbose_name_plural = 'Product Color Options'
 
+    def save(self, *args, **kwargs):
+        if not self.sku:
+            base = (self.product.sku if self.product and self.product.sku else "PRD").strip()
+            name_clean = re.sub(r'[^A-Za-z0-9]', '', self.name or '').upper()
+            common_abbr = {
+                'BLUE': 'BLU', 'PINK': 'PNK', 'GREEN': 'GRN', 'CRYSTAL': 'CRYS',
+                'BLACK': 'BLK', 'WHITE': 'WHT', 'RED': 'RED', 'YELLOW': 'YEL',
+                'GOLD': 'GLD', 'ROSEGOLD': 'RGLD', 'SILVER': 'SLV', 'PURPLE': 'PURP',
+            }
+            code = common_abbr.get(name_clean, name_clean[:4] if name_clean else uuid.uuid4().hex[:4].upper())
+            candidate = f"{base}-{code}"
+            if ProductColor.objects.filter(sku=candidate).exclude(pk=self.pk).exists():
+                candidate = f"{base}-{code}-{uuid.uuid4().hex[:3].upper()}"
+            self.sku = candidate
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.product.title} - {self.name}"
+        sku_part = f" ({self.sku})" if self.sku else ""
+        return f"{self.product.title} - {self.name}{sku_part}"
 
 
 class Order(models.Model):

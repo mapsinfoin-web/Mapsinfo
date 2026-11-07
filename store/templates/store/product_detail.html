@@ -524,7 +524,7 @@
             <div class="alert {{ message.tags }}">{{ message }}</div>
             {% endfor %}
 
-            <span class="sku">SKU: {{ product.sku }}</span>
+            <span class="sku" id="productSkuDisplay" data-base-sku="{{ product.sku }}">SKU: {% if selected_color_obj and selected_color_obj.sku %}{{ selected_color_obj.sku }}{% else %}{{ product.sku }}{% endif %}</span>
             <h1 class="title">{{ product.title }}</h1>
             <p class="price">
                 {% if product.mrp and product.mrp > product.price %}
@@ -551,6 +551,7 @@
                     <button type="button"
                             class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id %}active{% endif %}"
                             data-name="{{ c.name }}"
+                            data-sku="{% if c.sku %}{{ c.sku }}{% else %}{{ product.sku }}{% endif %}"
                             data-image="{% if c.image %}{{ c.image.url }}{% endif %}"
                             onclick="selectColor(this)"
                             title="{{ c.name }}"
@@ -743,11 +744,17 @@
             });
             btn.classList.add('active');
             var colorName = btn.getAttribute('data-name') || '';
+            var colorSku = btn.getAttribute('data-sku') || '';
             var imgUrl = btn.getAttribute('data-image') || '';
 
             var label = document.getElementById('selectedColorName');
             if (label) {
                 label.textContent = colorName;
+            }
+
+            var skuDisplay = document.getElementById('productSkuDisplay');
+            if (skuDisplay && colorSku) {
+                skuDisplay.textContent = 'SKU: ' + colorSku;
             }
 
             document.querySelectorAll('.productSelectedColor').forEach(function(input) {
@@ -769,7 +776,8 @@
                 try {
                     var url = new URL(waBtn.href);
                     var currentText = url.searchParams.get('text') || '';
-                    var updatedText = currentText.replace(/\s*\(Colour:[^\)]+\)/i, '') + ' (Colour: ' + colorName + ')';
+                    var colorTag = ' (Colour: ' + colorName + (colorSku ? ' | SKU: ' + colorSku : '') + ')';
+                    var updatedText = currentText.replace(/\s*\(Colour:[^\)]+\)/i, '') + colorTag;
                     url.searchParams.set('text', updatedText);
                     waBtn.href = url.toString();
                 } catch(e) {}
@@ -790,6 +798,11 @@
             var label = document.getElementById('selectedColorName');
             if (label) {
                 label.textContent = 'Choose a colour';
+            }
+            var skuDisplay = document.getElementById('productSkuDisplay');
+            if (skuDisplay) {
+                var baseSku = skuDisplay.getAttribute('data-base-sku') || '{{ product.sku }}';
+                skuDisplay.textContent = 'SKU: ' + baseSku;
             }
             document.querySelectorAll('.productSelectedColor').forEach(function(input) {
                 input.value = '';
