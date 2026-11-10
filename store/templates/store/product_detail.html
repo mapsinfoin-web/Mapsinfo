@@ -627,7 +627,15 @@
             <div class="thumbs" id="productThumbsContainer">
                 {% if selected_color_obj and selected_color_obj.all_images %}
                     {% for img_url in selected_color_obj.all_images %}
-                    <img src="{{ img_url }}" class="thumb {% if forloop.first %}active{% endif %}" onclick="swapColorThumb(this)" alt="{{ selected_color_obj.name }} view {{ forloop.counter }}" loading="lazy" />
+                    <img src="{{ img_url }}" class="thumb {% if forloop.first %}active{% endif %}" onclick="swapImage(this)" alt="{{ selected_color_obj.name }} view {{ forloop.counter }}" loading="lazy" />
+                    {% endfor %}
+                    {% if product.image and product.image.url not in selected_color_obj.all_images %}
+                    <img src="{{ product.image.url }}" class="thumb" onclick="swapImage(this)" alt="Main view" loading="lazy" />
+                    {% endif %}
+                    {% for gallery_img in product.gallery_images.all %}
+                    {% if gallery_img.image.url not in selected_color_obj.all_images %}
+                    <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
+                    {% endif %}
                     {% endfor %}
                 {% else %}
                     {% if product.image %}
@@ -909,7 +917,13 @@
             mrp: '{% if product.mrp and product.mrp > product.price %}{{ product.mrp }}{% endif %}',
             discount: '{{ product.discount_percent|default:0 }}',
             mainImage: '{% if product.image %}{{ product.image.url }}{% endif %}',
-            mainTitle: '{{ product.title|escapejs }}'
+            mainTitle: '{{ product.title|escapejs }}',
+            galleryImages: [
+                {% if product.image %}'{{ product.image.url }}',{% endif %}
+                {% for gallery_img in product.gallery_images.all %}
+                '{{ gallery_img.image.url }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
         };
 
         function resetToBaseProduct() {
@@ -1042,26 +1056,55 @@
                 }
             }
 
-            // Update Gallery Thumbnails for this colour
-            var galleryList = galleryRaw ? galleryRaw.split('|').filter(Boolean) : [];
-            if (!galleryList.length && imgUrl) {
-                galleryList = [imgUrl];
+            // Update Gallery Thumbnails: Selected colour image(s) FIRST, then product gallery images after
+            var colorList = galleryRaw ? galleryRaw.split('|').filter(Boolean) : [];
+            if (!colorList.length && imgUrl) {
+                colorList = [imgUrl];
+            }
+
+            var combinedImages = [];
+            var seen = {};
+
+            // 1. Colour images first
+            for (var i = 0; i < colorList.length; i++) {
+                var cu = colorList[i];
+                if (cu && !seen[cu]) {
+                    seen[cu] = true;
+                    combinedImages.push({
+                        url: cu,
+                        alt: colorName + ' view ' + (i + 1)
+                    });
+                }
+            }
+
+            // 2. Base product gallery images after the colour
+            if (baseProductState.galleryImages && baseProductState.galleryImages.length > 0) {
+                for (var j = 0; j < baseProductState.galleryImages.length; j++) {
+                    var gu = baseProductState.galleryImages[j];
+                    if (gu && !seen[gu]) {
+                        seen[gu] = true;
+                        combinedImages.push({
+                            url: gu,
+                            alt: 'Gallery view ' + (j + 1)
+                        });
+                    }
+                }
             }
 
             var thumbsContainer = document.getElementById('productThumbsContainer');
-            if (thumbsContainer && galleryList.length > 0) {
+            if (thumbsContainer && combinedImages.length > 0) {
                 var thumbsHtml = '';
-                for (var i = 0; i < galleryList.length; i++) {
-                    var u = galleryList[i];
-                    var activeCls = (i === 0) ? 'thumb active' : 'thumb';
-                    thumbsHtml += '<img src="' + u + '" class="' + activeCls + '" onclick="swapColorThumb(this)" alt="' + colorName + ' view ' + (i + 1) + '" loading="lazy" />';
+                for (var k = 0; k < combinedImages.length; k++) {
+                    var item = combinedImages[k];
+                    var activeCls = (k === 0) ? 'thumb active' : 'thumb';
+                    thumbsHtml += '<img src="' + item.url + '" class="' + activeCls + '" onclick="swapImage(this)" alt="' + item.alt + '" loading="lazy" />';
                 }
                 thumbsContainer.innerHTML = thumbsHtml;
             }
 
             // Set main image to primary color image
-            var primaryColorImg = galleryList.length > 0 ? galleryList[0] : imgUrl;
-            if (primaryColorImg) {
+            if (combinedImages.length > 0) {
+                var primaryColorImg = combinedImages[0].url;
                 var main = document.getElementById('main-image');
                 if (main) {
                     main.src = primaryColorImg;
@@ -1090,18 +1133,7 @@
 
         // Swapping thumbnail within a selected colour variant
         function swapColorThumb(thumbnail) {
-            if (!thumbnail) return;
-            var main = document.getElementById('main-image');
-            if (main) {
-                main.src = thumbnail.src;
-                if (thumbnail.alt) { main.alt = thumbnail.alt; }
-            }
-            var wrap = document.getElementById('main-wrap');
-            if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
-            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
-                img.classList.remove('active');
-            });
-            thumbnail.classList.add('active');
+            swapImage(thumbnail);
         }
 
         // Swapping thumbnail in base product gallery
