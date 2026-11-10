@@ -362,7 +362,62 @@
     </style>
 </head>
 <body>
-    {% include 'store/includes/header.html' %}
+    <!-- ===== ANNOUNCEMENT BAR ===== -->
+    <div class="bar">
+        <div class="bar-inner">
+            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
+            <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
+            <span><i class="fas fa-gift"></i>Complimentary premium gift box with every order</span>
+            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
+            <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header" id="header">
+        <div class="container header-main">
+            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
+            </a>
+
+            <nav class="nav" id="nav">
+                <a href="{% url 'store:all_products' %}">Home</a>
+                <a href="{% url 'store:collections' %}">Collections</a>
+                <a href="{% url 'store:all_products' %}#latest-arrivals">Latest Arrivals</a>
+                <a href="{% url 'store:about' %}">About</a>
+                <a href="{% url 'store:contact' %}">Contact</a>
+                <a href="{% url 'store:sale' %}" class="sale active">Sale 🔥</a>
+            </nav>
+
+            <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" placeholder="Search products…" aria-label="Search products" required />
+            </form>
+
+            <div class="actions">
+                {% include 'store/includes/notification_bell.html' %}
+
+                <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
+                    <i class="far fa-heart"></i>
+                    <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
+                <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
+                {% endif %}
+
+                <a href="{% url 'store:cart_detail' %}" class="icon-btn" title="Cart" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+                </a>
+
+                <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
 
     <main>
         <!-- ===== SALE HERO ===== -->
