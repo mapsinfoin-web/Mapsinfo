@@ -69,6 +69,9 @@ class Product(models.Model):
     @property
     def available_colors(self):
         """Returns active colors for this product if defined, otherwise empty list."""
+        if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:
+            colors = [c for c in self.colors.all() if c.is_available]
+            return sorted(colors, key=lambda c: (c.order, c.id))
         try:
             return list(self.colors.filter(is_available=True).order_by('order', 'id'))
         except Exception:
@@ -82,6 +85,52 @@ class Product(models.Model):
         if 'earring' in cat_slug or 'earring' in title_lower:
             return 'Includes velvet jewellery box'
         return 'Includes velvet jewellery pouch'
+
+    @property
+    def color_tags(self):
+        """Returns normalized list of lowercase color slugs associated with this product."""
+        if hasattr(self, '_cached_color_tags'):
+            return self._cached_color_tags
+        palette = ['blue', 'pink', 'green', 'purple', 'crystal', 'white', 'yellow', 'gold', 'black', 'multicolour', 'ruby', 'silver']
+        tags = set()
+        for c in self.available_colors:
+            s = c.name.strip().lower()
+            if s in ['yello', 'yellow']:
+                tags.add('yellow')
+            else:
+                tags.add(s)
+        t = (self.title or '').lower()
+        import re
+        for p in palette:
+            if re.search(r'\b' + p + r'\b', t):
+                tags.add(p)
+        self._cached_color_tags = sorted(list(tags))
+        return self._cached_color_tags
+
+    @property
+    def color_tags_str(self):
+        """Space-separated list for data-colors attribute."""
+        return " ".join(self.color_tags)
+
+    @property
+    def color_images_json(self):
+        """JSON mapping of color slug -> image url for instant frontend image switching."""
+        if hasattr(self, '_cached_color_images_json'):
+            return self._cached_color_images_json
+        import json
+        cmap = {}
+        for c in self.available_colors:
+            s = c.name.strip().lower()
+            if s in ['yello', 'yellow']:
+                s = 'yellow'
+            if c.image:
+                cmap[s] = c.image.url
+        default_img = self.image.url if self.image else ''
+        for tag in self.color_tags:
+            if tag not in cmap and default_img:
+                cmap[tag] = default_img
+        self._cached_color_images_json = json.dumps(cmap)
+        return self._cached_color_images_json
 
     def save(self, *args, **kwargs):
         if not self.sku:

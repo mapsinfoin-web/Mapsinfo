@@ -39,15 +39,15 @@ class OutOfStock(Exception):
 # ---------------------------------------------------------------------------
 
 def all_products(request):
-    # Only fetch active products
-    all_active = Product.objects.filter(is_active=True)
+    # Only fetch active products with prefetched relations for instant loading
+    all_active = list(Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors').order_by('-created'))
     # 4 newest active products for Latest Arrivals
-    recent_products = list(all_active.order_by('-created')[:4])
-    recent_ids = [p.pk for p in recent_products]
+    recent_products = all_active[:4]
+    recent_ids = {p.pk for p in recent_products}
 
     # Don't duplicate the 4 recent items in "Shop All Collection" if more products exist
-    if all_active.count() > len(recent_ids):
-        product_list = all_active.exclude(pk__in=recent_ids)
+    if len(all_active) > len(recent_ids):
+        product_list = [p for p in all_active if p.pk not in recent_ids]
     else:
         product_list = all_active
     paginator = Paginator(product_list, 20) 
@@ -67,11 +67,13 @@ def all_products(request):
     if request.user.is_authenticated:
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
+    color_filters = _get_collection_color_filters(all_active)
+
     return render(request, 'store/index.html', {
         'page_obj': page_obj,
         'categories': categories,
         'recent_products': recent_products,
-
+        'color_filters': color_filters,
         'user_wishlist': user_wishlist,
     })
 
@@ -718,6 +720,45 @@ def my_orders(request):
 
 
 # ---------------------------------------------------------------------------
+# COLOR FILTER UTILITIES
+# ---------------------------------------------------------------------------
+
+COLOR_HEX_MAP = {
+    'blue': {'name': 'Blue', 'hex': '#2563EB'},
+    'pink': {'name': 'Pink', 'hex': '#EC4899'},
+    'green': {'name': 'Green', 'hex': '#059669'},
+    'purple': {'name': 'Purple', 'hex': '#9333EA'},
+    'crystal': {'name': 'Crystal', 'hex': '#CBD5E1'},
+    'white': {'name': 'White', 'hex': '#F1F5F9'},
+    'yellow': {'name': 'Yellow', 'hex': '#EAB308'},
+    'gold': {'name': 'Gold', 'hex': '#D4AF37'},
+    'black': {'name': 'Black', 'hex': '#1E293B'},
+    'multicolour': {'name': 'Multicolour', 'hex': '#8B5CF6'},
+    'ruby': {'name': 'Ruby', 'hex': '#E11D48'},
+    'silver': {'name': 'Silver', 'hex': '#94A3B8'},
+}
+
+def _get_collection_color_filters(products):
+    """Computes distinct colors present in the given products with count and hex."""
+    counts = {}
+    for p in products:
+        for tag in p.color_tags:
+            counts[tag] = counts.get(tag, 0) + 1
+
+    color_filters = []
+    for slug, count in counts.items():
+        info = COLOR_HEX_MAP.get(slug, {'name': slug.capitalize(), 'hex': '#64748B'})
+        color_filters.append({
+            'slug': slug,
+            'name': info['name'],
+            'hex': info['hex'],
+            'count': count,
+        })
+    color_filters.sort(key=lambda x: (-x['count'], x['name']))
+    return color_filters
+
+
+# ---------------------------------------------------------------------------
 # COLLECTIONS
 # ---------------------------------------------------------------------------
 
@@ -738,19 +779,24 @@ def collection_detail(request, slug):
                 Q(title__icontains='flow') | Q(title__icontains='layer') | Q(title__icontains='set') | Q(description__icontains='layer')
             )
         )
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).distinct()))
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).prefetch_related('colors').distinct()))
     elif category.slug == 'necklaces':
         # Necklaces page includes both main necklaces and layered-necklaces
         q_filter = Q(category=category) | Q(category__slug='layered-necklaces')
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).distinct()))
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).prefetch_related('colors').distinct()))
     else:
-        products = attach_offers(list(Product.objects.filter(category=category, is_active=True)))
+        products = attach_offers(list(Product.objects.filter(category=category, is_active=True).prefetch_related('colors')))
+
+    color_filters = _get_collection_color_filters(products)
+    selected_color = request.GET.get('color', '').strip().lower()
 
     return render(request, 'store/collection_detail.html', {
         'category': category,
         'products': products,
         'is_subcollection': is_subcollection,
         'parent_category': parent_category,
+        'color_filters': color_filters,
+        'selected_color': selected_color,
     })
 
 
@@ -787,7 +833,7 @@ def search_products(request):
         product_list = Product.objects.filter(
             Q(title__icontains=query) | Q(description__icontains=query),
             is_active=True
-        ).select_related('category').order_by('-id')
+        ).select_related('category').prefetch_related('colors').order_by('-id')
     else:
         product_list = Product.objects.none()
 
@@ -801,10 +847,12 @@ def search_products(request):
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
     categories = list(Category.objects.all())
+    color_filters = _get_collection_color_filters(product_list)
     return render(request, 'store/search.html', {
         'page_obj': page_obj,
         'categories': categories,
         'query': query,
+        'color_filters': color_filters,
         'user_wishlist': user_wishlist,
     })
 

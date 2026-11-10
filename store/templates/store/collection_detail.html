@@ -122,6 +122,30 @@
         .empty i { font-size: 44px; color: var(--line); margin-bottom: 14px; }
         .empty a { display: inline-block; margin-top: 16px; padding: 12px 28px; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 600; font-size: 14px; }
 
+        /* ===== Colour Filter Bar ===== */
+        .filter-section { max-width: 1200px; width: 100%; margin: 0 auto 24px; padding: 0 24px; box-sizing: border-box; }
+        .filter-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 16px 22px; box-shadow: 0 4px 18px rgba(19, 38, 57, .04); display: flex; flex-direction: column; gap: 12px; }
+        .filter-top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .filter-label { font-size: 13.5px; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; letter-spacing: .2px; }
+        .filter-label i { color: var(--blue); font-size: 14px; }
+        .filter-count { font-size: 13px; color: var(--muted); font-weight: 600; }
+        .color-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .color-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s ease; user-select: none; font-family: inherit; }
+        .color-pill:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-1px); }
+        .color-pill.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(31, 58, 102, .25); }
+        .pill-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(0, 0, 0, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2); flex-shrink: 0; display: inline-block; }
+        .pill-dot-all { background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899); }
+        .color-pill.active .pill-dot { border-color: #fff; }
+        .pill-count { font-size: 11.5px; opacity: .75; font-weight: 500; }
+        .filter-active-indicator { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--navy); background: #EFF6FF; border: 1px solid #BFDBFE; padding: 5px 14px; border-radius: 999px; font-weight: 600; width: fit-content; }
+        .btn-clear-filter { background: none; border: none; color: #EF4444; font-size: 12.5px; font-weight: 700; cursor: pointer; margin-left: 6px; padding: 0; display: inline-flex; align-items: center; gap: 2px; font-family: inherit; }
+        .btn-clear-filter:hover { text-decoration: underline; }
+        .card.hide { display: none !important; }
+        .filter-empty { grid-column: 1 / -1; text-align: center; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 60px 20px; color: var(--muted); display: none; }
+        .filter-empty i { font-size: 44px; color: var(--line); margin-bottom: 14px; }
+        .filter-empty button { display: inline-block; margin-top: 16px; padding: 12px 28px; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 600; font-size: 14px; border: none; cursor: pointer; font-family: inherit; transition: background .2s; }
+        .filter-empty button:hover { background: var(--navy-2); }
+
         /* ===== Footer ===== */
         /* Footer logo: same method as the home page (the two logo files, unchanged) */
 
@@ -293,9 +317,48 @@
         {% endif %}
     </header>
 
+    {% if color_filters %}
+    <div class="filter-section animate-up">
+        <div class="filter-card">
+            <div class="filter-top-row">
+                <span class="filter-label"><i class="fas fa-palette"></i> Filter by Colour:</span>
+                <span class="filter-count" id="activeFilterCount">{{ products|length }} Pieces</span>
+            </div>
+            <div class="color-pills" id="colorFilterPills">
+                <button type="button" class="color-pill active" data-color="all" onclick="applyColorFilter('all')">
+                    <span class="pill-dot pill-dot-all"></span>
+                    <span>All Colours</span>
+                    <span class="pill-count">({{ products|length }})</span>
+                </button>
+                {% for col in color_filters %}
+                <button type="button" class="color-pill" data-color="{{ col.slug }}" onclick="applyColorFilter('{{ col.slug }}')">
+                    <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
+                    <span>{{ col.name }}</span>
+                    <span class="pill-count">({{ col.count }})</span>
+                </button>
+                {% endfor %}
+            </div>
+            <div class="filter-active-indicator" id="filterActiveIndicator" style="display: none;">
+                <span>Showing <strong id="activeColorName">Blue</strong> only</span>
+                <button type="button" class="btn-clear-filter" onclick="applyColorFilter('all')" aria-label="Clear colour filter"><i class="fas fa-times-circle"></i> Clear</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <section class="grid">
+        <div class="filter-empty" id="filterEmptyMessage">
+            <i class="fas fa-palette"></i>
+            <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found in this colour.</p>
+            <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another colour or view all pieces in this collection.</p>
+            <button type="button" onclick="applyColorFilter('all')">View All Colours</button>
+        </div>
+
         {% for product in products %}
-        <article class="card animate-up">
+        <article class="card animate-up"
+                 data-colors="{{ product.color_tags_str }}"
+                 data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
+                 data-color-images='{{ product.color_images_json|safe }}'>
             <a href="{% url 'store:product_detail' product.pk %}" class="thumb" aria-label="{{ product.title }}">
                 {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
@@ -398,6 +461,104 @@
     </footer>
 
     <script>
+        function applyColorFilter(colorSlug) {
+            colorSlug = (colorSlug || 'all').toLowerCase();
+            var cards = document.querySelectorAll('.grid .card');
+            var pills = document.querySelectorAll('.color-pill');
+            var countEl = document.getElementById('activeFilterCount');
+            var activeIndicator = document.getElementById('filterActiveIndicator');
+            var activeColorName = document.getElementById('activeColorName');
+            var emptyMessageEl = document.getElementById('filterEmptyMessage');
+            var visibleCount = 0;
+
+            pills.forEach(function (pill) {
+                if (pill.getAttribute('data-color') === colorSlug) {
+                    pill.classList.add('active');
+                } else {
+                    pill.classList.remove('active');
+                }
+            });
+
+            cards.forEach(function (card) {
+                var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
+                var colorImages = {};
+                try {
+                    colorImages = JSON.parse(card.getAttribute('data-color-images') || '{}');
+                } catch (e) {}
+                var defaultImg = card.getAttribute('data-default-img');
+                var imgEl = card.querySelector('.thumb img');
+                var thumbLink = card.querySelector('a.thumb');
+                var viewBtn = card.querySelector('a.btn-view');
+                var baseDetailUrl = card.getAttribute('data-base-url');
+                if (!baseDetailUrl && thumbLink) {
+                    baseDetailUrl = thumbLink.getAttribute('href').split('?')[0];
+                    card.setAttribute('data-base-url', baseDetailUrl);
+                }
+
+                if (colorSlug === 'all') {
+                    card.classList.remove('hide');
+                    visibleCount++;
+                    if (imgEl && defaultImg) {
+                        imgEl.src = defaultImg;
+                    }
+                    if (thumbLink && baseDetailUrl) thumbLink.href = baseDetailUrl;
+                    if (viewBtn && baseDetailUrl) viewBtn.href = baseDetailUrl;
+                } else {
+                    if (cardColors.indexOf(colorSlug) !== -1) {
+                        card.classList.remove('hide');
+                        visibleCount++;
+                        // Swap card image to the specific colour image if available!
+                        if (colorImages[colorSlug] && imgEl) {
+                            imgEl.src = colorImages[colorSlug];
+                        } else if (imgEl && defaultImg) {
+                            imgEl.src = defaultImg;
+                        }
+                        var capitalized = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
+                        var colorParam = '?color=' + encodeURIComponent(capitalized);
+                        if (thumbLink && baseDetailUrl) thumbLink.href = baseDetailUrl + colorParam;
+                        if (viewBtn && baseDetailUrl) viewBtn.href = baseDetailUrl + colorParam;
+                    } else {
+                        card.classList.add('hide');
+                    }
+                }
+            });
+
+            if (countEl) {
+                countEl.textContent = visibleCount + ' Piece' + (visibleCount === 1 ? '' : 's');
+            }
+
+            if (activeIndicator && activeColorName) {
+                if (colorSlug === 'all') {
+                    activeIndicator.style.display = 'none';
+                } else {
+                    activeColorName.textContent = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
+                    activeIndicator.style.display = 'inline-flex';
+                }
+            }
+
+            if (emptyMessageEl) {
+                emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
+            }
+
+            try {
+                var url = new URL(window.location);
+                if (colorSlug === 'all') {
+                    url.searchParams.delete('color');
+                } else {
+                    url.searchParams.set('color', colorSlug);
+                }
+                window.history.replaceState({}, '', url);
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var params = new URLSearchParams(window.location.search);
+            var colorFromUrl = params.get('color');
+            if (colorFromUrl) {
+                applyColorFilter(colorFromUrl);
+            }
+        });
+
         function previewCardColor(dot) {
             if (!dot) return;
             var newSrc = dot.getAttribute('data-img');
