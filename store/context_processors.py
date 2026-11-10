@@ -20,11 +20,11 @@ def cart_item_count(request):
         count = 0
 
     user_wishlist = []
-    if hasattr(request, 'user') and request.user.is_authenticated:
-        try:
+    try:
+        if hasattr(request, 'user') and request.user.is_authenticated:
             user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
-        except Exception:
-            user_wishlist = []
+    except Exception:
+        user_wishlist = []
 
     # Active Store Notifications & Announcements
     notifications = []

@@ -987,7 +987,14 @@ def toggle_wishlist(request, product_id):
 # ---------------------------------------------------------------------------
 
 def _error_page(request, status):
-    return render(request, 'store/error.html', {'status': status}, status=status)
+    try:
+        return render(request, 'store/error.html', {'status': status}, status=status)
+    except Exception:
+        from django.http import HttpResponse
+        return HttpResponse(
+            f"<!DOCTYPE html><html><head><title>Error {status}</title><style>body{{font-family:sans-serif;text-align:center;padding:60px 20px;color:#132639}}h1{{font-size:36px;margin-bottom:12px}}p{{color:#52637a;font-size:16px}}a{{display:inline-block;margin-top:20px;padding:12px 24px;background:#1F3A66;color:#fff;text-decoration:none;border-radius:999px}}</style></head><body><h1>Something went wrong ({status})</h1><p>We are temporarily experiencing connection issues. Please refresh or try again in a moment.</p><a href='/'>Return to Home</a></body></html>",
+            status=status
+        )
 
 
 def bad_request(request, exception=None):
