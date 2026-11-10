@@ -703,7 +703,7 @@
             {% if is_subcollection and parent_category %}
             <span style="display:inline-block; background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-right: 6px;">Sub-collection of {{ parent_category.name }}</span>
             {% endif %}
-            {{ products|length }} Piece{{ products|length|pluralize }}
+            Handcrafted jewellery designed for everyday luxury
         </p>
 
         {% if is_subcollection and parent_category %}
@@ -723,7 +723,6 @@
                class="subcat-pill {% if not is_subcollection and not active_sub %}active{% endif %}"
                title="View all {{ main_cat.name }}">
                 <i class="fas fa-shapes"></i> All {{ main_cat.name }}
-                <span class="subcat-badge-count">{{ total_main_count }}</span>
             </a>
             {% for sub in subcategories %}
             <a href="{% url 'store:collection_detail' sub.slug %}" 
@@ -739,9 +738,6 @@
                 {% elif 'choker' in sub.slug %}<i class="fas fa-crown"></i>
                 {% else %}<i class="fas fa-tag"></i>{% endif %}
                 {{ sub.name }}
-                {% if sub.product_count %}
-                <span class="subcat-badge-count">{{ sub.product_count }}</span>
-                {% endif %}
             </a>
             {% endfor %}
         </div>
@@ -770,7 +766,6 @@
                         <option value="newest">New Arrivals</option>
                     </select>
                 </div>
-                <span class="products-count-badge" id="productsCountBadge">{{ products|length }} Pieces</span>
             </div>
         </div>
 
@@ -866,7 +861,7 @@
                         <i class="fas fa-rotate-left"></i> Reset All Filters
                     </button>
                     <button type="button" class="btn-apply-drawer" onclick="toggleFilterDrawer(false)">
-                        <i class="fas fa-check"></i> Show Results (<span id="drawerResultsCount">{{ products|length }}</span>)
+                        <i class="fas fa-check"></i> Apply Filters
                     </button>
                 </div>
             </div>
@@ -1235,13 +1230,6 @@
                     card.classList.add('hide');
                 }
             });
-
-            if (countBadge) {
-                countBadge.textContent = visibleCount + ' Piece' + (visibleCount === 1 ? '' : 's');
-            }
-            if (drawerCount) {
-                drawerCount.textContent = visibleCount;
-            }
 
             if (emptyMessageEl) {
                 emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';

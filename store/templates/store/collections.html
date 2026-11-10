@@ -875,9 +875,8 @@
         <div class="subcat-scroll-track">
             <a href="{% if active_cat_slug %}{% url 'store:collections' %}?cat={{ active_cat_slug }}{% else %}{% url 'store:collections' %}{% endif %}" 
                class="subcat-pill {% if not active_sub_slug %}active{% endif %}"
-               title="All {% if active_main_cat %}{{ active_main_cat.name }}{% else %}Pieces{% endif %}">
+               title="All {% if active_main_cat %}{{ active_main_cat.name }}{% else %}Jewellery{% endif %}">
                 <i class="fas fa-shapes"></i> All {% if active_main_cat %}{{ active_main_cat.name }}{% else %}Jewellery{% endif %}
-                <span class="subcat-badge-count">{{ total_count }}</span>
             </a>
             {% for sub in subcategories %}
             <a href="{% if active_cat_slug %}{% url 'store:collections' %}?cat={{ active_cat_slug }}&sub={{ sub.slug }}{% else %}{% url 'store:collections' %}?sub={{ sub.slug }}{% endif %}" 
@@ -895,9 +894,6 @@
                 {% elif 'charm' in sub.slug %}<i class="fas fa-heart"></i>
                 {% else %}<i class="fas fa-tag"></i>{% endif %}
                 {{ sub.name }}
-                {% if sub.product_count %}
-                <span class="subcat-badge-count">{{ sub.product_count }}</span>
-                {% endif %}
             </a>
             {% endfor %}
         </div>
@@ -947,7 +943,6 @@
                         <option value="newest">New Arrivals</option>
                     </select>
                 </div>
-                <span class="products-count-badge" id="productsCountBadge">{{ products|length }} Pieces</span>
             </div>
         </div>
 
@@ -1357,9 +1352,6 @@
                 }
             });
 
-            if (countBadge) {
-                countBadge.textContent = visibleCount + ' Piece' + (visibleCount === 1 ? '' : 's');
-            }
             if (emptyMessageEl) {
                 emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
             }
