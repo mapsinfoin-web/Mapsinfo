@@ -154,13 +154,101 @@
         .alert.error, .alert.warning { background: #fee2e2; color: #991b1b; }
         .alert.success { background: #dcfce7; color: #166534; }
 
-        /* Buttons */
-        .btn { display: block; width: 100%; padding: 16px; text-align: center; border-radius: 999px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .25s ease; border: 2px solid var(--navy); }
+        /* Buttons & Gallery Actions */
+        .btn { display: block; width: 100%; padding: 16px; text-align: center; border-radius: 999px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .25s ease; border: 2px solid var(--navy); box-sizing: border-box; }
         .btn-add { background: var(--navy); color: #fff; }
         .btn-add:hover { background: var(--navy-2); border-color: var(--navy-2); transform: translateY(-2px); }
-        .btn-buy { background: #fff; color: var(--navy); margin-top: 12px; }
+        .btn-buy { background: #fff; color: var(--navy); }
         .btn-buy:hover { background: var(--navy); color: #fff; transform: translateY(-2px); }
         .btn.disabled { background: var(--soft); border-color: var(--soft); color: var(--muted); cursor: not-allowed; transform: none; }
+
+        /* Gallery Actions (Add to Cart / Buy Now) placed at the bottom of the product gallery */
+        .gallery-actions {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .gallery-actions .stock-note {
+            margin: 0 0 12px;
+            display: inline-flex;
+        }
+        .gallery-actions-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+        .gallery-actions-btns .action-form {
+            margin: 0;
+            width: 100%;
+        }
+        .gallery-actions-btns .btn {
+            margin: 0;
+            width: 100%;
+            height: 52px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15.5px;
+            font-weight: 700;
+            border-radius: 999px;
+            box-shadow: 0 4px 14px rgba(31, 58, 102, .12);
+        }
+        .gallery-actions-btns .btn i {
+            font-size: 15px;
+        }
+        .gallery-actions-btns .btn-add {
+            background: var(--navy);
+            color: #fff;
+            border: 2px solid var(--navy);
+        }
+        .gallery-actions-btns .btn-add:hover {
+            background: var(--navy-2);
+            border-color: var(--navy-2);
+            box-shadow: 0 6px 18px rgba(19, 38, 57, .24);
+        }
+        .gallery-actions-btns .btn-buy {
+            background: #fff;
+            color: var(--navy);
+            border: 2px solid var(--navy);
+        }
+        .gallery-actions-btns .btn-buy:hover {
+            background: var(--navy);
+            color: #fff;
+            border-color: var(--navy);
+            box-shadow: 0 6px 18px rgba(31, 58, 102, .24);
+        }
+        .gallery-actions .btn.disabled {
+            width: 100%;
+            height: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--soft);
+            border: 2px solid var(--soft);
+            color: var(--muted);
+            cursor: not-allowed;
+            transform: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        @media (max-width: 480px) {
+            .gallery-actions-btns {
+                gap: 8px;
+            }
+            .gallery-actions-btns .btn {
+                height: 48px;
+                padding: 0 8px;
+                font-size: 14px;
+                gap: 6px;
+            }
+            .gallery-actions-btns .btn i {
+                font-size: 13px;
+            }
+        }
 
         /* Free gift picker */
         .gift-offer { border: 2px dashed var(--accent); border-radius: 20px; padding: 20px; margin-bottom: 18px; background: #f2f9ff; }
@@ -559,6 +647,60 @@
                 {% endfor %}
             </template>
             {% endif %}
+
+            <!-- Action buttons placed at bottom of product gallery -->
+            <div class="gallery-actions">
+                {% if product.in_stock %}
+                    {% if product.is_low_stock %}
+                    <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
+                    {% endif %}
+
+                    {% if offer and gift_choices %}
+                    <!-- Buy 1 Get 1 Free: customer picks gift, one click adds both -->
+                    <div class="gift-offer">
+                        <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
+                        <form action="{% url 'store:add_cart' product.id %}" method="POST">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <p class="gift-offer-sub">Choose your FREE gift:</p>
+                            {% for g in gift_choices %}
+                            <label class="gift-choice">
+                                <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
+                                {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" loading="lazy" />{% endif %}
+                                <span class="gift-name">{{ g.title }}</span>
+                                <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
+                            </label>
+                            {% endfor %}
+                            <div class="gallery-actions-btns">
+                                <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart + Free Gift</button>
+                                <button type="submit" class="btn btn-buy" formaction="{% url 'store:buy_now' product.pk %}"><i class="fas fa-bolt"></i> Buy Now + Free Gift</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="gallery-actions-btns">
+                        <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+                        </form>
+                        <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <button type="submit" class="btn btn-buy"><i class="fas fa-bolt"></i> Buy Now</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <button class="btn disabled" disabled><i class="fas fa-circle-xmark"></i> Out of Stock</button>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Right: details -->
@@ -681,51 +823,10 @@
             <div style="border-top: 1px solid var(--line); margin-bottom: 22px;"></div>
             {% endif %}
 
-            {% if product.in_stock %}
-                {% if product.is_low_stock %}
-                <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
-                {% endif %}
-
-                {% if offer and gift_choices %}
-                <!-- Buy 1 Get 1 Free: the customer picks the gift here, one click adds both -->
-                <div class="gift-offer">
-                    <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
-                    <form action="{% url 'store:add_cart' product.id %}" method="POST">
-                        {% csrf_token %}
-                        {% if product.available_colors %}
-                        <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                        {% endif %}
-                        <p class="gift-offer-sub">Choose your FREE gift:</p>
-                        {% for g in gift_choices %}
-                        <label class="gift-choice">
-                            <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
-                            {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" loading="lazy" />{% endif %}
-                            <span class="gift-name">{{ g.title }}</span>
-                            <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
-                        </label>
-                        {% endfor %}
-                        <button type="submit" class="btn btn-add">Add to Cart + Free Gift</button>
-                        <button type="submit" class="btn btn-buy" formaction="{% url 'store:buy_now' product.pk %}">Buy Now + Free Gift</button>
-                    </form>
-                </div>
-                {% else %}
-                <form action="{% url 'store:add_cart' product.id %}" method="POST">
-                    {% csrf_token %}
-                    {% if product.available_colors %}
-                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                    {% endif %}
-                    <button type="submit" class="btn btn-add">Add to Cart</button>
-                </form>
-                <form action="{% url 'store:buy_now' product.pk %}" method="POST">
-                    {% csrf_token %}
-                    {% if product.available_colors %}
-                    <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                    {% endif %}
-                    <button type="submit" class="btn btn-buy">Buy Now</button>
-                </form>
-                {% endif %}
-            {% else %}
-                <button class="btn disabled" disabled>Out of Stock</button>
+            {% if not product.in_stock %}
+            <p class="stock-note" style="background:#fee2e2; color:#991b1b; border: 1px solid #fecaca; margin: 0 0 16px;">
+                <i class="fas fa-circle-xmark"></i> Currently Out of Stock
+            </p>
             {% endif %}
 
             <div class="notes">
