@@ -1235,11 +1235,6 @@
             }
         })();
     </script>
-    <!-- Floating WhatsApp Support Widget -->
-    <a href="https://wa.me/919953595557?text=Hi%20MAPSKART!%20I%20have%20a%20question%20about%20{{ product.title|urlencode }}%20(SKU:%20{{ product.sku }})%20-%20{{ request.build_absolute_uri|urlencode }}"
-       target="_blank" rel="noopener noreferrer" class="floating-wa" aria-label="Chat on WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-        <span>Need help? Chat with us</span>
-    </a>
+    {% include 'store/includes/floating_whatsapp.html' %}
 </body>
 </html>
