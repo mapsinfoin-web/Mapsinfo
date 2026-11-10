@@ -433,14 +433,19 @@ class OrderItem(models.Model):
 
 
 class ContactInquiry(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, default='')
     email = models.EmailField()
-    subject = models.CharField(max_length=255)
-    message = models.TextField()
+    subject = models.CharField(max_length=255, blank=True, default='Contact request')
+    message = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Inquiry from {self.name} - {self.subject}"
+        return f"Inquiry from {self.email} ({self.created_at.strftime('%d %b %Y') if self.created_at else ''})"
+    
+    class Meta:
+        verbose_name = 'Contact Inquiry'
+        verbose_name_plural = 'Contact Inquiries'
+        ordering = ['-created_at']
     
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist')

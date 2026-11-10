@@ -450,11 +450,11 @@ class OrderAdmin(admin.ModelAdmin):
 # --- CONTACT INQUIRIES ---
 @admin.register(ContactInquiry)
 class ContactInquiryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'subject', 'email', 'created_at']
-    search_fields = ['name', 'email', 'subject']
+    list_display = ['email', 'name', 'subject', 'created_at']
+    search_fields = ['email', 'name', 'subject']
 
-    # Read-only so you don't accidentally edit a customer's original message
-    readonly_fields = ['name', 'email', 'subject', 'message', 'created_at']
+    # Read-only so customer's submission is never altered
+    readonly_fields = ['email', 'name', 'subject', 'message', 'created_at']
 
 # --- PAYMENT SETTINGS (Paytm QR, WhatsApp number) ---
 @admin.register(PaymentSettings)
