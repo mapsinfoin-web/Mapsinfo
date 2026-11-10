@@ -280,7 +280,7 @@
         @media (max-width: 900px) {
             .footer-top { grid-template-columns: 1fr 1fr; }
         }
-        /* Jewelry Care & Guarantee Badges */
+        /* Jewellery Care & Guarantee Badges */
         .guarantee-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -641,7 +641,7 @@
                 {% endfor %}
             </ul>
 
-            <!-- Jewelry Care & Anti-Tarnish Guarantee Badges -->
+            <!-- Jewellery Care & Anti-Tarnish Guarantee Badges -->
             <div class="guarantee-grid">
                 <div class="g-badge">
                     <div class="g-badge-icon"><i class="fas fa-shield-halved"></i></div>
@@ -668,7 +668,7 @@
                     <div class="g-badge-icon"><i class="fas fa-box-open"></i></div>
                     <div>
                         <h4>Luxury Gift Ready</h4>
-                        <p>{% if product.packaging_text %}{{ product.packaging_text }}{% elif product.category and 'earring' in product.category.slug|lower or 'earring' in product.title|lower %}Includes velvet jewelry box{% else %}Includes velvet jewelry pouch{% endif %}</p>
+                        <p>{% if product.packaging_text %}{{ product.packaging_text }}{% elif product.category and 'earring' in product.category.slug|lower or 'earring' in product.title|lower %}Includes velvet jewellery box{% else %}Includes velvet jewellery pouch{% endif %}</p>
                     </div>
                 </div>
             </div>

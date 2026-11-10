@@ -333,7 +333,7 @@ class OrderAdmin(admin.ModelAdmin):
                     f"Hi {obj.full_name}, great news! ✨\n"
                     f"Your MAPSKART order #{obj.pk} has been shipped! 🚀\n\n"
                     f"📦 Tracking Details: {obj.tracking_number}\n\n"
-                    f"Your jewelry is on its way. Thank you for shopping with MAPSKART! 💎"
+                    f"Your jewellery is on its way. Thank you for shopping with MAPSKART! 💎"
                 )
                 btn_text = "📦 Send Tracking"
                 bg = "#059669"
@@ -348,7 +348,7 @@ class OrderAdmin(admin.ModelAdmin):
             msg = (
                 f"Hi {obj.full_name}, thank you! 🎉\n"
                 f"Your payment of Rs.{obj.amount_paid} for MAPSKART order #{obj.pk} has been verified.\n\n"
-                f"We are packing your jewelry with care. We will update you as soon as it ships! ✨"
+                f"We are packing your jewellery with care. We will update you as soon as it ships! ✨"
             )
             btn_text = "✅ Send Paid Confirm"
             bg = "#16a34a"

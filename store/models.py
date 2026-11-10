@@ -76,12 +76,12 @@ class Product(models.Model):
 
     @property
     def packaging_text(self):
-        """Returns custom packaging text: velvet jewelry box for earrings, velvet jewelry pouch for necklaces & others."""
+        """Returns custom packaging text: velvet jewellery box for earrings, velvet jewellery pouch for necklaces & others."""
         cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
         title_lower = (self.title.lower() if self.title else '')
         if 'earring' in cat_slug or 'earring' in title_lower:
-            return 'Includes velvet jewelry box'
-        return 'Includes velvet jewelry pouch'
+            return 'Includes velvet jewellery box'
+        return 'Includes velvet jewellery pouch'
 
     def save(self, *args, **kwargs):
         if not self.sku:
