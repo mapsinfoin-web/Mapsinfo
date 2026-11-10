@@ -1092,7 +1092,10 @@
         function swapColorThumb(thumbnail) {
             if (!thumbnail) return;
             var main = document.getElementById('main-image');
-            if (main) { main.src = thumbnail.src; }
+            if (main) {
+                main.src = thumbnail.src;
+                if (thumbnail.alt) { main.alt = thumbnail.alt; }
+            }
             var wrap = document.getElementById('main-wrap');
             if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
             document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
@@ -1105,19 +1108,18 @@
         function swapImage(thumbnail) {
             if (!thumbnail) return;
             var main = document.getElementById('main-image');
-            if (main) { main.src = thumbnail.src; }
+            if (main) {
+                main.src = thumbnail.src;
+                if (thumbnail.alt) { main.alt = thumbnail.alt; }
+            }
             var wrap = document.getElementById('main-wrap');
-            if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
+            if (wrap) {
+                wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')");
+            }
             document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
                 img.classList.remove('active');
             });
             thumbnail.classList.add('active');
-            // When returning to a base gallery thumb, reset swatch selection
-            resetToBaseProduct();
-            // Re-activate clicked thumb
-            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
-                if (img.src === thumbnail.src) img.classList.add('active');
-            });
         }
 
         // ===== Photo viewer with zoom =====
