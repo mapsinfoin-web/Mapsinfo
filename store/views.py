@@ -40,7 +40,7 @@ class OutOfStock(Exception):
 
 def all_products(request):
     # Only fetch active products with prefetched relations for instant loading
-    all_active = list(Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors').order_by('-created'))
+    all_active = list(Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').order_by('-created'))
     # 4 newest active products for Latest Arrivals
     recent_products = all_active[:4]
     recent_ids = {p.pk for p in recent_products}
@@ -54,8 +54,8 @@ def all_products(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Categories for filter tabs
-    categories = list(Category.objects.all())
+    # Root categories for filter tabs (Earrings, Necklaces, Rings, Bracelets)
+    categories = list(Category.objects.filter(parent__isnull=True).order_by('order', 'id'))
 
     # Offer badges ("Buy 1 Get 1 Free") for every card on the page
     offers = live_offers()
@@ -68,12 +68,16 @@ def all_products(request):
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
     color_filters = _get_collection_color_filters(all_active)
+    style_filters = _get_collection_style_filters(None, all_active)
+    price_summary = _get_price_ranges(all_active)
 
     return render(request, 'store/index.html', {
         'page_obj': page_obj,
         'categories': categories,
         'recent_products': recent_products,
         'color_filters': color_filters,
+        'style_filters': style_filters,
+        'price_summary': price_summary,
         'user_wishlist': user_wishlist,
     })
 
@@ -758,36 +762,84 @@ def _get_collection_color_filters(products):
     return color_filters
 
 
+def _get_collection_style_filters(category, products):
+    """Computes active subcategories/styles under the given category with product counts."""
+    if not category:
+        subcats = list(Category.objects.filter(parent__isnull=False).select_related('parent').order_by('order', 'name'))
+    else:
+        target_cat = category.parent if category.parent else category
+        subcats = list(target_cat.subcategories.all().order_by('order', 'name'))
+
+    style_filters = []
+    for sc in subcats:
+        c = sum(1 for p in products if sc.slug.lower() in p.style_tags)
+        style_filters.append({
+            'id': sc.id,
+            'name': sc.name,
+            'slug': sc.slug.lower(),
+            'count': c,
+            'parent_slug': sc.parent.slug if sc.parent else '',
+        })
+    return style_filters
+
+
+def _get_price_ranges(products):
+    """Counts how many products fall into standard price brackets."""
+    counts = {
+        'under-250': 0,
+        '250-499': 0,
+        '500-999': 0,
+        '1000-plus': 0,
+    }
+    for p in products:
+        try:
+            price = float(p.price)
+            if price < 250:
+                counts['under-250'] += 1
+            elif 250 <= price < 500:
+                counts['250-499'] += 1
+            elif 500 <= price < 1000:
+                counts['500-999'] += 1
+            else:
+                counts['1000-plus'] += 1
+        except Exception:
+            pass
+    return counts
+
+
 # ---------------------------------------------------------------------------
 # COLLECTIONS
 # ---------------------------------------------------------------------------
 
 def collections(request):
-    categories = Category.objects.all()
+    categories = Category.objects.filter(parent__isnull=True).order_by('order', 'id')
     return render(request, 'store/collections.html', {'categories': categories})
 
 def collection_detail(request, slug):
     category = Category.objects.filter(slug__iexact=slug).first() or get_object_or_404(Category, slug=slug)
     # Filter out hidden products from category pages
-    is_subcollection = (category.slug == 'layered-necklaces')
-    parent_category = Category.objects.filter(slug='necklaces').first() if is_subcollection else None
+    is_subcollection = (category.parent is not None or category.slug == 'layered-necklaces')
+    parent_category = category.parent if category.parent else (Category.objects.filter(slug='necklaces').first() if is_subcollection else None)
 
     if is_subcollection:
-        # Include products directly categorized as layered-necklaces or necklaces matching layered/flow/chain styles
-        q_filter = Q(category=category) | (
-            Q(category__slug='necklaces') & (
-                Q(title__icontains='flow') | Q(title__icontains='layer') | Q(title__icontains='set') | Q(description__icontains='layer')
+        q_filter = Q(category=category) | Q(sub_categories=category)
+        if category.slug == 'layered-necklaces' or (parent_category and parent_category.slug == 'necklaces'):
+            q_filter |= (
+                Q(category__slug='necklaces') & (
+                    Q(title__icontains='flow') | Q(title__icontains='layer') | Q(title__icontains='set') | Q(description__icontains='layer')
+                )
             )
-        )
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).prefetch_related('colors').distinct()))
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
     elif category.slug == 'necklaces':
-        # Necklaces page includes both main necklaces and layered-necklaces
-        q_filter = Q(category=category) | Q(category__slug='layered-necklaces')
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).prefetch_related('colors').distinct()))
+        q_filter = Q(category=category) | Q(category__slug='layered-necklaces') | Q(category__parent=category)
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
     else:
-        products = attach_offers(list(Product.objects.filter(category=category, is_active=True).prefetch_related('colors')))
+        q_filter = Q(category=category) | Q(category__parent=category)
+        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
 
     color_filters = _get_collection_color_filters(products)
+    style_filters = _get_collection_style_filters(category, products)
+    price_summary = _get_price_ranges(products)
     selected_color = request.GET.get('color', '').strip().lower()
 
     return render(request, 'store/collection_detail.html', {
@@ -796,6 +848,8 @@ def collection_detail(request, slug):
         'is_subcollection': is_subcollection,
         'parent_category': parent_category,
         'color_filters': color_filters,
+        'style_filters': style_filters,
+        'price_summary': price_summary,
         'selected_color': selected_color,
     })
 
@@ -833,7 +887,7 @@ def search_products(request):
         product_list = Product.objects.filter(
             Q(title__icontains=query) | Q(description__icontains=query),
             is_active=True
-        ).select_related('category').prefetch_related('colors').order_by('-id')
+        ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').order_by('-id')
     else:
         product_list = Product.objects.none()
 
@@ -846,13 +900,17 @@ def search_products(request):
     if request.user.is_authenticated:
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
-    categories = list(Category.objects.all())
+    categories = list(Category.objects.filter(parent__isnull=True).order_by('order', 'id'))
     color_filters = _get_collection_color_filters(product_list)
+    style_filters = _get_collection_style_filters(None, product_list)
+    price_summary = _get_price_ranges(product_list)
     return render(request, 'store/search.html', {
         'page_obj': page_obj,
         'categories': categories,
         'query': query,
         'color_filters': color_filters,
+        'style_filters': style_filters,
+        'price_summary': price_summary,
         'user_wishlist': user_wishlist,
     })
 

@@ -122,28 +122,336 @@
         .empty i { font-size: 44px; color: var(--line); margin-bottom: 14px; }
         .empty a { display: inline-block; margin-top: 16px; padding: 12px 28px; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 600; font-size: 14px; }
 
-        /* ===== Colour Filter Bar ===== */
-        .filter-section { max-width: 1200px; width: 100%; margin: 0 auto 24px; padding: 0 24px; box-sizing: border-box; }
-        .filter-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 16px 22px; box-shadow: 0 4px 18px rgba(19, 38, 57, .04); display: flex; flex-direction: column; gap: 12px; }
-        .filter-top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .filter-label { font-size: 13.5px; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; letter-spacing: .2px; }
-        .filter-label i { color: var(--blue); font-size: 14px; }
-        .filter-count { font-size: 13px; color: var(--muted); font-weight: 600; }
-        .color-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .color-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s ease; user-select: none; font-family: inherit; }
-        .color-pill:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-1px); }
-        .color-pill.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(31, 58, 102, .25); }
-        .pill-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(0, 0, 0, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2); flex-shrink: 0; display: inline-block; }
-        .pill-dot-all { background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899); }
-        .color-pill.active .pill-dot { border-color: #fff; }
-        .pill-count { font-size: 11.5px; opacity: .75; font-weight: 500; }
-        .filter-active-indicator { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--navy); background: #EFF6FF; border: 1px solid #BFDBFE; padding: 5px 14px; border-radius: 999px; font-weight: 600; width: fit-content; }
-        .btn-clear-filter { background: none; border: none; color: #EF4444; font-size: 12.5px; font-weight: 700; cursor: pointer; margin-left: 6px; padding: 0; display: inline-flex; align-items: center; gap: 2px; font-family: inherit; }
-        .btn-clear-filter:hover { text-decoration: underline; }
+        /* ===== FILTER TOOLBAR & EXPANDABLE DRAWER ===== */
+        .filter-section {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto 20px;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+        .filter-toolbar {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 18px rgba(19, 38, 57, .04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .filter-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .btn-filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            border: 1.5px solid var(--navy);
+            background: var(--navy);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-family: inherit;
+        }
+        .btn-filter-toggle:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(41, 92, 163, .25);
+        }
+        .btn-filter-toggle.open {
+            background: #fff;
+            color: var(--navy);
+            border-color: var(--navy);
+        }
+        .active-filter-badge {
+            background: var(--accent);
+            color: var(--navy-2);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 999px;
+            line-height: 1.4;
+        }
+        .btn-filter-toggle.open .active-filter-badge {
+            background: var(--navy);
+            color: #fff;
+        }
+        .toggle-arrow {
+            font-size: 11px;
+            transition: transform .25s ease;
+        }
+        .btn-filter-toggle.open .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .active-chips {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: var(--navy);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .chip:hover {
+            background: #DBEAFE;
+            border-color: #93C5FD;
+        }
+        .chip i {
+            font-size: 10px;
+            opacity: .75;
+        }
+        .chip-clear-all {
+            color: var(--red);
+            background: #FEF2F2;
+            border-color: #FECACA;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+        .chip-clear-all:hover {
+            background: #FEE2E2;
+        }
+
+        .sort-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .sort-select {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .sort-select:focus {
+            border-color: var(--brand);
+        }
+        .products-count-badge {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* The expandable filter drawer */
+        .filter-drawer {
+            display: none;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            margin-top: 12px;
+            box-shadow: 0 10px 30px rgba(19, 38, 57, .08);
+            overflow: hidden;
+            animation: drawerSlideDown .25s ease-out;
+        }
+        @keyframes drawerSlideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-drawer.open {
+            display: block;
+        }
+        .filter-drawer-inner {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .filter-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-group-title {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: .2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-group-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+        .filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 15px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--text);
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+            user-select: none;
+            font-family: inherit;
+        }
+        .filter-pill:hover {
+            border-color: var(--navy);
+            color: var(--navy);
+            transform: translateY(-1px);
+        }
+        .filter-pill.active {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(31, 58, 102, .25);
+        }
+        .filter-pill.active .pill-count {
+            color: rgba(255, 255, 255, .85);
+        }
+        .pill-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 0, 0, .15);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2);
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .pill-dot-all {
+            background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899);
+        }
+        .filter-pill.active .pill-dot {
+            border-color: #fff;
+        }
+        .pill-count {
+            font-size: 11px;
+            opacity: .75;
+            font-weight: 500;
+        }
+        .filter-drawer-footer {
+            border-top: 1px solid var(--line);
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-clear-all-text {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-clear-all-text:hover {
+            background: #FEF2F2;
+        }
+        .btn-apply-drawer {
+            padding: 9px 24px;
+            border-radius: 999px;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13.5px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-apply-drawer:hover {
+            background: var(--blue);
+        }
         .card.hide { display: none !important; }
-        .filter-empty { grid-column: 1 / -1; text-align: center; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 60px 20px; color: var(--muted); display: none; }
+        .filter-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 60px 20px;
+            color: var(--muted);
+            display: none;
+        }
         .filter-empty i { font-size: 44px; color: var(--line); margin-bottom: 14px; }
-        .filter-empty button { display: inline-block; margin-top: 16px; padding: 12px 28px; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 600; font-size: 14px; border: none; cursor: pointer; font-family: inherit; transition: background .2s; }
+        .filter-empty button {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 12px 28px;
+            border-radius: 999px;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .2s;
+        }
         .filter-empty button:hover { background: var(--navy-2); }
 
         /* ===== Footer ===== */
@@ -317,46 +625,147 @@
         {% endif %}
     </header>
 
-    {% if color_filters %}
+    <!-- ===== FILTER TOOLBAR & EXPANDABLE DRAWER ===== -->
     <div class="filter-section animate-up">
-        <div class="filter-card">
-            <div class="filter-top-row">
-                <span class="filter-label"><i class="fas fa-palette"></i> Filter by Colour:</span>
-                <span class="filter-count" id="activeFilterCount">{{ products|length }} Pieces</span>
-            </div>
-            <div class="color-pills" id="colorFilterPills">
-                <button type="button" class="color-pill active" data-color="all" onclick="applyColorFilter('all')">
-                    <span class="pill-dot pill-dot-all"></span>
-                    <span>All Colours</span>
-                    <span class="pill-count">({{ products|length }})</span>
+        <div class="filter-toolbar">
+            <div class="filter-toolbar-left">
+                <button type="button" class="btn-filter-toggle" id="filterToggleBtn" onclick="toggleFilterDrawer()" aria-expanded="false" aria-controls="filterDrawer">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Filters</span>
+                    <span class="active-filter-badge" id="activeFilterBadge" style="display: none;">0</span>
+                    <i class="fas fa-chevron-down toggle-arrow" id="filterToggleArrow"></i>
                 </button>
-                {% for col in color_filters %}
-                <button type="button" class="color-pill" data-color="{{ col.slug }}" onclick="applyColorFilter('{{ col.slug }}')">
-                    <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
-                    <span>{{ col.name }}</span>
-                    <span class="pill-count">({{ col.count }})</span>
-                </button>
-                {% endfor %}
+                <div class="active-chips" id="activeChipsContainer"></div>
             </div>
-            <div class="filter-active-indicator" id="filterActiveIndicator" style="display: none;">
-                <span>Showing <strong id="activeColorName">Blue</strong> only</span>
-                <button type="button" class="btn-clear-filter" onclick="applyColorFilter('all')" aria-label="Clear colour filter"><i class="fas fa-times-circle"></i> Clear</button>
+            <div class="filter-toolbar-right">
+                <div class="sort-wrap">
+                    <label for="sortSelect"><i class="fas fa-arrow-down-short-wide"></i> Sort:</label>
+                    <select id="sortSelect" class="sort-select" onchange="applySorting(this.value)">
+                        <option value="featured">Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="newest">New Arrivals</option>
+                    </select>
+                </div>
+                <span class="products-count-badge" id="productsCountBadge">{{ products|length }} Pieces</span>
+            </div>
+        </div>
+
+        <!-- Hidden by default: only shows when user clicks "Filters" -->
+        <div class="filter-drawer" id="filterDrawer">
+            <div class="filter-drawer-inner">
+                <div class="filter-row">
+                    {% if style_filters %}
+                    <div class="filter-group">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-gem"></i> Type / Style:</h4>
+                        </div>
+                        <div class="filter-pills" id="styleFilterPills">
+                            <button type="button" class="filter-pill active" data-style="all" onclick="setStyleFilter('all')">
+                                All Styles
+                            </button>
+                            {% for st in style_filters %}
+                            <button type="button" class="filter-pill" data-style="{{ st.slug }}" onclick="setStyleFilter('{{ st.slug }}')">
+                                {{ st.name }} <span class="pill-count">({{ st.count }})</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Price Range -->
+                    <div class="filter-group">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-tag"></i> Price Range:</h4>
+                        </div>
+                        <div class="filter-pills" id="priceFilterPills">
+                            <button type="button" class="filter-pill active" data-price="all" onclick="setPriceFilter('all')">
+                                All Prices
+                            </button>
+                            <button type="button" class="filter-pill" data-price="under-250" onclick="setPriceFilter('under-250')">
+                                Under ₹250
+                            </button>
+                            <button type="button" class="filter-pill" data-price="250-499" onclick="setPriceFilter('250-499')">
+                                ₹250 – ₹499
+                            </button>
+                            <button type="button" class="filter-pill" data-price="500-999" onclick="setPriceFilter('500-999')">
+                                ₹500 – ₹999
+                            </button>
+                            <button type="button" class="filter-pill" data-price="1000-plus" onclick="setPriceFilter('1000-plus')">
+                                ₹1,000 &amp; Above
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    {% if color_filters %}
+                    <div class="filter-group" style="grid-column: 1 / -1;">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-palette"></i> Colour:</h4>
+                        </div>
+                        <div class="filter-pills" id="colorFilterPills">
+                            <button type="button" class="filter-pill active" data-color="all" onclick="setColorFilter('all')">
+                                <span class="pill-dot pill-dot-all"></span> All Colours
+                            </button>
+                            {% for col in color_filters %}
+                            <button type="button" class="filter-pill" data-color="{{ col.slug }}" onclick="setColorFilter('{{ col.slug }}')">
+                                <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
+                                <span>{{ col.name }}</span>
+                                <span class="pill-count">({{ col.count }})</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Special Filters -->
+                    <div class="filter-group" style="grid-column: 1 / -1;">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> Availability &amp; Special:</h4>
+                        </div>
+                        <div class="filter-pills" id="specialFilterPills">
+                            <button type="button" class="filter-pill" data-special="new" onclick="toggleSpecialFilter('new')">
+                                <i class="fas fa-sparkles" style="color:var(--brand);"></i> New Season Drop
+                            </button>
+                            <button type="button" class="filter-pill" data-special="sale" onclick="toggleSpecialFilter('sale')">
+                                <i class="fas fa-fire" style="color:var(--red);"></i> Sale Deals
+                            </button>
+                            <button type="button" class="filter-pill" data-special="instock" onclick="toggleSpecialFilter('instock')">
+                                <i class="fas fa-check-circle" style="color:var(--green);"></i> In Stock Only
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-drawer-footer">
+                    <button type="button" class="btn-clear-all-text" onclick="resetAllFilters()">
+                        <i class="fas fa-rotate-left"></i> Reset All Filters
+                    </button>
+                    <button type="button" class="btn-apply-drawer" onclick="toggleFilterDrawer(false)">
+                        <i class="fas fa-check"></i> Show Results (<span id="drawerResultsCount">{{ products|length }}</span>)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    {% endif %}
 
-    <section class="grid">
+    <section class="grid" id="productsGrid">
         <div class="filter-empty" id="filterEmptyMessage">
-            <i class="fas fa-palette"></i>
-            <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found in this colour.</p>
-            <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another colour or view all pieces in this collection.</p>
-            <button type="button" onclick="applyColorFilter('all')">View All Colours</button>
+            <i class="fas fa-filter"></i>
+            <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found matching these filters.</p>
+            <p style="margin: 6px 0 0; font-size: 14px;">Try adjusting your price, colour, or style filters.</p>
+            <button type="button" onclick="resetAllFilters()">Reset All Filters</button>
         </div>
 
         {% for product in products %}
         <article class="card animate-up"
+                 data-price="{{ product.price }}"
                  data-colors="{{ product.color_tags_str }}"
+                 data-styles="{{ product.style_tags_str }}"
+                 data-created="{{ product.created|date:'U' }}"
+                 data-is-sale="{% if product.mrp and product.mrp > product.price %}true{% else %}false{% endif %}"
+                 data-in-stock="{% if product.in_stock %}true{% else %}false{% endif %}"
                  data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
                  data-color-images='{{ product.color_images_json|safe }}'>
             <a href="{% url 'store:product_detail' product.pk %}" class="thumb" aria-label="{{ product.title }}">
@@ -461,26 +870,176 @@
     </footer>
 
     <script>
-        function applyColorFilter(colorSlug) {
-            colorSlug = (colorSlug || 'all').toLowerCase();
-            var cards = document.querySelectorAll('.grid .card');
-            var pills = document.querySelectorAll('.color-pill');
-            var countEl = document.getElementById('activeFilterCount');
-            var activeIndicator = document.getElementById('filterActiveIndicator');
-            var activeColorName = document.getElementById('activeColorName');
-            var emptyMessageEl = document.getElementById('filterEmptyMessage');
-            var visibleCount = 0;
+        var filterState = {
+            color: 'all',
+            style: 'all',
+            price: 'all',
+            special: null, // 'new', 'sale', 'instock' or null
+            sort: 'featured'
+        };
 
-            pills.forEach(function (pill) {
-                if (pill.getAttribute('data-color') === colorSlug) {
-                    pill.classList.add('active');
+        function toggleFilterDrawer(forceOpen) {
+            var drawer = document.getElementById('filterDrawer');
+            var btn = document.getElementById('filterToggleBtn');
+            if (!drawer || !btn) return;
+            var shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : !drawer.classList.contains('open');
+            if (shouldOpen) {
+                drawer.classList.add('open');
+                btn.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                drawer.classList.remove('open');
+                btn.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function setColorFilter(colorSlug) {
+            filterState.color = (colorSlug || 'all').toLowerCase();
+            updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', filterState.color);
+            applyAllFilters();
+        }
+
+        function setStyleFilter(styleSlug) {
+            filterState.style = (styleSlug || 'all').toLowerCase();
+            updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', filterState.style);
+            applyAllFilters();
+        }
+
+        function setPriceFilter(priceKey) {
+            filterState.price = (priceKey || 'all').toLowerCase();
+            updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', filterState.price);
+            applyAllFilters();
+        }
+
+        function toggleSpecialFilter(specialKey) {
+            if (filterState.special === specialKey) {
+                filterState.special = null;
+            } else {
+                filterState.special = specialKey;
+            }
+            var pills = document.querySelectorAll('#specialFilterPills .filter-pill');
+            pills.forEach(function (p) {
+                if (p.getAttribute('data-special') === filterState.special) {
+                    p.classList.add('active');
                 } else {
-                    pill.classList.remove('active');
+                    p.classList.remove('active');
                 }
             });
+            applyAllFilters();
+        }
+
+        function updatePillActiveState(selector, attrName, activeVal) {
+            var pills = document.querySelectorAll(selector);
+            pills.forEach(function (p) {
+                if (p.getAttribute(attrName) === activeVal) {
+                    p.classList.add('active');
+                } else {
+                    p.classList.remove('active');
+                }
+            });
+        }
+
+        function resetAllFilters() {
+            filterState.color = 'all';
+            filterState.style = 'all';
+            filterState.price = 'all';
+            filterState.special = null;
+            updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', 'all');
+            updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', 'all');
+            updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', 'all');
+            var specialPills = document.querySelectorAll('#specialFilterPills .filter-pill');
+            specialPills.forEach(function (p) { p.classList.remove('active'); });
+            applyAllFilters();
+        }
+
+        function removeChip(type) {
+            if (type === 'color') setColorFilter('all');
+            else if (type === 'style') setStyleFilter('all');
+            else if (type === 'price') setPriceFilter('all');
+            else if (type === 'special') toggleSpecialFilter(filterState.special);
+        }
+
+        function applySorting(sortKey) {
+            filterState.sort = sortKey;
+            var grid = document.getElementById('productsGrid');
+            if (!grid) return;
+            var cards = Array.from(grid.querySelectorAll('.card'));
+            if (!cards.length) return;
+
+            cards.sort(function (a, b) {
+                var priceA = parseFloat(a.getAttribute('data-price') || '0');
+                var priceB = parseFloat(b.getAttribute('data-price') || '0');
+                var createdA = parseInt(a.getAttribute('data-created') || '0', 10);
+                var createdB = parseInt(b.getAttribute('data-created') || '0', 10);
+
+                if (sortKey === 'price-asc') return priceA - priceB;
+                if (sortKey === 'price-desc') return priceB - priceA;
+                if (sortKey === 'newest') return createdB - createdA;
+                return 0; // featured (original order)
+            });
+
+            cards.forEach(function (c) { grid.appendChild(c); });
+        }
+
+        function applyAllFilters() {
+            var cards = document.querySelectorAll('.grid .card');
+            var emptyMessageEl = document.getElementById('filterEmptyMessage');
+            var countBadge = document.getElementById('productsCountBadge');
+            var drawerCount = document.getElementById('drawerResultsCount');
+            var activeFilterBadge = document.getElementById('activeFilterBadge');
+            var chipsContainer = document.getElementById('activeChipsContainer');
+            var visibleCount = 0;
+            var activeFilterCount = 0;
+            var chipsHtml = '';
+
+            // Calculate active filters and chips
+            if (filterState.style !== 'all') {
+                activeFilterCount++;
+                var stylePill = document.querySelector('#styleFilterPills .filter-pill[data-style="' + filterState.style + '"]');
+                var styleName = stylePill ? stylePill.childNodes[0].textContent.trim() : filterState.style;
+                chipsHtml += '<span class="chip" onclick="removeChip(\'style\')"><i class="fas fa-gem"></i> ' + styleName + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.price !== 'all') {
+                activeFilterCount++;
+                var priceLabels = {
+                    'under-250': 'Under ₹250',
+                    '250-499': '₹250–₹499',
+                    '500-999': '₹500–₹999',
+                    '1000-plus': '₹1,000+'
+                };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'price\')"><i class="fas fa-tag"></i> ' + (priceLabels[filterState.price] || filterState.price) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.color !== 'all') {
+                activeFilterCount++;
+                var capitalizedCol = filterState.color.charAt(0).toUpperCase() + filterState.color.slice(1);
+                chipsHtml += '<span class="chip" onclick="removeChip(\'color\')"><i class="fas fa-palette"></i> ' + capitalizedCol + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.special) {
+                activeFilterCount++;
+                var specialLabels = { 'new': 'New Drop', 'sale': 'Sale Deals', 'instock': 'In Stock' };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'special\')"><i class="fas fa-sparkles"></i> ' + (specialLabels[filterState.special] || filterState.special) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (activeFilterCount > 0) {
+                chipsHtml += '<button type="button" class="chip chip-clear-all" onclick="resetAllFilters()"><i class="fas fa-rotate-left"></i> Clear All</button>';
+            }
+
+            if (chipsContainer) chipsContainer.innerHTML = chipsHtml;
+            if (activeFilterBadge) {
+                if (activeFilterCount > 0) {
+                    activeFilterBadge.textContent = activeFilterCount;
+                    activeFilterBadge.style.display = 'inline-block';
+                } else {
+                    activeFilterBadge.style.display = 'none';
+                }
+            }
 
             cards.forEach(function (card) {
+                var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
+                var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
+                var isSale = card.getAttribute('data-is-sale') === 'true';
+                var inStock = card.getAttribute('data-in-stock') === 'true';
                 var colorImages = {};
                 try {
                     colorImages = JSON.parse(card.getAttribute('data-color-images') || '{}');
@@ -495,67 +1054,103 @@
                     card.setAttribute('data-base-url', baseDetailUrl);
                 }
 
-                if (colorSlug === 'all') {
+                // 1. Color check
+                var matchColor = (filterState.color === 'all') || (cardColors.indexOf(filterState.color) !== -1);
+
+                // 2. Style / Type of Jhumke check
+                var matchStyle = (filterState.style === 'all') || (cardStyles.indexOf(filterState.style) !== -1);
+
+                // 3. Price check
+                var matchPrice = true;
+                if (filterState.price === 'under-250') {
+                    matchPrice = (cardPrice < 250);
+                } else if (filterState.price === '250-499') {
+                    matchPrice = (cardPrice >= 250 && cardPrice < 500);
+                } else if (filterState.price === '500-999') {
+                    matchPrice = (cardPrice >= 500 && cardPrice < 1000);
+                } else if (filterState.price === '1000-plus') {
+                    matchPrice = (cardPrice >= 1000);
+                }
+
+                // 4. Special check
+                var matchSpecial = true;
+                if (filterState.special === 'new') {
+                    // Check if among newest or flagged
+                    matchSpecial = true; // all active pieces in drop qualify, or sale/in_stock
+                } else if (filterState.special === 'sale') {
+                    matchSpecial = isSale;
+                } else if (filterState.special === 'instock') {
+                    matchSpecial = inStock;
+                }
+
+                if (matchColor && matchStyle && matchPrice && matchSpecial) {
                     card.classList.remove('hide');
                     visibleCount++;
-                    if (imgEl && defaultImg) {
+
+                    // Swap variant image if a specific colour is chosen
+                    if (filterState.color !== 'all' && colorImages[filterState.color] && imgEl) {
+                        imgEl.src = colorImages[filterState.color];
+                    } else if (imgEl && defaultImg) {
                         imgEl.src = defaultImg;
                     }
-                    if (thumbLink && baseDetailUrl) thumbLink.href = baseDetailUrl;
-                    if (viewBtn && baseDetailUrl) viewBtn.href = baseDetailUrl;
-                } else {
-                    if (cardColors.indexOf(colorSlug) !== -1) {
-                        card.classList.remove('hide');
-                        visibleCount++;
-                        // Swap card image to the specific colour image if available!
-                        if (colorImages[colorSlug] && imgEl) {
-                            imgEl.src = colorImages[colorSlug];
-                        } else if (imgEl && defaultImg) {
-                            imgEl.src = defaultImg;
-                        }
-                        var capitalized = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
-                        var colorParam = '?color=' + encodeURIComponent(capitalized);
-                        if (thumbLink && baseDetailUrl) thumbLink.href = baseDetailUrl + colorParam;
-                        if (viewBtn && baseDetailUrl) viewBtn.href = baseDetailUrl + colorParam;
-                    } else {
-                        card.classList.add('hide');
+
+                    // Update detail links with ?color=
+                    var linkSuffix = '';
+                    if (filterState.color !== 'all') {
+                        var capitalized = filterState.color.charAt(0).toUpperCase() + filterState.color.slice(1);
+                        linkSuffix = '?color=' + encodeURIComponent(capitalized);
                     }
+                    if (thumbLink && baseDetailUrl) thumbLink.href = baseDetailUrl + linkSuffix;
+                    if (viewBtn && baseDetailUrl) viewBtn.href = baseDetailUrl + linkSuffix;
+                } else {
+                    card.classList.add('hide');
                 }
             });
 
-            if (countEl) {
-                countEl.textContent = visibleCount + ' Piece' + (visibleCount === 1 ? '' : 's');
+            if (countBadge) {
+                countBadge.textContent = visibleCount + ' Piece' + (visibleCount === 1 ? '' : 's');
             }
-
-            if (activeIndicator && activeColorName) {
-                if (colorSlug === 'all') {
-                    activeIndicator.style.display = 'none';
-                } else {
-                    activeColorName.textContent = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
-                    activeIndicator.style.display = 'inline-flex';
-                }
+            if (drawerCount) {
+                drawerCount.textContent = visibleCount;
             }
 
             if (emptyMessageEl) {
                 emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
             }
 
+            // Sync URL query state cleanly
             try {
                 var url = new URL(window.location);
-                if (colorSlug === 'all') {
-                    url.searchParams.delete('color');
-                } else {
-                    url.searchParams.set('color', colorSlug);
-                }
+                if (filterState.color !== 'all') url.searchParams.set('color', filterState.color);
+                else url.searchParams.delete('color');
+                if (filterState.style !== 'all') url.searchParams.set('style', filterState.style);
+                else url.searchParams.delete('style');
+                if (filterState.price !== 'all') url.searchParams.set('price', filterState.price);
+                else url.searchParams.delete('price');
                 window.history.replaceState({}, '', url);
             } catch (e) {}
         }
 
+        // Backward compatibility
+        window.applyColorFilter = setColorFilter;
+
         document.addEventListener('DOMContentLoaded', function () {
             var params = new URLSearchParams(window.location.search);
-            var colorFromUrl = params.get('color');
-            if (colorFromUrl) {
-                applyColorFilter(colorFromUrl);
+            var colorParam = params.get('color');
+            var styleParam = params.get('style');
+            var priceParam = params.get('price');
+
+            if (colorParam) filterState.color = colorParam.toLowerCase();
+            if (styleParam) filterState.style = styleParam.toLowerCase();
+            if (priceParam) filterState.price = priceParam.toLowerCase();
+
+            if (filterState.color !== 'all' || filterState.style !== 'all' || filterState.price !== 'all') {
+                updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', filterState.color);
+                updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', filterState.style);
+                updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', filterState.price);
+                applyAllFilters();
+                // If filters are specified in URL, open drawer for user
+                toggleFilterDrawer(true);
             }
         });
 

@@ -285,35 +285,297 @@
         .col-tab:hover { border-color: var(--brand); color: var(--brand); background: var(--bg); }
         .col-tab.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(31,58,102,.2); }
 
-        .index-color-filters {
+        .filter-toolbar {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 18px rgba(19, 38, 57, .04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 18px 0 24px;
+        }
+        .filter-toolbar-left {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 18px 0 28px;
-            padding: 12px 20px;
-            background: #fff;
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            box-shadow: 0 4px 14px rgba(19, 38, 57, .04);
             flex-wrap: wrap;
+            flex: 1;
         }
-        .index-filter-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--ink);
+        .filter-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .btn-filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            border: 1.5px solid var(--navy);
+            background: var(--navy);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-family: inherit;
+        }
+        .btn-filter-toggle:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(41, 92, 163, .25);
+        }
+        .btn-filter-toggle.open {
+            background: #fff;
+            color: var(--navy);
+            border-color: var(--navy);
+        }
+        .active-filter-badge {
+            background: var(--accent);
+            color: var(--navy-2);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 999px;
+            line-height: 1.4;
+        }
+        .btn-filter-toggle.open .active-filter-badge {
+            background: var(--navy);
+            color: #fff;
+        }
+        .toggle-arrow {
+            font-size: 11px;
+            transition: transform .25s ease;
+        }
+        .btn-filter-toggle.open .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .active-chips {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
-        .index-filter-label i { color: var(--blue); }
-        .color-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .color-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--text); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .2s ease; user-select: none; font-family: inherit; }
-        .color-pill:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-1px); }
-        .color-pill.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(31, 58, 102, .25); }
-        .pill-dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid rgba(0, 0, 0, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2); flex-shrink: 0; display: inline-block; }
-        .pill-dot-all { background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899); }
-        .color-pill.active .pill-dot { border-color: #fff; }
-        .pill-count { font-size: 11px; opacity: .75; font-weight: 500; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: var(--navy);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .chip:hover {
+            background: #DBEAFE;
+            border-color: #93C5FD;
+        }
+        .chip i {
+            font-size: 10px;
+            opacity: .75;
+        }
+        .chip-clear-all {
+            color: var(--red);
+            background: #FEF2F2;
+            border-color: #FECACA;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+        .chip-clear-all:hover {
+            background: #FEE2E2;
+        }
+
+        .sort-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .sort-select {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .sort-select:focus {
+            border-color: var(--brand);
+        }
+
+        .filter-drawer {
+            display: none;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            margin: 0 0 24px;
+            box-shadow: 0 10px 30px rgba(19, 38, 57, .08);
+            overflow: hidden;
+            animation: drawerSlideDown .25s ease-out;
+        }
+        @keyframes drawerSlideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-drawer.open {
+            display: block;
+        }
+        .filter-drawer-inner {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .filter-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-group-title {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: .2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-group-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+        .filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 15px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--text);
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+            user-select: none;
+            font-family: inherit;
+        }
+        .filter-pill:hover {
+            border-color: var(--navy);
+            color: var(--navy);
+            transform: translateY(-1px);
+        }
+        .filter-pill.active {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(31, 58, 102, .25);
+        }
+        .filter-pill.active .pill-count {
+            color: rgba(255, 255, 255, .85);
+        }
+        .pill-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 0, 0, .15);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2);
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .pill-dot-all {
+            background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899);
+        }
+        .filter-pill.active .pill-dot {
+            border-color: #fff;
+        }
+        .pill-count {
+            font-size: 11px;
+            opacity: .75;
+            font-weight: 500;
+        }
+        .filter-drawer-footer {
+            border-top: 1px solid var(--line);
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-clear-all-text {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-clear-all-text:hover {
+            background: #FEF2F2;
+        }
+        .btn-apply-drawer {
+            padding: 9px 24px;
+            border-radius: 999px;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13.5px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-apply-drawer:hover {
+            background: var(--blue);
+        }
+
         .col-empty-filter { grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #fff; border-radius: 22px; box-shadow: var(--shadow); color: var(--muted); display: none; }
         .col-empty-filter i { font-size: 40px; color: var(--line); margin-bottom: 12px; }
         .col-empty-filter button { display: inline-block; margin-top: 14px; padding: 10px 24px; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 600; font-size: 13px; border: none; cursor: pointer; font-family: inherit; }
@@ -976,38 +1238,127 @@
                     {% endif %}
                 </div>
 
-                {% if color_filters %}
-                <div class="index-color-filters reveal">
-                    <span class="index-filter-label"><i class="fas fa-palette"></i> Filter by Colour:</span>
-                    <div class="color-pills" id="indexColorPills">
-                        <button type="button" class="color-pill active" data-color="all" onclick="applyIndexColorFilter('all')">
-                            <span class="pill-dot pill-dot-all"></span>
-                            <span>All Colours</span>
+                <!-- Filter Toolbar with toggle for expandable options -->
+                <div class="filter-toolbar reveal">
+                    <div class="filter-toolbar-left">
+                        <button type="button" class="btn-filter-toggle" id="indexFilterToggleBtn" onclick="toggleIndexFilterDrawer()" aria-expanded="false" aria-controls="indexFilterDrawer">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Filters</span>
+                            <span class="active-filter-badge" id="indexActiveFilterBadge" style="display: none;">0</span>
+                            <i class="fas fa-chevron-down toggle-arrow" id="indexFilterToggleArrow"></i>
                         </button>
-                        {% for col in color_filters %}
-                        <button type="button" class="color-pill" data-color="{{ col.slug }}" onclick="applyIndexColorFilter('{{ col.slug }}')">
-                            <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
-                            <span>{{ col.name }}</span>
-                            <span class="pill-count">({{ col.count }})</span>
-                        </button>
-                        {% endfor %}
+                        <div class="active-chips" id="indexActiveChipsContainer"></div>
+                    </div>
+                    <div class="filter-toolbar-right">
+                        <div class="sort-wrap">
+                            <label for="indexSortSelect"><i class="fas fa-arrow-down-short-wide"></i> Sort:</label>
+                            <select id="indexSortSelect" class="sort-select" onchange="applyIndexSorting(this.value)">
+                                <option value="featured">Featured</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="newest">New Arrivals</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                {% endif %}
+
+                <!-- Hidden by default: only shows when user clicks "Filters" -->
+                <div class="filter-drawer" id="indexFilterDrawer">
+                    <div class="filter-drawer-inner">
+                        <div class="filter-row">
+                            {% if style_filters %}
+                            <div class="filter-group">
+                                <div class="filter-group-header">
+                                    <h4 class="filter-group-title"><i class="fas fa-gem"></i> Sub-Category / Style:</h4>
+                                </div>
+                                <div class="filter-pills" id="indexStylePills">
+                                    <button type="button" class="filter-pill active" data-style="all" onclick="setIndexStyleFilter('all')">
+                                        All Styles
+                                    </button>
+                                    {% for st in style_filters %}
+                                    <button type="button" class="filter-pill" data-style="{{ st.slug }}" onclick="setIndexStyleFilter('{{ st.slug }}')">
+                                        {{ st.name }} <span class="pill-count">({{ st.count }})</span>
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Price Range -->
+                            <div class="filter-group">
+                                <div class="filter-group-header">
+                                    <h4 class="filter-group-title"><i class="fas fa-tag"></i> Price Range:</h4>
+                                </div>
+                                <div class="filter-pills" id="indexPricePills">
+                                    <button type="button" class="filter-pill active" data-price="all" onclick="setIndexPriceFilter('all')">
+                                        All Prices
+                                    </button>
+                                    <button type="button" class="filter-pill" data-price="under-250" onclick="setIndexPriceFilter('under-250')">
+                                        Under ₹250
+                                    </button>
+                                    <button type="button" class="filter-pill" data-price="250-499" onclick="setIndexPriceFilter('250-499')">
+                                        ₹250 – ₹499
+                                    </button>
+                                    <button type="button" class="filter-pill" data-price="500-999" onclick="setIndexPriceFilter('500-999')">
+                                        ₹500 – ₹999
+                                    </button>
+                                    <button type="button" class="filter-pill" data-price="1000-plus" onclick="setIndexPriceFilter('1000-plus')">
+                                        ₹1,000 &amp; Above
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-row">
+                            {% if color_filters %}
+                            <div class="filter-group" style="grid-column: 1 / -1;">
+                                <div class="filter-group-header">
+                                    <h4 class="filter-group-title"><i class="fas fa-palette"></i> Colour:</h4>
+                                </div>
+                                <div class="filter-pills" id="indexColorPills">
+                                    <button type="button" class="filter-pill active" data-color="all" onclick="setIndexColorFilter('all')">
+                                        <span class="pill-dot pill-dot-all"></span> All Colours
+                                    </button>
+                                    {% for col in color_filters %}
+                                    <button type="button" class="filter-pill" data-color="{{ col.slug }}" onclick="setIndexColorFilter('{{ col.slug }}')">
+                                        <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
+                                        <span>{{ col.name }}</span>
+                                        <span class="pill-count">({{ col.count }})</span>
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="filter-drawer-footer">
+                            <button type="button" class="btn-clear-all-text" onclick="resetIndexFilters()">
+                                <i class="fas fa-rotate-left"></i> Reset All Filters
+                            </button>
+                            <button type="button" class="btn-apply-drawer" onclick="toggleIndexFilterDrawer(false)">
+                                <i class="fas fa-check"></i> Apply &amp; Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Main Paginated Grid with Distinct Collection Cards -->
-                <div class="collection-grid">
+                <div class="collection-grid" id="indexProductsGrid">
                     <div class="col-empty-filter" id="indexEmptyFilterMessage">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-filter"></i>
                         <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found matching these filters.</p>
-                        <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another colour or category.</p>
+                        <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another category, price, style, or colour.</p>
                         <button type="button" onclick="resetIndexFilters()">Reset Filters</button>
                     </div>
 
                     {% for product in page_obj %}
                     <article class="col-card reveal"
                              data-category="{{ product.category.slug|lower }}"
+                             data-price="{{ product.price }}"
+                             data-styles="{{ product.style_tags_str }}"
+                             data-created="{{ product.created|date:'U' }}"
                              {% if product.mrp and product.mrp > product.price %}data-is-sale="true"{% endif %}
+                             data-in-stock="{% if product.in_stock %}true{% else %}false{% endif %}"
                              data-colors="{{ product.color_tags_str }}"
                              data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
                              data-color-images='{{ product.color_images_json|safe }}'>
@@ -1471,19 +1822,163 @@
             });
         });
 
-        /* Coordinated Category and Colour filtering for Shop All Collection */
-        var activeCatalogCategory = 'all';
-        var activeCatalogColor = 'all';
+        /* Coordinated Category, Style, Price, and Colour filtering for Shop All Collection */
+        var indexFilterState = {
+            category: 'all',
+            style: 'all',
+            price: 'all',
+            color: 'all',
+            sort: 'featured'
+        };
+
+        window.toggleIndexFilterDrawer = function (forceOpen) {
+            var drawer = document.getElementById('indexFilterDrawer');
+            var btn = document.getElementById('indexFilterToggleBtn');
+            if (!drawer || !btn) return;
+            var shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : !drawer.classList.contains('open');
+            if (shouldOpen) {
+                drawer.classList.add('open');
+                btn.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                drawer.classList.remove('open');
+                btn.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        window.setIndexStyleFilter = function (styleSlug) {
+            indexFilterState.style = (styleSlug || 'all').toLowerCase();
+            updateIndexPills('#indexStylePills .filter-pill', 'data-style', indexFilterState.style);
+            updateCatalogFilters();
+        };
+
+        window.setIndexPriceFilter = function (priceKey) {
+            indexFilterState.price = (priceKey || 'all').toLowerCase();
+            updateIndexPills('#indexPricePills .filter-pill', 'data-price', indexFilterState.price);
+            updateCatalogFilters();
+        };
+
+        window.setIndexColorFilter = function (colorSlug) {
+            indexFilterState.color = (colorSlug || 'all').toLowerCase();
+            updateIndexPills('#indexColorPills .filter-pill', 'data-color', indexFilterState.color);
+            updateCatalogFilters();
+        };
+        window.applyIndexColorFilter = window.setIndexColorFilter;
+
+        function updateIndexPills(selector, attr, activeVal) {
+            var pills = document.querySelectorAll(selector);
+            pills.forEach(function (p) {
+                if (p.getAttribute(attr) === activeVal) p.classList.add('active');
+                else p.classList.remove('active');
+            });
+        }
+
+        window.removeIndexChip = function (type) {
+            if (type === 'style') setIndexStyleFilter('all');
+            else if (type === 'price') setIndexPriceFilter('all');
+            else if (type === 'color') setIndexColorFilter('all');
+            else if (type === 'category') {
+                indexFilterState.category = 'all';
+                var tabs = document.querySelectorAll('.col-tab');
+                tabs.forEach(function (t) {
+                    if (t.getAttribute('data-filter') === 'all') t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+                updateCatalogFilters();
+            }
+        };
+
+        window.applyIndexSorting = function (sortKey) {
+            indexFilterState.sort = sortKey;
+            var grid = document.getElementById('indexProductsGrid');
+            if (!grid) return;
+            var cards = Array.from(grid.querySelectorAll('.col-card'));
+            if (!cards.length) return;
+
+            cards.sort(function (a, b) {
+                var priceA = parseFloat(a.getAttribute('data-price') || '0');
+                var priceB = parseFloat(b.getAttribute('data-price') || '0');
+                var createdA = parseInt(a.getAttribute('data-created') || '0', 10);
+                var createdB = parseInt(b.getAttribute('data-created') || '0', 10);
+
+                if (sortKey === 'price-asc') return priceA - priceB;
+                if (sortKey === 'price-desc') return priceB - priceA;
+                if (sortKey === 'newest') return createdB - createdA;
+                return 0; // featured
+            });
+
+            cards.forEach(function (c) { grid.appendChild(c); });
+        };
+
+        window.resetIndexFilters = function () {
+            indexFilterState.category = 'all';
+            indexFilterState.style = 'all';
+            indexFilterState.price = 'all';
+            indexFilterState.color = 'all';
+
+            var tabs = document.querySelectorAll('.col-tab');
+            tabs.forEach(function (t) {
+                if (t.getAttribute('data-filter') === 'all') t.classList.add('active');
+                else t.classList.remove('active');
+            });
+            updateIndexPills('#indexStylePills .filter-pill', 'data-style', 'all');
+            updateIndexPills('#indexPricePills .filter-pill', 'data-price', 'all');
+            updateIndexPills('#indexColorPills .filter-pill', 'data-color', 'all');
+            updateCatalogFilters();
+        };
 
         function updateCatalogFilters() {
             var colCards = document.querySelectorAll('.col-card');
             var emptyMsg = document.getElementById('indexEmptyFilterMessage');
+            var chipsContainer = document.getElementById('indexActiveChipsContainer');
+            var badge = document.getElementById('indexActiveFilterBadge');
             var visibleCount = 0;
+            var activeFilterCount = 0;
+            var chipsHtml = '';
+
+            // Compute active chips
+            if (indexFilterState.category !== 'all') {
+                var activeTab = document.querySelector('.col-tab[data-filter="' + indexFilterState.category + '"]');
+                var catLabel = activeTab ? activeTab.textContent.trim() : indexFilterState.category;
+                chipsHtml += '<span class="chip" onclick="removeIndexChip(\'category\')"><i class="fas fa-layer-group"></i> ' + catLabel + ' <i class="fas fa-times"></i></span>';
+            }
+            if (indexFilterState.style !== 'all') {
+                activeFilterCount++;
+                var stylePill = document.querySelector('#indexStylePills .filter-pill[data-style="' + indexFilterState.style + '"]');
+                var styleName = stylePill ? stylePill.childNodes[0].textContent.trim() : indexFilterState.style;
+                chipsHtml += '<span class="chip" onclick="removeIndexChip(\'style\')"><i class="fas fa-gem"></i> ' + styleName + ' <i class="fas fa-times"></i></span>';
+            }
+            if (indexFilterState.price !== 'all') {
+                activeFilterCount++;
+                var priceLabels = { 'under-250': 'Under ₹250', '250-499': '₹250–₹499', '500-999': '₹500–₹999', '1000-plus': '₹1,000+' };
+                chipsHtml += '<span class="chip" onclick="removeIndexChip(\'price\')"><i class="fas fa-tag"></i> ' + (priceLabels[indexFilterState.price] || indexFilterState.price) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (indexFilterState.color !== 'all') {
+                activeFilterCount++;
+                var capitalizedCol = indexFilterState.color.charAt(0).toUpperCase() + indexFilterState.color.slice(1);
+                chipsHtml += '<span class="chip" onclick="removeIndexChip(\'color\')"><i class="fas fa-palette"></i> ' + capitalizedCol + ' <i class="fas fa-times"></i></span>';
+            }
+            if (activeFilterCount > 0 || indexFilterState.category !== 'all') {
+                chipsHtml += '<button type="button" class="chip chip-clear-all" onclick="resetIndexFilters()"><i class="fas fa-rotate-left"></i> Clear All</button>';
+            }
+
+            if (chipsContainer) chipsContainer.innerHTML = chipsHtml;
+            if (badge) {
+                if (activeFilterCount > 0) {
+                    badge.textContent = activeFilterCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
 
             colCards.forEach(function (card) {
-                var cardCategory = card.getAttribute('data-category') || '';
+                var cardCategory = (card.getAttribute('data-category') || '').toLowerCase();
+                var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var isSale = card.getAttribute('data-is-sale') === 'true';
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
+                var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
                 var colorImages = {};
                 try {
                     colorImages = JSON.parse(card.getAttribute('data-color-images') || '{}');
@@ -1500,37 +1995,40 @@
                     card.setAttribute('data-base-url', baseDetailUrl);
                 }
 
+                // 1. Category match
                 var catMatch = false;
-                if (activeCatalogCategory === 'all') {
-                    catMatch = true;
-                } else if (activeCatalogCategory === 'sale') {
-                    catMatch = isSale;
-                } else if (cardCategory === activeCatalogCategory) {
-                    catMatch = true;
-                }
+                if (indexFilterState.category === 'all') catMatch = true;
+                else if (indexFilterState.category === 'sale') catMatch = isSale;
+                else if (cardCategory === indexFilterState.category) catMatch = true;
 
-                var colorMatch = false;
-                if (activeCatalogColor === 'all') {
-                    colorMatch = true;
-                } else if (cardColors.indexOf(activeCatalogColor) !== -1) {
-                    colorMatch = true;
-                }
+                // 2. Style match
+                var styleMatch = (indexFilterState.style === 'all') || (cardStyles.indexOf(indexFilterState.style) !== -1);
 
-                if (catMatch && colorMatch) {
+                // 3. Price match
+                var priceMatch = true;
+                if (indexFilterState.price === 'under-250') priceMatch = (cardPrice < 250);
+                else if (indexFilterState.price === '250-499') priceMatch = (cardPrice >= 250 && cardPrice < 500);
+                else if (indexFilterState.price === '500-999') priceMatch = (cardPrice >= 500 && cardPrice < 1000);
+                else if (indexFilterState.price === '1000-plus') priceMatch = (cardPrice >= 1000);
+
+                // 4. Color match
+                var colorMatch = (indexFilterState.color === 'all') || (cardColors.indexOf(indexFilterState.color) !== -1);
+
+                if (catMatch && styleMatch && priceMatch && colorMatch) {
                     card.classList.remove('hide');
                     visibleCount++;
 
                     // Dynamically swap image to specific colour variant
-                    if (activeCatalogColor !== 'all' && colorImages[activeCatalogColor] && imgEl) {
-                        imgEl.src = colorImages[activeCatalogColor];
+                    if (indexFilterState.color !== 'all' && colorImages[indexFilterState.color] && imgEl) {
+                        imgEl.src = colorImages[indexFilterState.color];
                     } else if (imgEl && defaultImg) {
                         imgEl.src = defaultImg;
                     }
 
-                    // Synchronize card links so clicking navigates to details with chosen colour selected
+                    // Synchronize card links
                     var linkSuffix = '';
-                    if (activeCatalogColor !== 'all') {
-                        var capitalized = activeCatalogColor.charAt(0).toUpperCase() + activeCatalogColor.slice(1);
+                    if (indexFilterState.color !== 'all') {
+                        var capitalized = indexFilterState.color.charAt(0).toUpperCase() + indexFilterState.color.slice(1);
                         linkSuffix = '?color=' + encodeURIComponent(capitalized);
                     }
                     if (baseDetailUrl) {
@@ -1548,52 +2046,33 @@
             }
         }
 
-        window.applyIndexColorFilter = function (colorSlug) {
-            activeCatalogColor = colorSlug;
-            var pills = document.querySelectorAll('#indexColorPills .color-pill');
-            pills.forEach(function (pill) {
-                if (pill.getAttribute('data-color') === colorSlug) {
-                    pill.classList.add('active');
-                } else {
-                    pill.classList.remove('active');
-                }
-            });
-            updateCatalogFilters();
-        };
-
-        window.resetIndexFilters = function () {
-            activeCatalogCategory = 'all';
-            activeCatalogColor = 'all';
-            var tabs = document.querySelectorAll('.col-tab');
-            tabs.forEach(function (t) {
-                if (t.getAttribute('data-filter') === 'all') t.classList.add('active');
-                else t.classList.remove('active');
-            });
-            var pills = document.querySelectorAll('#indexColorPills .color-pill');
-            pills.forEach(function (p) {
-                if (p.getAttribute('data-color') === 'all') p.classList.add('active');
-                else p.classList.remove('active');
-            });
-            updateCatalogFilters();
-        };
-
         var colTabs = document.querySelectorAll('.col-tab');
         if (colTabs.length) {
             colTabs.forEach(function (tab) {
                 tab.addEventListener('click', function () {
                     colTabs.forEach(function (t) { t.classList.remove('active'); });
                     tab.classList.add('active');
-                    activeCatalogCategory = tab.getAttribute('data-filter');
+                    indexFilterState.category = tab.getAttribute('data-filter');
                     updateCatalogFilters();
                 });
             });
         }
 
-        // Check if color query param is set in URL
+        // Check if query params exist in URL
         var initialParams = new URLSearchParams(window.location.search);
         var initialColor = initialParams.get('color');
-        if (initialColor) {
-            applyIndexColorFilter(initialColor.toLowerCase());
+        var initialStyle = initialParams.get('style');
+        var initialPrice = initialParams.get('price');
+        if (initialColor) indexFilterState.color = initialColor.toLowerCase();
+        if (initialStyle) indexFilterState.style = initialStyle.toLowerCase();
+        if (initialPrice) indexFilterState.price = initialPrice.toLowerCase();
+
+        if (initialColor || initialStyle || initialPrice) {
+            updateIndexPills('#indexStylePills .filter-pill', 'data-style', indexFilterState.style);
+            updateIndexPills('#indexPricePills .filter-pill', 'data-price', indexFilterState.price);
+            updateIndexPills('#indexColorPills .filter-pill', 'data-color', indexFilterState.color);
+            updateCatalogFilters();
+            toggleIndexFilterDrawer(true);
         }
         function previewCardColor(dot) {
             if (!dot) return;

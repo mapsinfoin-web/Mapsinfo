@@ -12,16 +12,41 @@ from django.utils import timezone
 class Category(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='subcategories',
+        help_text="Optional parent category. For example, select 'Earrings' to create a sub-category / style like 'Jhumke', 'Studs', 'Drops'."
+    )
+    keywords = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text="Optional keywords (comma-separated) for automatically tagging matching products (e.g. 'jhumk, jhumka, jhumki')."
+    )
+    order = models.PositiveIntegerField(default=0, help_text="Display order in filters")
 
     class Meta:
         verbose_name_plural = 'Categories'
+        ordering = ['order', 'name']
 
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} → {self.name}"
         return self.name
 
 
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.PROTECT)
+    sub_categories = models.ManyToManyField(
+        Category,
+        blank=True,
+        related_name='tagged_products',
+        verbose_name='Sub-categories / Filter Styles',
+        help_text="Assign this product to specific filter sub-categories / styles (e.g. Jhumke, Studs, Halos). Also auto-matches based on keywords in title."
+    )
     title = models.CharField(max_length=255)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text="Unique Product ID")
     description = models.TextField(blank=True)
@@ -131,6 +156,51 @@ class Product(models.Model):
                 cmap[tag] = default_img
         self._cached_color_images_json = json.dumps(cmap)
         return self._cached_color_images_json
+
+    @property
+    def style_tags(self):
+        """Returns list of subcategory / style slugs for this product (from explicit M2M or keyword matching)."""
+        if hasattr(self, '_cached_style_tags'):
+            return self._cached_style_tags
+        tags = set()
+        # 1. Explicit M2M subcategories
+        if hasattr(self, '_prefetched_objects_cache') and 'sub_categories' in self._prefetched_objects_cache:
+            for sc in self.sub_categories.all():
+                tags.add(sc.slug.lower())
+        else:
+            try:
+                for sc in self.sub_categories.all():
+                    tags.add(sc.slug.lower())
+            except Exception:
+                pass
+        # 2. Check title against subcategories with keywords
+        title_lower = (self.title or '').lower()
+        if self.category:
+            subcats = getattr(self.category, '_cached_subcategories', None)
+            if subcats is None:
+                if hasattr(self.category, '_prefetched_objects_cache') and 'subcategories' in self.category._prefetched_objects_cache:
+                    subcats = list(self.category.subcategories.all())
+                else:
+                    try:
+                        subcats = list(self.category.subcategories.all())
+                    except Exception:
+                        subcats = []
+                self.category._cached_subcategories = subcats
+            for sc in subcats:
+                if sc.slug.lower() in tags:
+                    continue
+                kws = [k.strip().lower() for k in (sc.keywords or sc.name).split(',') if k.strip()]
+                for kw in kws:
+                    if re.search(r'\b' + re.escape(kw) + r'\b', title_lower):
+                        tags.add(sc.slug.lower())
+                        break
+        self._cached_style_tags = sorted(list(tags))
+        return self._cached_style_tags
+
+    @property
+    def style_tags_str(self):
+        """Space-separated list for data-styles attribute."""
+        return " ".join(self.style_tags)
 
     def save(self, *args, **kwargs):
         if not self.sku:

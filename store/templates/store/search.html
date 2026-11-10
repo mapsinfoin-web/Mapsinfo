@@ -150,35 +150,297 @@
             .price { font-size: 16px; }
         }
 
-        /* ===== COLOUR FILTER BAR ===== */
+        /* ===== FILTER TOOLBAR & EXPANDABLE DRAWER ===== */
         .filter-section { margin-bottom: 24px; }
-        .filter-card {
+        .filter-toolbar {
             background: #fff;
             border: 1px solid var(--line);
-            border-radius: 20px;
-            padding: 16px 20px;
-            box-shadow: 0 4px 14px rgba(19, 38, 57, .04);
+            border-radius: 18px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 18px rgba(19, 38, 57, .04);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
             flex-wrap: wrap;
         }
-        .filter-top-row { display: flex; align-items: center; gap: 12px; }
-        .filter-label { font-size: 13.5px; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
-        .filter-label i { color: var(--brand); }
-        .filter-count { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--soft); padding: 3px 10px; border-radius: 999px; }
-        .color-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .color-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--text); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .2s ease; user-select: none; font-family: inherit; }
-        .color-pill:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-1px); }
-        .color-pill.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(31, 58, 102, .25); }
-        .pill-dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid rgba(0, 0, 0, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2); flex-shrink: 0; display: inline-block; }
-        .pill-dot-all { background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899); }
-        .color-pill.active .pill-dot { border-color: #fff; }
-        .pill-count { font-size: 11px; opacity: .75; font-weight: 500; }
-        .filter-active-indicator { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--navy); font-weight: 600; padding: 4px 12px; background: rgba(179, 224, 255, .35); border-radius: 999px; }
-        .btn-clear-filter { background: none; border: none; color: var(--red); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0 4px; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; }
-        .btn-clear-filter:hover { text-decoration: underline; }
+        .filter-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .filter-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .btn-filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            border: 1.5px solid var(--navy);
+            background: var(--navy);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-family: inherit;
+        }
+        .btn-filter-toggle:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(41, 92, 163, .25);
+        }
+        .btn-filter-toggle.open {
+            background: #fff;
+            color: var(--navy);
+            border-color: var(--navy);
+        }
+        .active-filter-badge {
+            background: var(--accent);
+            color: var(--navy-2);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 999px;
+            line-height: 1.4;
+        }
+        .btn-filter-toggle.open .active-filter-badge {
+            background: var(--navy);
+            color: #fff;
+        }
+        .toggle-arrow {
+            font-size: 11px;
+            transition: transform .25s ease;
+        }
+        .btn-filter-toggle.open .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .active-chips {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: var(--navy);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .chip:hover {
+            background: #DBEAFE;
+            border-color: #93C5FD;
+        }
+        .chip i {
+            font-size: 10px;
+            opacity: .75;
+        }
+        .chip-clear-all {
+            color: var(--red);
+            background: #FEF2F2;
+            border-color: #FECACA;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+        .chip-clear-all:hover {
+            background: #FEE2E2;
+        }
+
+        .sort-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .sort-select {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .sort-select:focus {
+            border-color: var(--brand);
+        }
+
+        .filter-drawer {
+            display: none;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            margin-top: 12px;
+            box-shadow: 0 10px 30px rgba(19, 38, 57, .08);
+            overflow: hidden;
+            animation: drawerSlideDown .25s ease-out;
+        }
+        @keyframes drawerSlideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-drawer.open {
+            display: block;
+        }
+        .filter-drawer-inner {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .filter-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-group-title {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: .2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-group-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+        .filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 15px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--text);
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+            user-select: none;
+            font-family: inherit;
+        }
+        .filter-pill:hover {
+            border-color: var(--navy);
+            color: var(--navy);
+            transform: translateY(-1px);
+        }
+        .filter-pill.active {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(31, 58, 102, .25);
+        }
+        .filter-pill.active .pill-count {
+            color: rgba(255, 255, 255, .85);
+        }
+        .pill-dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 0, 0, .15);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2);
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .pill-dot-all {
+            background: conic-gradient(#EC4899, #2563EB, #059669, #EAB308, #EC4899);
+        }
+        .filter-pill.active .pill-dot {
+            border-color: #fff;
+        }
+        .pill-count {
+            font-size: 11px;
+            opacity: .75;
+            font-weight: 500;
+        }
+        .filter-drawer-footer {
+            border-top: 1px solid var(--line);
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-clear-all-text {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-clear-all-text:hover {
+            background: #FEF2F2;
+        }
+        .btn-apply-drawer {
+            padding: 9px 24px;
+            border-radius: 999px;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13.5px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: background .2s;
+        }
+        .btn-apply-drawer:hover {
+            background: var(--blue);
+        }
         .card.hide { display: none !important; }
         .filter-empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #fff; border-radius: 20px; box-shadow: var(--shadow); color: var(--muted); display: none; }
         .filter-empty i { font-size: 40px; color: var(--line); margin-bottom: 12px; }
@@ -323,44 +585,128 @@
                     </div>
                 </div>
 
-                {% if color_filters %}
+                <!-- Filter Toolbar with toggle for expandable options -->
                 <div class="filter-section reveal">
-                    <div class="filter-card">
-                        <div class="filter-top-row">
-                            <span class="filter-label"><i class="fas fa-palette"></i> Filter by Colour:</span>
-                            <span class="filter-count" id="activeFilterCount">{{ page_obj.paginator.count }} Found</span>
-                        </div>
-                        <div class="color-pills" id="colorFilterPills">
-                            <button type="button" class="color-pill active" data-color="all" onclick="applySearchColorFilter('all')">
-                                <span class="pill-dot pill-dot-all"></span>
-                                <span>All Colours</span>
+                    <div class="filter-toolbar">
+                        <div class="filter-toolbar-left">
+                            <button type="button" class="btn-filter-toggle" id="searchFilterToggleBtn" onclick="toggleSearchFilterDrawer()" aria-expanded="false" aria-controls="searchFilterDrawer">
+                                <i class="fas fa-sliders-h"></i>
+                                <span>Filters</span>
+                                <span class="active-filter-badge" id="searchActiveFilterBadge" style="display: none;">0</span>
+                                <i class="fas fa-chevron-down toggle-arrow" id="searchFilterToggleArrow"></i>
                             </button>
-                            {% for col in color_filters %}
-                            <button type="button" class="color-pill" data-color="{{ col.slug }}" onclick="applySearchColorFilter('{{ col.slug }}')">
-                                <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
-                                <span>{{ col.name }}</span>
-                                <span class="pill-count">({{ col.count }})</span>
-                            </button>
-                            {% endfor %}
+                            <div class="active-chips" id="searchActiveChipsContainer"></div>
                         </div>
-                        <div class="filter-active-indicator" id="filterActiveIndicator" style="display: none;">
-                            <span>Showing <strong id="activeColorName">Blue</strong> only</span>
-                            <button type="button" class="btn-clear-filter" onclick="applySearchColorFilter('all')" aria-label="Clear colour filter"><i class="fas fa-times-circle"></i> Clear</button>
+                        <div class="filter-toolbar-right">
+                            <div class="sort-wrap">
+                                <label for="searchSortSelect"><i class="fas fa-arrow-down-short-wide"></i> Sort:</label>
+                                <select id="searchSortSelect" class="sort-select" onchange="applySearchSorting(this.value)">
+                                    <option value="featured">Featured</option>
+                                    <option value="price-asc">Price: Low to High</option>
+                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="newest">New Arrivals</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden by default: only shows when user clicks "Filters" -->
+                    <div class="filter-drawer" id="searchFilterDrawer">
+                        <div class="filter-drawer-inner">
+                            <div class="filter-row">
+                                {% if style_filters %}
+                                <div class="filter-group">
+                                    <div class="filter-group-header">
+                                        <h4 class="filter-group-title"><i class="fas fa-gem"></i> Sub-Category / Style:</h4>
+                                    </div>
+                                    <div class="filter-pills" id="searchStylePills">
+                                        <button type="button" class="filter-pill active" data-style="all" onclick="setSearchStyleFilter('all')">
+                                            All Styles
+                                        </button>
+                                        {% for st in style_filters %}
+                                        <button type="button" class="filter-pill" data-style="{{ st.slug }}" onclick="setSearchStyleFilter('{{ st.slug }}')">
+                                            {{ st.name }} <span class="pill-count">({{ st.count }})</span>
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Price Range -->
+                                <div class="filter-group">
+                                    <div class="filter-group-header">
+                                        <h4 class="filter-group-title"><i class="fas fa-tag"></i> Price Range:</h4>
+                                    </div>
+                                    <div class="filter-pills" id="searchPricePills">
+                                        <button type="button" class="filter-pill active" data-price="all" onclick="setSearchPriceFilter('all')">
+                                            All Prices
+                                        </button>
+                                        <button type="button" class="filter-pill" data-price="under-250" onclick="setSearchPriceFilter('under-250')">
+                                            Under ₹250
+                                        </button>
+                                        <button type="button" class="filter-pill" data-price="250-499" onclick="setSearchPriceFilter('250-499')">
+                                            ₹250 – ₹499
+                                        </button>
+                                        <button type="button" class="filter-pill" data-price="500-999" onclick="setSearchPriceFilter('500-999')">
+                                            ₹500 – ₹999
+                                        </button>
+                                        <button type="button" class="filter-pill" data-price="1000-plus" onclick="setSearchPriceFilter('1000-plus')">
+                                            ₹1,000 &amp; Above
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-row">
+                                {% if color_filters %}
+                                <div class="filter-group" style="grid-column: 1 / -1;">
+                                    <div class="filter-group-header">
+                                        <h4 class="filter-group-title"><i class="fas fa-palette"></i> Colour:</h4>
+                                    </div>
+                                    <div class="filter-pills" id="searchColorPills">
+                                        <button type="button" class="filter-pill active" data-color="all" onclick="setSearchColorFilter('all')">
+                                            <span class="pill-dot pill-dot-all"></span> All Colours
+                                        </button>
+                                        {% for col in color_filters %}
+                                        <button type="button" class="filter-pill" data-color="{{ col.slug }}" onclick="setSearchColorFilter('{{ col.slug }}')">
+                                            <span class="pill-dot" style="background-color: {{ col.hex }};"></span>
+                                            <span>{{ col.name }}</span>
+                                            <span class="pill-count">({{ col.count }})</span>
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="filter-drawer-footer">
+                                <button type="button" class="btn-clear-all-text" onclick="resetSearchFilters()">
+                                    <i class="fas fa-rotate-left"></i> Reset All Filters
+                                </button>
+                                <button type="button" class="btn-apply-drawer" onclick="toggleSearchFilterDrawer(false)">
+                                    <i class="fas fa-check"></i> Apply &amp; Close
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {% endif %}
 
-                <div class="grid">
+                <div class="grid" id="searchProductsGrid">
                     <div class="filter-empty" id="filterEmptyMessage">
-                        <i class="fas fa-palette"></i>
-                        <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found in this colour.</p>
-                        <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another colour or clear the colour filter.</p>
-                        <button type="button" onclick="applySearchColorFilter('all')">View All Colours</button>
+                        <i class="fas fa-filter"></i>
+                        <p style="margin: 0; font-size: 16px; color: var(--ink); font-weight: 600;">No jewellery found matching these filters.</p>
+                        <p style="margin: 6px 0 0; font-size: 14px;">Try selecting another price, style, or colour.</p>
+                        <button type="button" onclick="resetSearchFilters()">Reset Filters</button>
                     </div>
 
                     {% for product in page_obj %}
                     <article class="card reveal"
+                             data-category="{{ product.category.slug|lower }}"
+                             data-price="{{ product.price }}"
+                             data-styles="{{ product.style_tags_str }}"
+                             data-created="{{ product.created|date:'U' }}"
+                             {% if product.mrp and product.mrp > product.price %}data-is-sale="true"{% endif %}
+                             data-in-stock="{% if product.in_stock %}true{% else %}false{% endif %}"
                              data-colors="{{ product.color_tags_str }}"
                              data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
                              data-color-images='{{ product.color_images_json|safe }}'>
@@ -663,37 +1009,160 @@
 
             var searchUrlParams = new URLSearchParams(window.location.search);
             var searchColorParam = searchUrlParams.get('color');
-            if (searchColorParam) {
-                applySearchColorFilter(searchColorParam.toLowerCase());
+            var searchStyleParam = searchUrlParams.get('style');
+            var searchPriceParam = searchUrlParams.get('price');
+            if (searchColorParam) searchFilterState.color = searchColorParam.toLowerCase();
+            if (searchStyleParam) searchFilterState.style = searchStyleParam.toLowerCase();
+            if (searchPriceParam) searchFilterState.price = searchPriceParam.toLowerCase();
+
+            if (searchColorParam || searchStyleParam || searchPriceParam) {
+                updateSearchPills('#searchStylePills .filter-pill', 'data-style', searchFilterState.style);
+                updateSearchPills('#searchPricePills .filter-pill', 'data-price', searchFilterState.price);
+                updateSearchPills('#searchColorPills .filter-pill', 'data-color', searchFilterState.color);
+                applyAllSearchFilters();
+                toggleSearchFilterDrawer(true);
             }
         });
 
-        window.applySearchColorFilter = function (colorSlug) {
-            var pills = document.querySelectorAll('#colorFilterPills .color-pill');
-            var cards = document.querySelectorAll('.grid .card');
-            var countEl = document.getElementById('activeFilterCount');
-            var activeIndicator = document.getElementById('filterActiveIndicator');
-            var activeColorName = document.getElementById('activeColorName');
-            var emptyMessageEl = document.getElementById('filterEmptyMessage');
-            var visibleCount = 0;
+        var searchFilterState = {
+            style: 'all',
+            price: 'all',
+            color: 'all',
+            sort: 'featured'
+        };
 
-            pills.forEach(function (pill) {
-                if (pill.getAttribute('data-color') === colorSlug) {
-                    pill.classList.add('active');
-                } else {
-                    pill.classList.remove('active');
-                }
+        window.toggleSearchFilterDrawer = function (forceOpen) {
+            var drawer = document.getElementById('searchFilterDrawer');
+            var btn = document.getElementById('searchFilterToggleBtn');
+            if (!drawer || !btn) return;
+            var shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : !drawer.classList.contains('open');
+            if (shouldOpen) {
+                drawer.classList.add('open');
+                btn.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                drawer.classList.remove('open');
+                btn.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        window.setSearchStyleFilter = function (styleSlug) {
+            searchFilterState.style = (styleSlug || 'all').toLowerCase();
+            updateSearchPills('#searchStylePills .filter-pill', 'data-style', searchFilterState.style);
+            applyAllSearchFilters();
+        };
+
+        window.setSearchPriceFilter = function (priceKey) {
+            searchFilterState.price = (priceKey || 'all').toLowerCase();
+            updateSearchPills('#searchPricePills .filter-pill', 'data-price', searchFilterState.price);
+            applyAllSearchFilters();
+        };
+
+        window.setSearchColorFilter = function (colorSlug) {
+            searchFilterState.color = (colorSlug || 'all').toLowerCase();
+            updateSearchPills('#searchColorPills .filter-pill', 'data-color', searchFilterState.color);
+            applyAllSearchFilters();
+        };
+        window.applySearchColorFilter = window.setSearchColorFilter;
+
+        function updateSearchPills(selector, attr, activeVal) {
+            var pills = document.querySelectorAll(selector);
+            pills.forEach(function (p) {
+                if (p.getAttribute(attr) === activeVal) p.classList.add('active');
+                else p.classList.remove('active');
+            });
+        }
+
+        window.removeSearchChip = function (type) {
+            if (type === 'style') setSearchStyleFilter('all');
+            else if (type === 'price') setSearchPriceFilter('all');
+            else if (type === 'color') setSearchColorFilter('all');
+        };
+
+        window.applySearchSorting = function (sortKey) {
+            searchFilterState.sort = sortKey;
+            var grid = document.getElementById('searchProductsGrid');
+            if (!grid) return;
+            var cards = Array.from(grid.querySelectorAll('.card'));
+            if (!cards.length) return;
+
+            cards.sort(function (a, b) {
+                var priceA = parseFloat(a.getAttribute('data-price') || '0');
+                var priceB = parseFloat(b.getAttribute('data-price') || '0');
+                var createdA = parseInt(a.getAttribute('data-created') || '0', 10);
+                var createdB = parseInt(b.getAttribute('data-created') || '0', 10);
+
+                if (sortKey === 'price-asc') return priceA - priceB;
+                if (sortKey === 'price-desc') return priceB - priceA;
+                if (sortKey === 'newest') return createdB - createdA;
+                return 0; // featured
             });
 
+            cards.forEach(function (c) { grid.appendChild(c); });
+        };
+
+        window.resetSearchFilters = function () {
+            searchFilterState.style = 'all';
+            searchFilterState.price = 'all';
+            searchFilterState.color = 'all';
+
+            updateSearchPills('#searchStylePills .filter-pill', 'data-style', 'all');
+            updateSearchPills('#searchPricePills .filter-pill', 'data-price', 'all');
+            updateSearchPills('#searchColorPills .filter-pill', 'data-color', 'all');
+            applyAllSearchFilters();
+        };
+
+        function applyAllSearchFilters() {
+            var cards = document.querySelectorAll('#searchProductsGrid .card');
+            var emptyMessageEl = document.getElementById('filterEmptyMessage');
+            var chipsContainer = document.getElementById('searchActiveChipsContainer');
+            var badge = document.getElementById('searchActiveFilterBadge');
+            var visibleCount = 0;
+            var activeFilterCount = 0;
+            var chipsHtml = '';
+
+            if (searchFilterState.style !== 'all') {
+                activeFilterCount++;
+                var stylePill = document.querySelector('#searchStylePills .filter-pill[data-style="' + searchFilterState.style + '"]');
+                var styleName = stylePill ? stylePill.childNodes[0].textContent.trim() : searchFilterState.style;
+                chipsHtml += '<span class="chip" onclick="removeSearchChip(\'style\')"><i class="fas fa-gem"></i> ' + styleName + ' <i class="fas fa-times"></i></span>';
+            }
+            if (searchFilterState.price !== 'all') {
+                activeFilterCount++;
+                var priceLabels = { 'under-250': 'Under ₹250', '250-499': '₹250–₹499', '500-999': '₹500–₹999', '1000-plus': '₹1,000+' };
+                chipsHtml += '<span class="chip" onclick="removeSearchChip(\'price\')"><i class="fas fa-tag"></i> ' + (priceLabels[searchFilterState.price] || searchFilterState.price) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (searchFilterState.color !== 'all') {
+                activeFilterCount++;
+                var capitalizedCol = searchFilterState.color.charAt(0).toUpperCase() + searchFilterState.color.slice(1);
+                chipsHtml += '<span class="chip" onclick="removeSearchChip(\'color\')"><i class="fas fa-palette"></i> ' + capitalizedCol + ' <i class="fas fa-times"></i></span>';
+            }
+            if (activeFilterCount > 0) {
+                chipsHtml += '<button type="button" class="chip chip-clear-all" onclick="resetSearchFilters()"><i class="fas fa-rotate-left"></i> Clear All</button>';
+            }
+
+            if (chipsContainer) chipsContainer.innerHTML = chipsHtml;
+            if (badge) {
+                if (activeFilterCount > 0) {
+                    badge.textContent = activeFilterCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
             cards.forEach(function (card) {
+                var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
+                var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
                 var colorImages = {};
                 try {
                     colorImages = JSON.parse(card.getAttribute('data-color-images') || '{}');
                 } catch (e) {}
                 var defaultImg = card.getAttribute('data-default-img');
                 var imgEl = card.querySelector('.thumb img');
-                var thumbLink = card.querySelector('.thumb a') || card.querySelector('a[href*="product"]');
+                var thumbLink = card.querySelector('a[href*="product"]');
                 var titleLink = card.querySelector('.card-body h3 a');
                 var baseDetailUrl = card.getAttribute('data-base-url');
                 if (!baseDetailUrl && thumbLink) {
@@ -701,54 +1170,43 @@
                     card.setAttribute('data-base-url', baseDetailUrl);
                 }
 
-                if (colorSlug === 'all') {
+                var matchStyle = (searchFilterState.style === 'all') || (cardStyles.indexOf(searchFilterState.style) !== -1);
+                var matchPrice = true;
+                if (searchFilterState.price === 'under-250') matchPrice = (cardPrice < 250);
+                else if (searchFilterState.price === '250-499') matchPrice = (cardPrice >= 250 && cardPrice < 500);
+                else if (searchFilterState.price === '500-999') matchPrice = (cardPrice >= 500 && cardPrice < 1000);
+                else if (searchFilterState.price === '1000-plus') matchPrice = (cardPrice >= 1000);
+
+                var matchColor = (searchFilterState.color === 'all') || (cardColors.indexOf(searchFilterState.color) !== -1);
+
+                if (matchStyle && matchPrice && matchColor) {
                     card.classList.remove('hide');
                     visibleCount++;
-                    if (imgEl && defaultImg) {
+
+                    if (searchFilterState.color !== 'all' && colorImages[searchFilterState.color] && imgEl) {
+                        imgEl.src = colorImages[searchFilterState.color];
+                    } else if (imgEl && defaultImg) {
                         imgEl.src = defaultImg;
                     }
+
+                    var linkSuffix = '';
+                    if (searchFilterState.color !== 'all') {
+                        var capitalized = searchFilterState.color.charAt(0).toUpperCase() + searchFilterState.color.slice(1);
+                        linkSuffix = '?color=' + encodeURIComponent(capitalized);
+                    }
                     if (baseDetailUrl) {
-                        if (thumbLink) thumbLink.href = baseDetailUrl;
-                        if (titleLink) titleLink.href = baseDetailUrl;
+                        if (thumbLink) thumbLink.href = baseDetailUrl + linkSuffix;
+                        if (titleLink) titleLink.href = baseDetailUrl + linkSuffix;
                     }
                 } else {
-                    if (cardColors.indexOf(colorSlug) !== -1) {
-                        card.classList.remove('hide');
-                        visibleCount++;
-                        if (colorImages[colorSlug] && imgEl) {
-                            imgEl.src = colorImages[colorSlug];
-                        } else if (imgEl && defaultImg) {
-                            imgEl.src = defaultImg;
-                        }
-                        var capitalized = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
-                        var colorParam = '?color=' + encodeURIComponent(capitalized);
-                        if (baseDetailUrl) {
-                            if (thumbLink) thumbLink.href = baseDetailUrl + colorParam;
-                            if (titleLink) titleLink.href = baseDetailUrl + colorParam;
-                        }
-                    } else {
-                        card.classList.add('hide');
-                    }
+                    card.classList.add('hide');
                 }
             });
-
-            if (countEl) {
-                countEl.textContent = visibleCount + ' Found';
-            }
-
-            if (activeIndicator && activeColorName) {
-                if (colorSlug === 'all') {
-                    activeIndicator.style.display = 'none';
-                } else {
-                    activeColorName.textContent = colorSlug.charAt(0).toUpperCase() + colorSlug.slice(1);
-                    activeIndicator.style.display = 'inline-flex';
-                }
-            }
 
             if (emptyMessageEl) {
                 emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
             }
-        };
+        }
 
         function previewCardColor(dot) {
             if (!dot) return;

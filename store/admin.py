@@ -73,8 +73,18 @@ class ProductColorAdmin(admin.ModelAdmin):
 # --- CATEGORY ---
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'parent', 'slug', 'keywords', 'order', 'product_count']
+    list_filter = ['parent']
+    list_editable = ['parent', 'order']
+    search_fields = ['name', 'slug', 'keywords']
     # Automatically fills out the slug field based on the category name
     prepopulated_fields = {'slug': ('name',)}
+
+    @admin.display(description='Active Products')
+    def product_count(self, obj):
+        direct = obj.products.filter(is_active=True).count()
+        tagged = obj.tagged_products.filter(is_active=True).count()
+        return direct + tagged
 
 
 # --- PRODUCT ---
@@ -102,13 +112,14 @@ class StockStatusFilter(admin.SimpleListFilter):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'sku', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
+    list_display = ['title', 'sku', 'category', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
     list_filter = [StockStatusFilter, 'category', 'is_active']
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku']
+    filter_horizontal = ['sub_categories']
     inlines = [ProductGalleryInline, ProductColorInline]
-    fields = ['category', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active']
+    fields = ['category', 'sub_categories', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active']
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('bogo_offers')
