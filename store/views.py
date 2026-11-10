@@ -812,30 +812,89 @@ def _get_price_ranges(products):
 # ---------------------------------------------------------------------------
 
 def collections(request):
-    categories = Category.objects.filter(parent__isnull=True).order_by('order', 'id')
-    return render(request, 'store/collections.html', {'categories': categories})
+    main_categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('order', 'id'))
+    
+    active_cat_slug = request.GET.get('cat', '').strip().lower()
+    active_sub_slug = request.GET.get('sub', '').strip().lower()
+
+    # Determine active main category
+    active_main_cat = None
+    if active_cat_slug:
+        active_main_cat = next((c for c in main_categories if c.slug.lower() == active_cat_slug), None)
+    
+    # Base products for category context
+    base_products_qs = Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct().order_by('-created')
+    if active_main_cat:
+        base_products_qs = base_products_qs.filter(Q(category=active_main_cat) | Q(category__parent=active_main_cat) | Q(sub_categories__parent=active_main_cat))
+    
+    base_products = list(base_products_qs)
+    total_count = len(base_products)
+
+    # Subcategories to display at starting of page
+    if active_main_cat:
+        subcategories = list(active_main_cat.subcategories.all().order_by('order', 'id'))
+    else:
+        # Show all subcategories across categories, ordered nicely
+        subcategories = list(Category.objects.filter(parent__isnull=False).select_related('parent').order_by('parent__order', 'order', 'name'))
+
+    # Precompute counts for subcategories based on base_products
+    for sub in subcategories:
+        sub.product_count = sum(1 for p in base_products if sub.slug.lower() in p.style_tags or (p.category and p.category.slug.lower() == sub.slug.lower()))
+
+    if active_sub_slug:
+        products_list = [p for p in base_products if active_sub_slug in p.style_tags or (p.category and p.category.slug.lower() == active_sub_slug)]
+    else:
+        products_list = base_products
+
+    products = attach_offers(products_list)
+    color_filters = _get_collection_color_filters(products)
+    price_summary = _get_price_ranges(products)
+
+    return render(request, 'store/collections.html', {
+        'categories': main_categories,
+        'active_main_cat': active_main_cat,
+        'active_cat_slug': active_cat_slug,
+        'active_sub_slug': active_sub_slug,
+        'subcategories': subcategories,
+        'total_count': total_count,
+        'products': products,
+        'color_filters': color_filters,
+        'price_summary': price_summary,
+    })
+
 
 def collection_detail(request, slug):
     category = Category.objects.filter(slug__iexact=slug).first() or get_object_or_404(Category, slug=slug)
     # Filter out hidden products from category pages
     is_subcollection = (category.parent is not None or category.slug == 'layered-necklaces')
     parent_category = category.parent if category.parent else (Category.objects.filter(slug='necklaces').first() if is_subcollection else None)
+    main_cat = parent_category if is_subcollection else category
+
+    # Subcategories of this main category
+    subcategories = list(main_cat.subcategories.all().order_by('order', 'id'))
+    
+    active_sub = request.GET.get('sub', '').strip().lower()
+    if is_subcollection and not active_sub:
+        active_sub = category.slug
+
+    # Fetch all products under main category
+    all_main_products_qs = Product.objects.filter(
+        Q(category=main_cat) | Q(category__parent=main_cat) | Q(sub_categories__parent=main_cat),
+        is_active=True
+    ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct().order_by('-created')
+    all_main_products = list(all_main_products_qs)
+    total_main_count = len(all_main_products)
+
+    # Compute count for each subcategory
+    for sub in subcategories:
+        sub.product_count = sum(1 for p in all_main_products if sub.slug.lower() in p.style_tags)
 
     if is_subcollection:
-        q_filter = Q(category=category) | Q(sub_categories=category)
-        if category.slug == 'layered-necklaces' or (parent_category and parent_category.slug == 'necklaces'):
-            q_filter |= (
-                Q(category__slug='necklaces') & (
-                    Q(title__icontains='flow') | Q(title__icontains='layer') | Q(title__icontains='set') | Q(description__icontains='layer')
-                )
-            )
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
-    elif category.slug == 'necklaces':
-        q_filter = Q(category=category) | Q(category__slug='layered-necklaces') | Q(category__parent=category)
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
+        products = attach_offers([p for p in all_main_products if (p.category == category or category in p.sub_categories.all() or category.slug.lower() in p.style_tags)])
+    elif active_sub:
+        products = attach_offers([p for p in all_main_products if active_sub in p.style_tags])
     else:
-        q_filter = Q(category=category) | Q(category__parent=category)
-        products = attach_offers(list(Product.objects.filter(q_filter, is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct()))
+        products = attach_offers(all_main_products)
 
     color_filters = _get_collection_color_filters(products)
     style_filters = _get_collection_style_filters(category, products)
@@ -844,9 +903,13 @@ def collection_detail(request, slug):
 
     return render(request, 'store/collection_detail.html', {
         'category': category,
-        'products': products,
+        'main_cat': main_cat,
+        'subcategories': subcategories,
         'is_subcollection': is_subcollection,
         'parent_category': parent_category,
+        'total_main_count': total_main_count,
+        'active_sub': active_sub,
+        'products': products,
         'color_filters': color_filters,
         'style_filters': style_filters,
         'price_summary': price_summary,

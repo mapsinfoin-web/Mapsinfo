@@ -606,7 +606,15 @@
         </div>
     </header>
 
-    <div class="crumb"><a href="{% url 'store:collections' %}">&larr; Collections</a>{% if product.category %} &nbsp;/&nbsp; <a href="{% url 'store:collection_detail' product.category.slug %}">{{ product.category.name }}</a>{% endif %}</div>
+    <div class="crumb">
+        <a href="{% url 'store:collections' %}">&larr; Collections</a>
+        {% if product.category %}
+            &nbsp;/&nbsp; <a href="{% url 'store:collection_detail' product.category.slug %}">{{ product.category.name }}</a>
+        {% endif %}
+        {% if product.primary_subcategory and product.primary_subcategory != product.category %}
+            &nbsp;/&nbsp; <a href="{% url 'store:collection_detail' product.primary_subcategory.slug %}">{{ product.primary_subcategory.name }}</a>
+        {% endif %}
+    </div>
 
     <main class="product">
 
@@ -717,7 +725,16 @@
             <div class="alert {{ message.tags }}">{{ message }}</div>
             {% endfor %}
 
-            <span class="sku" id="productSkuDisplay" data-base-sku="{{ product.sku }}">SKU: {% if selected_color_obj and selected_color_obj.sku %}{{ selected_color_obj.sku }}{% else %}{{ product.sku }}{% endif %}</span>
+            <div class="product-category-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                <span class="sku" id="productSkuDisplay" data-base-sku="{{ product.sku }}" style="margin-bottom:0;">SKU: {% if selected_color_obj and selected_color_obj.sku %}{{ selected_color_obj.sku }}{% else %}{{ product.sku }}{% endif %}</span>
+                {% if product.category %}
+                <span style="color: var(--line);">|</span>
+                <a href="{% url 'store:collection_detail' product.category.slug %}" style="font-size: 12.5px; font-weight: 600; color: var(--navy); text-decoration: none;">{{ product.category.name }}</a>
+                {% endif %}
+                {% if product.primary_subcategory and product.primary_subcategory != product.category %}
+                <a href="{% url 'store:collection_detail' product.primary_subcategory.slug %}" style="font-size: 11.5px; font-weight: 700; color: var(--blue); background: #eff6ff; padding: 2px 9px; border-radius: 999px; text-decoration: none;">{{ product.primary_subcategory.name }}</a>
+                {% endif %}
+            </div>
             <h1 class="title">{{ product.title }}</h1>
             <p class="price" id="productPriceContainer"
                data-base-price="{{ product.price }}"

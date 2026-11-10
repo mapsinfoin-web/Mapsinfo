@@ -202,6 +202,24 @@ class Product(models.Model):
         """Space-separated list for data-styles attribute."""
         return " ".join(self.style_tags)
 
+    @property
+    def primary_subcategory(self):
+        """Returns the primary subcategory for display badges and chips."""
+        if hasattr(self, '_prefetched_objects_cache') and 'sub_categories' in self._prefetched_objects_cache:
+            subs = list(self.sub_categories.all())
+            if subs:
+                return subs[0]
+        else:
+            try:
+                sub = self.sub_categories.first()
+                if sub:
+                    return sub
+            except Exception:
+                pass
+        if self.category and self.category.parent:
+            return self.category
+        return None
+
     def save(self, *args, **kwargs):
         if not self.sku:
             self.sku = uuid.uuid4().hex[:8].upper()
