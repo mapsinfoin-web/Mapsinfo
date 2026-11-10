@@ -255,7 +255,7 @@
 
                 <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
                     <i class="far fa-heart"></i>
-                    <span class="badge" id="wishCount" {% if not wishlist_records %}style="display:none"{% endif %}>{{ wishlist_records|length }}</span>
+                    <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
                 </a>
 
                 {% if user.is_authenticated %}

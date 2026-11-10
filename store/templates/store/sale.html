@@ -374,7 +374,7 @@
     </div>
 
     <!-- ===== HEADER ===== -->
-    <header class="header">
+    <header class="header" id="header">
         <div class="container header-main">
             <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
                 <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
@@ -610,6 +610,14 @@
                     navToggle.setAttribute('aria-expanded', o);
                     navToggle.innerHTML = o ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
                 });
+            }
+
+            // Header scroll shadow
+            var headerEl = document.getElementById('header');
+            if (headerEl) {
+                window.addEventListener('scroll', function() {
+                    headerEl.classList.toggle('scrolled', window.scrollY > 10);
+                }, { passive: true });
             }
 
             // Toast helper
