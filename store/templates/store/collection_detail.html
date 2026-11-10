@@ -139,7 +139,6 @@
         .subcat-scroll-track {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
             overflow-x: auto;
             padding: 6px 4px 12px;
@@ -236,33 +235,15 @@
         .tag { position: absolute; top: 12px; left: 12px; padding: 5px 11px; border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #fff; }
         .tag.bogo { background: var(--green); }
         .tag.out { background: var(--navy); }
-        .card-meta {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            color: var(--muted);
-            font-weight: 600;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            min-height: 20px;
-        }
-        .card-subcat-badge {
-            color: var(--blue);
-            background: #eff6ff;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 10.5px;
-            font-weight: 700;
-        }
-        .body { padding: 18px 20px 22px; display: flex; flex-direction: column; flex: 1; }
+        .body { padding: 18px 20px 22px; display: flex; flex-direction: column; flex: 1; text-align: center; }
+        .card-meta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
         .body h3 {
             margin: 0 0 8px;
             font-size: 16px;
             font-weight: 600;
             color: var(--ink);
-            line-height: 1.35;
+            line-height: 1.4;
+            text-align: center;
             min-height: 44px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -274,10 +255,12 @@
             margin: 2px 0 10px;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
         .card-color-swatches {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
         }
         .card-swatch-dot {
@@ -301,8 +284,10 @@
             color: var(--ink);
             display: flex;
             align-items: baseline;
+            justify-content: center;
             gap: 8px;
             min-height: 26px;
+            text-align: center;
         }
         .price s { color: var(--muted); font-size: 13.5px; font-weight: 400; margin-right: 0; }
         .discount-badge {
@@ -682,7 +667,6 @@
             .btn-all-collections-corner { font-size: 13.5px; padding: 8px 16px; gap: 7px; }
             .page-header { padding: 16px 16px 20px; }
             .page-header h1 { font-size: 32px; }
-            .subcat-scroll-track { justify-content: flex-start; }
             .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 6px 14px 60px; }
             .body { padding: 14px 14px 18px; }
             .body h3 { font-size: 14.5px; }

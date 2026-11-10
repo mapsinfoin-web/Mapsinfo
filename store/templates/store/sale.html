@@ -167,12 +167,13 @@
         .card:hover .quick { opacity: 1; transform: translateY(0); }
         .quick:hover { background: var(--accent); color: var(--ink); }
         
-        .card-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .cat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-        .card-body h3 { margin: 6px 0 10px; font-size: 15.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+        .card-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; text-align: center; }
+        .cat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; text-align: center; }
+        .card-body h3 { margin: 6px 0 10px; font-size: 15.5px; font-weight: 600; color: var(--ink); line-height: 1.35; text-align: center; }
         .card-color-swatches {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
             margin: 4px 0 8px;
         }
@@ -190,7 +191,7 @@
             font-weight: 600;
             margin-left: 2px;
         }
-        .price-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+        .price-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: auto; text-align: center; }
         .price { font-size: 18px; font-weight: 700; color: var(--ink); }
         .mrp { font-size: 13.5px; color: var(--muted); text-decoration: line-through; }
         .discount-badge {

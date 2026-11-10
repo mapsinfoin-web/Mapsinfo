@@ -147,9 +147,10 @@
         .subcat-label-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            justify-content: center;
+            margin-bottom: 10px;
             padding: 0 4px;
+            text-align: center;
         }
         .subcat-title {
             font-size: 12.5px;
@@ -157,7 +158,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--muted);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
         }
@@ -167,6 +168,7 @@
         .subcat-scroll-track {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             overflow-x: auto;
             padding: 6px 4px 12px;
@@ -606,10 +608,12 @@
             display: flex;
             flex-direction: column;
             flex: 1;
+            text-align: center;
         }
         .card-meta {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             font-size: 11px;
             color: var(--muted);
@@ -638,17 +642,22 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             min-height: 44px;
+            text-align: center;
         }
         .card-color-swatches-wrap {
             min-height: 24px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
         .card-color-swatches {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
+            margin-bottom: 0;
+            min-height: 20px;
         }
         .card-swatch-dot {
             width: 15px;
@@ -672,12 +681,14 @@
         .price {
             display: flex;
             align-items: baseline;
+            justify-content: center;
             gap: 8px;
             margin: auto 0 14px;
             font-size: 16px;
             font-weight: 700;
             color: var(--ink);
             min-height: 26px;
+            text-align: center;
         }
         .price s {
             font-size: 13.5px;
@@ -694,8 +705,6 @@
         }
         .btn-view {
             margin-top: auto;
-            display: block;
-            width: 100%;
             text-align: center;
             padding: 10px 14px;
             border-radius: 999px;
@@ -704,7 +713,6 @@
             font-size: 13px;
             font-weight: 600;
             transition: all .2s ease;
-            box-sizing: border-box;
         }
         .card:hover .btn-view {
             background: var(--navy);
