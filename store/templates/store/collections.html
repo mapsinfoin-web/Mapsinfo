@@ -147,9 +147,11 @@
         .subcat-label-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
             padding: 0 4px;
+            text-align: center;
         }
         .subcat-title {
             font-size: 12.5px;
@@ -157,7 +159,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--muted);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
         }
@@ -167,12 +169,21 @@
         .subcat-scroll-track {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             overflow-x: auto;
             padding: 6px 4px 12px;
             scrollbar-width: thin;
             scrollbar-color: var(--line) transparent;
             -webkit-overflow-scrolling: touch;
+        }
+        @media (max-width: 900px) {
+            .subcat-scroll-track {
+                justify-content: flex-start;
+            }
+            .subcat-label-row {
+                justify-content: space-between;
+            }
         }
         .subcat-scroll-track::-webkit-scrollbar {
             height: 4px;
