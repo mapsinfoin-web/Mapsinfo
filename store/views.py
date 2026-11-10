@@ -1,7 +1,4 @@
 import uuid
-import re
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -767,32 +764,17 @@ def about(request):
 
 def contact(request):
     if request.method == 'POST':
-        email = (request.POST.get('email') or '').strip().lower()
+        name = (request.POST.get('name') or '').strip()
+        email = (request.POST.get('email') or '').strip()
+        subject = (request.POST.get('subject') or '').strip()
+        message = (request.POST.get('message') or '').strip()
 
-        if not email:
-            messages.error(request, "Please enter your email address.")
+        if not (name and email and subject and message):
+            messages.error(request, "Please fill in all the fields.")
             return redirect('store:contact')
 
-        # Strict email validation: reject any invalid email format or unusual input
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, "Please enter a valid email address.")
-            return redirect('store:contact')
-
-        # Guard against unusual lengths, scripts, tags, or cross-the-mark content
-        if len(email) > 120 or re.search(r'[<>"\';()\\`\s]', email):
-            messages.error(request, "Please enter a valid email address.")
-            return redirect('store:contact')
-
-        username_part = email.split('@')[0].capitalize()
-        ContactInquiry.objects.create(
-            name=username_part,
-            email=email,
-            subject="Contact request",
-            message="Customer requested contact / inquiry via contact form."
-        )
-        messages.success(request, "Thank you! We have received your email and will contact you shortly.")
+        ContactInquiry.objects.create(name=name, email=email, subject=subject, message=message)
+        messages.success(request, "Thank you. Your inquiry has been forwarded to our atelier.")
         return redirect('store:contact')
 
     return render(request, 'store/contact.html')

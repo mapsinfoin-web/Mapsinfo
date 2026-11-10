@@ -208,8 +208,8 @@
         </div>
 
         <div class="card animate-up delay-2">
-            <h2>Get in touch</h2>
-            <p class="lead">Leave your email address and our team will get in touch with you shortly.</p>
+            <h2>Send a message</h2>
+            <p class="lead">Tell us how we can help with custom orders or any question about our collections.</p>
 
             {% for message in messages %}
             <div class="alert {{ message.tags }}"><i class="fas fa-circle-info"></i> {{ message }}</div>
@@ -218,10 +218,22 @@
             <form action="{% url 'store:contact' %}" method="POST">
                 {% csrf_token %}
                 <div class="field">
-                    <label for="c-email">Email address</label>
-                    <input type="email" id="c-email" name="email" placeholder="you@example.com" required maxlength="120" autocomplete="email" />
+                    <label for="c-name">Full name</label>
+                    <input type="text" id="c-name" name="name" required />
                 </div>
-                <button type="submit" class="btn-dark">Submit</button>
+                <div class="field">
+                    <label for="c-email">Email address</label>
+                    <input type="email" id="c-email" name="email" required />
+                </div>
+                <div class="field">
+                    <label for="c-subject">Subject</label>
+                    <input type="text" id="c-subject" name="subject" required />
+                </div>
+                <div class="field">
+                    <label for="c-message">Your message</label>
+                    <textarea id="c-message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn-dark">Send message</button>
             </form>
         </div>
 
