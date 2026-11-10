@@ -4,7 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact Us | MAPSKART</title>
+    <title>Contact Us | MAPSKART Customer Concierge</title>
+    <meta name="description" content="Get in touch with MAPSKART customer concierge. Order inquiries, jewellery care advice, and custom styling." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="Contact Us | MAPSKART Customer Concierge" />
+    <meta property="og:description" content="Get in touch with MAPSKART customer concierge for orders, tracking, and styling assistance." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}" />
+    <meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}" />
+    <meta property="og:image:alt" content="Contact MAPSKART" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Contact Us | MAPSKART Customer Concierge" />
+    <meta name="twitter:description" content="Get in touch with MAPSKART customer concierge for orders, tracking, and styling assistance." />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />

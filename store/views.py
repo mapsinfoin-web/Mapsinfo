@@ -297,10 +297,14 @@ def add_cart(request, product_id):
     return redirect('store:cart_detail')
 
 
-def _priced_cart(cart):
+def _priced_cart(cart, request=None):
     """Drop invalid gifts, then price the cart. Returns (cart_items, pricing, notes)."""
     notes = sync_gifts(cart)
     cart_items = CartItem.objects.filter(cart=cart, is_active=True).select_related('product')
+    if request:
+        cart_colors = request.session.get('cart_colors', {})
+        for item in cart_items:
+            item.selected_color = cart_colors.get(str(item.product_id), '')
     gifts = cart.gifts.select_related('product', 'offer__main_product')
     return cart_items, calculate_offers(cart_items, gifts), notes
 
@@ -312,7 +316,7 @@ def cart_detail(request):
     gift_anchor_id = None
     cart = _get_cart(request)
     if cart:
-        cart_items, pricing, notes = _priced_cart(cart)
+        cart_items, pricing, notes = _priced_cart(cart, request)
         cart_colors = request.session.get('cart_colors', {})
         for item in cart_items:
             item.selected_color = cart_colors.get(str(item.product_id), '')
@@ -481,7 +485,7 @@ def checkout(request):
         return redirect('store:all_products')
 
     # Re-validate offers and gifts on the server on EVERY request (dates, switches, stock, quantities)
-    cart_items, pricing, notes = _priced_cart(cart)
+    cart_items, pricing, notes = _priced_cart(cart, request)
     cart_colors = request.session.get('cart_colors', {})
     for item in cart_items:
         item.selected_color = cart_colors.get(str(item.product_id), '')
@@ -566,7 +570,9 @@ def checkout(request):
                     if not updated:
                         raise OutOfStock(item.product.title)
                     OrderItem.objects.create(order=order, product=item.product,
-                                             price=item.product.price, quantity=item.quantity)
+                                             color=getattr(item, 'selected_color', '') or '',
+                                             price=getattr(item, 'unit_price', item.product.price),
+                                             quantity=item.quantity)
 
                 # Free gifts: a separate line at Rs.0, linked to the offer, and they leave the shelf too
                 for gift in pricing['gifts']:
@@ -645,7 +651,7 @@ def _whatsapp_link(request, order, settings_obj=None):
     ]
     cart_colors = request.session.get('cart_colors', {}) if request else {}
     for item in order.items.select_related('product'):
-        color_val = cart_colors.get(str(item.product_id), '')
+        color_val = getattr(item, 'color', '') or cart_colors.get(str(item.product_id), '')
         color_tag = f" [Colour: {color_val}]" if color_val else ""
         if item.is_free_gift:
             lines.append(f"- {item.quantity} x {item.product.title}{color_tag} (FREE GIFT)")

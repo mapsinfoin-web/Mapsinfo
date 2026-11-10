@@ -4,7 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ category.name }} | MAPSKART</title>
+    <title>{{ category.name }} Collection | MAPSKART</title>
+    <meta name="description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Curated in Delhi, skin-safe with luxury velvet packaging." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="{{ category.name }} Collection | MAPSKART" />
+    <meta property="og:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Free shipping above ₹999." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
+    <meta property="og:image:secure_url" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
+    <meta property="og:image:alt" content="MAPSKART {{ category.name }} Collection" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ category.name }} Collection | MAPSKART" />
+    <meta name="twitter:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Free shipping above ₹999." />
+    <meta name="twitter:image" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />

@@ -5,6 +5,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ product.title }} | MAPSKART</title>
+    <meta name="description" content="{{ product.description|striptags|truncatewords:25|default:'Shop handcrafted luxury jewellery from MAPSKART.' }}" />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook, iMessage) -->
+    <meta property="og:type" content="product" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="{{ product.title }} | MAPSKART" />
+    <meta property="og:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery with signature velvet packaging.' }}" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
+    <meta property="og:image:secure_url" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
+    <meta property="og:image:alt" content="{{ product.title }}" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="product:price:amount" content="{{ product.price }}" />
+    <meta property="product:price:currency" content="INR" />
+    <meta property="product:availability" content="{% if product.in_stock %}in stock{% else %}out of stock{% endif %}" />
+    {% if product.sku %}<meta property="product:retailer_item_id" content="{{ product.sku }}" />{% endif %}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ product.title }} | MAPSKART" />
+    <meta name="twitter:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery from MAPSKART.' }}" />
+    <meta name="twitter:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />
@@ -506,15 +533,29 @@
                 <div class="no-image">No image available</div>
                 {% endif %}
             </div>
-            {% if product.image or product.gallery_images.all %}
-            <div class="thumbs">
+            {% if product.image or product.gallery_images.all or product.available_colors %}
+            <div class="thumbs" id="productThumbsContainer">
+                {% if selected_color_obj and selected_color_obj.all_images %}
+                    {% for img_url in selected_color_obj.all_images %}
+                    <img src="{{ img_url }}" class="thumb {% if forloop.first %}active{% endif %}" onclick="swapColorThumb(this)" alt="{{ selected_color_obj.name }} view {{ forloop.counter }}" loading="lazy" />
+                    {% endfor %}
+                {% else %}
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" loading="lazy" />
+                    {% endif %}
+                    {% for gallery_img in product.gallery_images.all %}
+                    <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <template id="baseGalleryTemplate">
                 {% if product.image %}
                 <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" loading="lazy" />
                 {% endif %}
                 {% for gallery_img in product.gallery_images.all %}
                 <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                 {% endfor %}
-            </div>
+            </template>
             {% endif %}
         </div>
 
@@ -526,16 +567,34 @@
 
             <span class="sku" id="productSkuDisplay" data-base-sku="{{ product.sku }}">SKU: {% if selected_color_obj and selected_color_obj.sku %}{{ selected_color_obj.sku }}{% else %}{{ product.sku }}{% endif %}</span>
             <h1 class="title">{{ product.title }}</h1>
-            <p class="price">
-                {% if product.mrp and product.mrp > product.price %}
-                    <s>₹{{ product.mrp }}</s>
-                    <span>₹{{ product.price }}</span>
-                    <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
-                {% elif product.mrp %}
-                    <s>₹{{ product.mrp }}</s>
-                    <span>₹{{ product.price }}</span>
+            <p class="price" id="productPriceContainer"
+               data-base-price="{{ product.price }}"
+               data-base-mrp="{% if product.mrp and product.mrp > product.price %}{{ product.mrp }}{% endif %}"
+               data-base-discount="{{ product.discount_percent|default:0 }}">
+                {% if selected_color_obj %}
+                    {% if selected_color_obj.effective_mrp and selected_color_obj.effective_mrp > selected_color_obj.effective_price %}
+                        <s id="productMrpDisplay">₹{{ selected_color_obj.effective_mrp }}</s>
+                        <span id="productPriceDisplay">₹{{ selected_color_obj.effective_price }}</span>
+                        <span class="discount-badge" id="productDiscountBadge">{{ selected_color_obj.discount_percent }}% OFF</span>
+                    {% else %}
+                        <s id="productMrpDisplay" style="display:none"></s>
+                        <span id="productPriceDisplay">₹{{ selected_color_obj.effective_price }}</span>
+                        <span class="discount-badge" id="productDiscountBadge" style="display:none"></span>
+                    {% endif %}
                 {% else %}
-                    <span>₹{{ product.price }}</span>
+                    {% if product.mrp and product.mrp > product.price %}
+                        <s id="productMrpDisplay">₹{{ product.mrp }}</s>
+                        <span id="productPriceDisplay">₹{{ product.price }}</span>
+                        <span class="discount-badge" id="productDiscountBadge">{{ product.discount_percent }}% OFF</span>
+                    {% elif product.mrp %}
+                        <s id="productMrpDisplay">₹{{ product.mrp }}</s>
+                        <span id="productPriceDisplay">₹{{ product.price }}</span>
+                        <span class="discount-badge" id="productDiscountBadge" style="display:none"></span>
+                    {% else %}
+                        <s id="productMrpDisplay" style="display:none"></s>
+                        <span id="productPriceDisplay">₹{{ product.price }}</span>
+                        <span class="discount-badge" id="productDiscountBadge" style="display:none"></span>
+                    {% endif %}
                 {% endif %}
             </p>
 
@@ -553,6 +612,10 @@
                             data-name="{{ c.name }}"
                             data-sku="{% if c.sku %}{{ c.sku }}{% else %}{{ product.sku }}{% endif %}"
                             data-image="{% if c.image %}{{ c.image.url }}{% endif %}"
+                            data-price="{{ c.effective_price }}"
+                            data-mrp="{% if c.effective_mrp and c.effective_mrp > c.effective_price %}{{ c.effective_mrp }}{% endif %}"
+                            data-discount="{{ c.discount_percent }}"
+                            data-gallery="{% for img_url in c.all_images %}{{ img_url }}{% if not forloop.last %}|{% endif %}{% endfor %}"
                             onclick="selectColor(this)"
                             title="{{ c.name }}"
                             aria-label="{{ c.name }}">
@@ -737,15 +800,106 @@
     </div>
 
     <script>
+        var baseProductState = {
+            sku: '{{ product.sku }}',
+            price: '{{ product.price }}',
+            mrp: '{% if product.mrp and product.mrp > product.price %}{{ product.mrp }}{% endif %}',
+            discount: '{{ product.discount_percent|default:0 }}',
+            mainImage: '{% if product.image %}{{ product.image.url }}{% endif %}',
+            mainTitle: '{{ product.title|escapejs }}'
+        };
+
+        function resetToBaseProduct() {
+            document.querySelectorAll('.color-swatch-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            var label = document.getElementById('selectedColorName');
+            if (label) {
+                label.textContent = 'Choose a colour';
+            }
+            var skuDisplay = document.getElementById('productSkuDisplay');
+            if (skuDisplay) {
+                skuDisplay.textContent = 'SKU: ' + baseProductState.sku;
+            }
+            document.querySelectorAll('.productSelectedColor').forEach(function(input) {
+                input.value = '';
+            });
+
+            // Restore price, MRP, discount badge
+            var priceEl = document.getElementById('productPriceDisplay');
+            if (priceEl) priceEl.textContent = '₹' + baseProductState.price;
+            var mrpEl = document.getElementById('productMrpDisplay');
+            if (mrpEl) {
+                if (baseProductState.mrp && Number(baseProductState.mrp) > Number(baseProductState.price)) {
+                    mrpEl.textContent = '₹' + baseProductState.mrp;
+                    mrpEl.style.display = '';
+                } else {
+                    mrpEl.style.display = 'none';
+                }
+            }
+            var badgeEl = document.getElementById('productDiscountBadge');
+            if (badgeEl) {
+                if (Number(baseProductState.discount) > 0) {
+                    badgeEl.textContent = baseProductState.discount + '% OFF';
+                    badgeEl.style.display = '';
+                } else {
+                    badgeEl.style.display = 'none';
+                }
+            }
+
+            // Restore main image
+            if (baseProductState.mainImage) {
+                var main = document.getElementById('main-image');
+                if (main) {
+                    main.src = baseProductState.mainImage;
+                    main.alt = baseProductState.mainTitle;
+                }
+                var wrap = document.getElementById('main-wrap');
+                if (wrap) {
+                    wrap.style.setProperty('--bg', "url('" + baseProductState.mainImage + "')");
+                }
+            }
+
+            // Restore base thumbnails
+            var thumbsContainer = document.getElementById('productThumbsContainer');
+            var baseTpl = document.getElementById('baseGalleryTemplate');
+            if (thumbsContainer && baseTpl) {
+                thumbsContainer.innerHTML = baseTpl.innerHTML;
+            }
+
+            // Reset floating WhatsApp link
+            var waBtn = document.querySelector('.floating-wa');
+            if (waBtn && waBtn.href) {
+                try {
+                    var url = new URL(waBtn.href);
+                    var currentText = url.searchParams.get('text') || '';
+                    var updatedText = currentText.replace(/\s*\(Colour:[^\)]+\)/i, '');
+                    url.searchParams.set('text', updatedText);
+                    waBtn.href = url.toString();
+                } catch(e) {}
+            }
+        }
+
         function selectColor(btn) {
             if (!btn) return;
+            var isAlreadyActive = btn.classList.contains('active');
+            if (isAlreadyActive) {
+                resetToBaseProduct();
+                return;
+            }
+
             document.querySelectorAll('.color-swatch-item').forEach(function(el) {
                 el.classList.remove('active');
             });
             btn.classList.add('active');
+
             var colorName = btn.getAttribute('data-name') || '';
             var colorSku = btn.getAttribute('data-sku') || '';
             var imgUrl = btn.getAttribute('data-image') || '';
+            var priceVal = btn.getAttribute('data-price') || '';
+            var mrpVal = btn.getAttribute('data-mrp') || '';
+            var discountVal = btn.getAttribute('data-discount') || '0';
+            var galleryRaw = btn.getAttribute('data-gallery') || '';
 
             var label = document.getElementById('selectedColorName');
             if (label) {
@@ -761,22 +915,69 @@
                 input.value = colorName;
             });
 
-            if (imgUrl) {
-                var main = document.getElementById('main-image');
-                if (main) { main.src = imgUrl; }
-                var wrap = document.getElementById('main-wrap');
-                if (wrap) { wrap.style.setProperty('--bg', "url('" + imgUrl + "')"); }
-                document.querySelectorAll('.thumb').forEach(function (img) {
-                    img.classList.remove('active');
-                });
+            // Update Price & MRP & Discount
+            if (priceVal) {
+                var priceEl = document.getElementById('productPriceDisplay');
+                if (priceEl) priceEl.textContent = '₹' + priceVal;
+            }
+            var mrpEl = document.getElementById('productMrpDisplay');
+            if (mrpEl) {
+                if (mrpVal && Number(mrpVal) > Number(priceVal)) {
+                    mrpEl.textContent = '₹' + mrpVal;
+                    mrpEl.style.display = '';
+                } else {
+                    mrpEl.style.display = 'none';
+                }
+            }
+            var badgeEl = document.getElementById('productDiscountBadge');
+            if (badgeEl) {
+                if (Number(discountVal) > 0) {
+                    badgeEl.textContent = discountVal + '% OFF';
+                    badgeEl.style.display = '';
+                } else {
+                    badgeEl.style.display = 'none';
+                }
             }
 
+            // Update Gallery Thumbnails for this colour
+            var galleryList = galleryRaw ? galleryRaw.split('|').filter(Boolean) : [];
+            if (!galleryList.length && imgUrl) {
+                galleryList = [imgUrl];
+            }
+
+            var thumbsContainer = document.getElementById('productThumbsContainer');
+            if (thumbsContainer && galleryList.length > 0) {
+                var thumbsHtml = '';
+                for (var i = 0; i < galleryList.length; i++) {
+                    var u = galleryList[i];
+                    var activeCls = (i === 0) ? 'thumb active' : 'thumb';
+                    thumbsHtml += '<img src="' + u + '" class="' + activeCls + '" onclick="swapColorThumb(this)" alt="' + colorName + ' view ' + (i + 1) + '" loading="lazy" />';
+                }
+                thumbsContainer.innerHTML = thumbsHtml;
+            }
+
+            // Set main image to primary color image
+            var primaryColorImg = galleryList.length > 0 ? galleryList[0] : imgUrl;
+            if (primaryColorImg) {
+                var main = document.getElementById('main-image');
+                if (main) {
+                    main.src = primaryColorImg;
+                    main.alt = '{{ product.title|escapejs }} - ' + colorName;
+                }
+                var wrap = document.getElementById('main-wrap');
+                if (wrap) {
+                    wrap.style.setProperty('--bg', "url('" + primaryColorImg + "')");
+                }
+            }
+
+            // Update floating WhatsApp link
             var waBtn = document.querySelector('.floating-wa');
             if (waBtn && waBtn.href) {
                 try {
                     var url = new URL(waBtn.href);
                     var currentText = url.searchParams.get('text') || '';
-                    var colorTag = ' (Colour: ' + colorName + (colorSku ? ' | SKU: ' + colorSku : '') + ')';
+                    var priceText = priceVal ? ' | ₹' + priceVal : '';
+                    var colorTag = ' (Colour: ' + colorName + (colorSku ? ' | SKU: ' + colorSku : '') + priceText + ')';
                     var updatedText = currentText.replace(/\s*\(Colour:[^\)]+\)/i, '') + colorTag;
                     url.searchParams.set('text', updatedText);
                     waBtn.href = url.toString();
@@ -784,28 +985,35 @@
             }
         }
 
-        function swapImage(thumbnail) {
+        // Swapping thumbnail within a selected colour variant
+        function swapColorThumb(thumbnail) {
+            if (!thumbnail) return;
             var main = document.getElementById('main-image');
             if (main) { main.src = thumbnail.src; }
             var wrap = document.getElementById('main-wrap');
             if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
-            document.querySelectorAll('.thumb').forEach(function (img) { img.classList.remove('active'); });
-            thumbnail.classList.add('active');
-            // When returning to a gallery thumb, reset swatch active selection
-            document.querySelectorAll('.color-swatch-item').forEach(function(el) {
-                el.classList.remove('active');
+            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
+                img.classList.remove('active');
             });
-            var label = document.getElementById('selectedColorName');
-            if (label) {
-                label.textContent = 'Choose a colour';
-            }
-            var skuDisplay = document.getElementById('productSkuDisplay');
-            if (skuDisplay) {
-                var baseSku = skuDisplay.getAttribute('data-base-sku') || '{{ product.sku }}';
-                skuDisplay.textContent = 'SKU: ' + baseSku;
-            }
-            document.querySelectorAll('.productSelectedColor').forEach(function(input) {
-                input.value = '';
+            thumbnail.classList.add('active');
+        }
+
+        // Swapping thumbnail in base product gallery
+        function swapImage(thumbnail) {
+            if (!thumbnail) return;
+            var main = document.getElementById('main-image');
+            if (main) { main.src = thumbnail.src; }
+            var wrap = document.getElementById('main-wrap');
+            if (wrap) { wrap.style.setProperty('--bg', "url('" + thumbnail.src + "')"); }
+            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
+                img.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+            // When returning to a base gallery thumb, reset swatch selection
+            resetToBaseProduct();
+            // Re-activate clicked thumb
+            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
+                if (img.src === thumbnail.src) img.classList.add('active');
             });
         }
 

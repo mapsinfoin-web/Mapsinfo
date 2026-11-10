@@ -4,7 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Our Story | MAPSKART</title>
+    <title>Our Story | MAPSKART Handcrafted Jewellery</title>
+    <meta name="description" content="Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi, India." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="Our Story | MAPSKART Handcrafted Jewellery" />
+    <meta property="og:description" content="Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi, India." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:alt" content="About MAPSKART Handcrafted Jewellery" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Our Story | MAPSKART Handcrafted Jewellery" />
+    <meta name="twitter:description" content="Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi." />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />

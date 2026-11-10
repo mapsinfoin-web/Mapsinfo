@@ -198,7 +198,8 @@ def calculate(cart_items, gifts=None, offers=None):
 
     subtotal = Decimal('0')
     for item in items:
-        item.line_total = item.product.price * item.quantity
+        unit_price = getattr(item, 'unit_price', item.product.price)
+        item.line_total = unit_price * item.quantity
         subtotal += item.line_total
         offer = by_main.get(item.product_id)
         item.offer = offer

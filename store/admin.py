@@ -20,23 +20,54 @@ from .models import (
 # --- PRODUCT GALLERY & COLORS ---
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
-    extra = 1  # Shows one blank row by default for a new image
+    extra = 2
+    fields = ['image', 'color']
+
+    def formfield_for_foreign_key(self, db_field, request, **kwargs):
+        if db_field.name == "color":
+            try:
+                from django.urls import resolve
+                resolved = resolve(request.path_info)
+                product_id = resolved.kwargs.get('object_id')
+                if product_id:
+                    kwargs["queryset"] = ProductColor.objects.filter(product_id=product_id)
+            except Exception:
+                pass
+        return super().formfield_for_foreign_key(db_field, request, **kwargs)
 
 
 class ProductColorInline(admin.TabularInline):
     model = ProductColor
     extra = 1
-    fields = ['order', 'name', 'sku', 'hex_code', 'image', 'is_available']
+    fields = ['order', 'name', 'sku', 'price', 'mrp', 'hex_code', 'image', 'is_available']
     ordering = ['order', 'id']
+
+
+class ColorGalleryInline(admin.TabularInline):
+    model = ProductGallery
+    extra = 2
+    fields = ['image']
+    verbose_name = 'Additional Picture for this Colour'
+    verbose_name_plural = 'Additional Pictures for this Colour'
 
 
 @admin.register(ProductColor)
 class ProductColorAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'name', 'sku', 'hex_code', 'is_available']
-    list_editable = ['order', 'sku', 'is_available']
+    list_display = ['product', 'order', 'name', 'sku', 'price', 'mrp', 'hex_code', 'is_available']
+    list_editable = ['order', 'sku', 'price', 'mrp', 'is_available']
     list_filter = ['is_available', 'product__category']
     search_fields = ['name', 'sku', 'product__title', 'product__sku']
     ordering = ['product', 'order', 'id']
+    inlines = [ColorGalleryInline]
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, ProductGallery):
+                instance.product = form.instance.product
+                instance.color = form.instance
+            instance.save()
+        formset.save_m2m()
 
 
 # --- CATEGORY ---

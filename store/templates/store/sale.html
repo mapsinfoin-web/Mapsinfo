@@ -6,6 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Festive Jewellery Sale | Up to 50% OFF | MAPSKART Delhi NCR</title>
     <meta name="description" content="Shop MAPSKART demi-fine jewellery sale in Delhi NCR. Up to 50% off earrings, necklaces, rings and bracelets." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="Festive Jewellery Sale | Up to 50% OFF | MAPSKART" />
+    <meta property="og:description" content="Shop MAPSKART jewellery sale: up to 50% off + Buy 1 Get 1 Free gifts. Handcrafted, anti-tarnish, skin safe." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:alt" content="MAPSKART Festive Jewellery Sale" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Festive Jewellery Sale | Up to 50% OFF | MAPSKART" />
+    <meta name="twitter:description" content="Shop MAPSKART jewellery sale: up to 50% off + Buy 1 Get 1 Free gifts." />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />

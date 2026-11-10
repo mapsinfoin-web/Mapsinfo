@@ -4,7 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collections | MAPSKART</title>
+    <title>All Jewellery Collections | MAPSKART</title>
+    <meta name="description" content="Discover curated handcrafted jewellery collections at MAPSKART: Earrings, Necklaces, Rings, and Bracelets. Anti-tarnish & skin safe." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="All Jewellery Collections | MAPSKART" />
+    <meta property="og:description" content="Discover curated handcrafted jewellery collections at MAPSKART. Free shipping above ₹999." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:alt" content="MAPSKART Jewellery Collections" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="All Jewellery Collections | MAPSKART" />
+    <meta name="twitter:description" content="Discover curated handcrafted jewellery collections at MAPSKART. Free shipping above ₹999." />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />

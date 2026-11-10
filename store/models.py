@@ -205,8 +205,17 @@ class CartItem(models.Model):
     quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     is_active = models.BooleanField(default=True)
 
+    @property
+    def unit_price(self):
+        """Returns the price for the selected colour variant if defined, else product base price."""
+        if hasattr(self, 'selected_color') and self.selected_color:
+            color_obj = self.product.colors.filter(name__iexact=self.selected_color).first()
+            if color_obj and color_obj.price is not None:
+                return color_obj.price
+        return self.product.price
+
     def sub_total(self):
-        return self.product.price * self.quantity
+        return self.unit_price * self.quantity
 
     def __str__(self):
         return self.product.title
@@ -228,10 +237,19 @@ class CartGift(models.Model):
 
 class ProductGallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery_images')
+    color = models.ForeignKey(
+        'ProductColor',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='gallery_images',
+        help_text="Optional: link this picture to a specific colour variant (e.g. Blue, Pink)"
+    )
     image = models.ImageField(upload_to='images/gallery/', max_length=255)
 
     def __str__(self):
-        return f"Image for {self.product.title}"
+        color_str = f" [{self.color.name}]" if self.color else ""
+        return f"Image for {self.product.title}{color_str}"
 
     class Meta:
         verbose_name = 'Product Gallery'
@@ -251,14 +269,68 @@ class ProductColor(models.Model):
         null=True,
         help_text="SKU ID for this color variant (e.g. MAPS-CSE-192-BLU). Auto-generated if left empty."
     )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Sale price for this colour (optional; leave blank to use the product's default price)"
+    )
+    mrp = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Original retail price (crossed out) for this colour (optional)"
+    )
     hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
-    image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Photo for this color variant (switches main image when selected)")
+    image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Main / cover photo for this color variant (switches main image when selected)")
     is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
 
     class Meta:
         ordering = ['order', 'id']
         verbose_name = 'Product Color Option'
         verbose_name_plural = 'Product Color Options'
+
+    @property
+    def effective_price(self):
+        """Returns variant price if set, otherwise the main product price."""
+        if self.price is not None:
+            return self.price
+        return self.product.price
+
+    @property
+    def effective_mrp(self):
+        """Returns variant MRP if set, otherwise the main product MRP."""
+        if self.mrp is not None:
+            return self.mrp
+        return self.product.mrp
+
+    @property
+    def discount_percent(self):
+        """Calculates discount percentage for this variant."""
+        p = self.effective_price
+        m = self.effective_mrp
+        if m and m > p:
+            return round(((m - p) / m) * 100)
+        return 0
+
+    @property
+    def all_images(self):
+        """Returns all image URLs for this colour: main image + all assigned gallery images."""
+        urls = []
+        if self.image:
+            try:
+                urls.append(self.image.url)
+            except Exception:
+                pass
+        for g in self.gallery_images.all():
+            try:
+                if g.image and g.image.url not in urls:
+                    urls.append(g.image.url)
+            except Exception:
+                pass
+        return urls
 
     def save(self, *args, **kwargs):
         if not self.sku:
@@ -278,7 +350,8 @@ class ProductColor(models.Model):
 
     def __str__(self):
         sku_part = f" ({self.sku})" if self.sku else ""
-        return f"{self.product.title} - {self.name}{sku_part}"
+        price_part = f" - ₹{self.price}" if self.price is not None else ""
+        return f"{self.product.title} - {self.name}{sku_part}{price_part}"
 
 
 class Order(models.Model):
@@ -346,6 +419,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     # PROTECT: a product that appears in past orders can't be deleted by accident
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    color = models.CharField(max_length=60, blank=True, default="", help_text="Selected colour variant")
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     # Free gifts are saved as their own line: price = 0, flagged, and linked to the offer that gave them
@@ -354,7 +428,8 @@ class OrderItem(models.Model):
                                    related_name='order_items')
 
     def __str__(self):
-        return f'{self.quantity} x {self.product.title}'
+        color_str = f" [{self.color}]" if self.color else ""
+        return f'{self.quantity} x {self.product.title}{color_str}'
 
 
 class ContactInquiry(models.Model):

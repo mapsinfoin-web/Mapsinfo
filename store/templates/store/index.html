@@ -15,12 +15,17 @@
     <meta name="geo.position" content="28.6139;77.2090" />
     <meta name="ICBM" content="28.6139, 77.2090" />
 
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="BING_WEBMASTER_VERIFICATION_CODE" />
+
     <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="MAPSKART" />
     <meta property="og:title" content="MAPSKART | Trending &amp; Handcrafted Jewellery in Delhi NCR" />
     <meta property="og:description" content="Exquisite handcrafted jewellery in Delhi NCR. Free shipping above ₹999 across Delhi, Gurgaon, Noida, Ghaziabad &amp; Faridabad." />
-    <meta property="og:image" content="{% static 'hero.png' %}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:secure_url" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:image:alt" content="MAPSKART Handcrafted Luxury Jewellery" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
     <meta property="og:locale" content="en_IN" />
 
@@ -28,7 +33,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="MAPSKART | Handcrafted Jewellery in Delhi NCR" />
     <meta name="twitter:description" content="Trending jewellery, everyday earrings, and layered necklaces in Delhi NCR. Free shipping above ₹999." />
-    <meta name="twitter:image" content="{% static 'hero.png' %}" />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static '/1.png' %}" />
