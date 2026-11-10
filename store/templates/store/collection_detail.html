@@ -59,56 +59,54 @@
         .animate-up { animation: fadeUp .9s cubic-bezier(.2, .8, .2, 1) forwards; opacity: 0; }
         @media (prefers-reduced-motion: reduce) { .animate-up { animation: none; opacity: 1; } }
 
-        /* ===== Collection Header Section ===== */
-        .page-header {
-            position: relative;
+        /* ===== Collection Top Actions & Breadcrumb ===== */
+        .collection-top-actions {
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            text-align: center;
-            padding: 46px 24px 24px;
+            padding: 32px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
             box-sizing: border-box;
         }
-        .collection-corner-nav {
-            position: absolute;
-            top: 42px;
-            right: 24px;
-            z-index: 10;
+        .collection-top-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            color: var(--muted);
+            font-weight: 500;
         }
-        .collection-parent-nav {
-            position: absolute;
-            top: 42px;
-            left: 24px;
-            z-index: 10;
-        }
-        .collection-parent-nav a {
+        .collection-top-left a {
+            color: var(--navy);
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 13.5px;
-            font-weight: 600;
-            color: var(--navy);
             text-decoration: none;
             transition: color .2s;
         }
-        .collection-parent-nav a:hover {
+        .collection-top-left a:hover {
             color: var(--blue);
             text-decoration: underline;
         }
         .btn-all-collections-corner {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
             padding: 10px 22px;
             border-radius: 999px;
             background: #fff;
             border: 1.5px solid var(--line);
             color: var(--navy);
-            font-size: 14.5px;
+            font-size: 15px;
             font-weight: 600;
             text-decoration: none;
             box-shadow: 0 2px 8px rgba(19, 38, 57, .06);
             transition: all .25s ease;
+            margin-left: auto;
         }
         .btn-all-collections-corner:hover {
             background: var(--navy);
@@ -125,32 +123,16 @@
             transform: translateX(-3px);
         }
 
-        .page-header h1 {
-            font-family: 'Inter', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--ink);
-            margin: 0 0 10px;
-            letter-spacing: -.8px;
-            text-align: center;
-        }
-        .page-header p {
-            margin: 0 auto;
-            max-width: 680px;
-            font-size: 14px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--muted);
-            font-weight: 500;
-            text-align: center;
-            line-height: 1.6;
-        }
+        /* ===== Page title ===== */
+        .page-header { text-align: center; padding: 22px 20px 24px; }
+        .page-header h1 { font-family: 'Inter', sans-serif; font-size: 42px; font-weight: 700; color: var(--ink); margin: 0 0 10px; letter-spacing: -.8px; }
+        .page-header p { margin: 0; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
 
         /* ===== Subcategories Bar at Starting of Page ===== */
         .subcategories-bar {
             max-width: 1200px;
             width: 100%;
-            margin: 0 auto 24px;
+            margin: 0 auto 22px;
             padding: 0 24px;
             box-sizing: border-box;
         }
@@ -254,9 +236,74 @@
         .tag { position: absolute; top: 12px; left: 12px; padding: 5px 11px; border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #fff; }
         .tag.bogo { background: var(--green); }
         .tag.out { background: var(--navy); }
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            min-height: 20px;
+        }
+        .card-subcat-badge {
+            color: var(--blue);
+            background: #eff6ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
         .body { padding: 18px 20px 22px; display: flex; flex-direction: column; flex: 1; }
-        .body h3 { margin: 0 0 8px; font-size: 16.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
-        .price { margin: 0 0 16px; font-size: 18px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .body h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.35;
+            min-height: 44px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-color-swatches-wrap {
+            min-height: 24px;
+            margin: 2px 0 10px;
+            display: flex;
+            align-items: center;
+        }
+        .card-color-swatches {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .card-swatch-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, .2);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
+            display: inline-block;
+        }
+        .card-color-count {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-left: 2px;
+        }
+        .price {
+            margin: auto 0 14px;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            min-height: 26px;
+        }
         .price s { color: var(--muted); font-size: 13.5px; font-weight: 400; margin-right: 0; }
         .discount-badge {
             display: inline-flex;
@@ -271,27 +318,21 @@
             line-height: 1.2;
             white-space: nowrap;
         }
-        .card-color-swatches {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin: 4px 0 8px;
-        }
-        .card-swatch-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 0, 0, .2);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
-            display: inline-block;
-        }
-        .card-color-count {
-            font-size: 11px;
-            color: var(--muted);
+        .btn-view {
+            margin-top: auto;
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 11px 16px;
+            border-radius: 999px;
+            border: 1.5px solid var(--navy);
+            background: var(--soft);
+            color: var(--navy);
+            font-size: 13.5px;
             font-weight: 600;
-            margin-left: 2px;
+            transition: all .25s ease;
+            box-sizing: border-box;
         }
-        .btn-view { margin-top: auto; display: block; text-align: center; padding: 12px; border-radius: 999px; border: 1.5px solid var(--navy); color: var(--navy); font-size: 14px; font-weight: 600; transition: all .25s; }
         .card:hover .btn-view, .btn-view:hover { background: var(--navy); color: #fff; }
 
         .empty { grid-column: 1 / -1; text-align: center; background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 60px 20px; color: var(--muted); }
@@ -637,10 +678,9 @@
         @media (max-width: 900px) {
         }
         @media (max-width: 760px) {
-            .page-header { padding: 20px 16px 18px; }
-            .collection-corner-nav { position: static; display: flex; justify-content: flex-end; margin-bottom: 12px; }
-            .collection-parent-nav { position: static; display: flex; justify-content: flex-start; margin-bottom: 8px; }
+            .collection-top-actions { padding: 18px 16px 0; }
             .btn-all-collections-corner { font-size: 13.5px; padding: 8px 16px; gap: 7px; }
+            .page-header { padding: 16px 16px 20px; }
             .page-header h1 { font-size: 32px; }
             .subcat-scroll-track { justify-content: flex-start; }
             .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 6px 14px 60px; }
@@ -775,23 +815,22 @@
         </div>
     </header>
 
-    <!-- COLLECTION HEADER WITH RIGHT-CORNER 'ALL COLLECTIONS' -->
-    <header class="page-header animate-up">
-        {% if is_subcollection and parent_category %}
-        <div class="collection-parent-nav">
+    <!-- TOP ACTIONS: ALL COLLECTIONS IN RIGHT CORNER -->
+    <div class="collection-top-actions animate-up">
+        <div class="collection-top-left">
+            {% if is_subcollection and parent_category %}
             <a href="{% url 'store:collection_detail' parent_category.slug %}">
                 <i class="fas fa-arrow-left"></i> View all {{ parent_category.name }}
             </a>
+            {% endif %}
         </div>
-        {% endif %}
+        <a href="{% url 'store:collections' %}" class="btn-all-collections-corner" title="View all jewellery collections">
+            <i class="fas fa-arrow-left"></i>
+            <span>All Collections</span>
+        </a>
+    </div>
 
-        <div class="collection-corner-nav">
-            <a href="{% url 'store:collections' %}" class="btn-all-collections-corner" title="View all jewellery collections">
-                <i class="fas fa-arrow-left"></i>
-                <span>All Collections</span>
-            </a>
-        </div>
-
+    <header class="page-header animate-up">
         <h1>{{ category.name }}</h1>
         <p>
             {% if is_subcollection and parent_category %}
@@ -992,21 +1031,23 @@
                     {% endif %}
                 </div>
                 <h3>{{ product.title }}</h3>
-                {% if product.available_colors %}
-                <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
-                    {% for c in product.available_colors|slice:":5" %}
-                    <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
-                       class="card-swatch-dot"
-                       style="background-color: {{ c.hex_code }};"
-                       title="{{ c.name }}"
-                       {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
-                       onclick="event.stopPropagation();"></a>
-                    {% endfor %}
-                    {% if product.available_colors|length > 1 %}
-                    <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
+                <div class="card-color-swatches-wrap">
+                    {% if product.available_colors %}
+                    <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
+                        {% for c in product.available_colors|slice:":5" %}
+                        <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+                           class="card-swatch-dot"
+                           style="background-color: {{ c.hex_code }};"
+                           title="{{ c.name }}"
+                           {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
+                           onclick="event.stopPropagation();"></a>
+                        {% endfor %}
+                        {% if product.available_colors|length > 1 %}
+                        <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
-                {% endif %}
                 <p class="price">
                     {% if product.mrp and product.mrp > product.price %}
                     <s>₹{{ product.mrp }}</s>

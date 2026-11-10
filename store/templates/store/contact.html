@@ -244,15 +244,6 @@
 
         <div class="left animate-up delay-1">
             <div class="card">
-                <h2>MAPSKART</h2>
-                <p class="owner"><small>Owner</small>Manish Kumar Ghai</p>
-                <div class="hours">
-                    Monday &ndash; Saturday: 11:00 AM &ndash; 8:00 PM<br />
-                    Sunday: By private appointment
-                </div>
-            </div>
-
-            <div class="card">
                 <h2>Direct inquiries</h2>
                 <p class="lead">Whether you need styling advice, a custom order, or post-purchase support, our advisors are here to help via phone, WhatsApp, or email.</p>
                 <ul class="contact-list">
@@ -261,12 +252,21 @@
                     <li><a href="tel:+919953525557"><span class="ic"><i class="fas fa-headset"></i></span><span>+91 99535 25557<small>Customer care</small></span></a></li>
                     <li><a href="mailto:mapskart.info.in@gmail.com"><span class="ic"><i class="far fa-envelope"></i></span><span>mapskart.info.in@gmail.com<small>Email us</small></span></a></li>
                 </ul>
+
+                <div class="hours" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line);">
+                    <div style="font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); font-weight: 700; margin-bottom: 6px;">MAPSKART &bull; Studio &amp; Atelier</div>
+                    <div style="font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 8px;">Manish Kumar Ghai <span style="font-size: 12.5px; font-weight: 400; color: var(--muted);">(Proprietor)</span></div>
+                    <div style="font-size: 14px; color: var(--muted); line-height: 1.8;">
+                        <i class="far fa-clock" style="color: var(--blue); margin-right: 6px;"></i>Monday &ndash; Saturday: 11:00 AM &ndash; 8:00 PM<br />
+                        <span style="display:inline-block; margin-left: 20px;">Sunday: By private appointment</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="card animate-up delay-2">
             <h2>Send a message</h2>
-            <p class="lead">Tell us how we can help with custom orders or any question about our collections.</p>
+            <p class="lead">Tell us how we can help with custom orders, sizing, styling advice, or any question about our jewellery.</p>
 
             {% for message in messages %}
             <div class="alert {{ message.tags }}"><i class="fas fa-circle-info"></i> {{ message }}</div>
