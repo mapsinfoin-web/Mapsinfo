@@ -330,7 +330,7 @@
                     <label for="c-message">
                         <span>Your message <span class="req">*</span></span>
                     </label>
-                    <textarea id="c-message" name="message" rows="5" placeholder="Tell us how we can help with custom orders, sizing, styling advice, or any question about our jewellery…" required minlength="10" maxlength="3000">{{ form_data.message|default:'' }}</textarea>
+                    <textarea id="c-message" name="message" rows="5" placeholder="Tell us how we can help with custom orders, sizing, styling advice, or any question about our jewellery…" required minlength="10" maxlength="2000">{{ form_data.message|default:'' }}</textarea>
                     <small class="field-hint">Minimum 10 characters</small>
                     <small class="field-error" id="err-message">Please enter a message of at least 10 characters.</small>
                 </div>
@@ -557,8 +557,8 @@
                     setInvalid(field, err, "Please enter your message.");
                     return false;
                 }
-                if (val.length < 10 || val.length > 3000) {
-                    setInvalid(field, err, "Message must be between 10 and 3,000 characters.");
+                if (val.length < 10 || val.length > 2000) {
+                    setInvalid(field, err, "Message must be between 10 and 2,000 characters.");
                     return false;
                 }
                 if (val.replace(/[^a-zA-Z0-9]/g, '').length < 5) {

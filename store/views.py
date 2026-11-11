@@ -1027,8 +1027,8 @@ def _validate_contact_inquiry(name, email, phone, subject, message):
         return False, "Please enter a meaningful subject for your inquiry.", None
 
     # 6. Message validation
-    if len(cleaned_message) < 10 or len(cleaned_message) > 3000:
-        return False, "Message must be between 10 and 3,000 characters.", None
+    if len(cleaned_message) < 10 or len(cleaned_message) > 2000:
+        return False, "Message must be between 10 and 2,000 characters.", None
 
     if len(re.sub(r"[^a-zA-Z0-9]", "", cleaned_message)) < 5:
         return False, "Please enter a detailed message describing your inquiry.", None
