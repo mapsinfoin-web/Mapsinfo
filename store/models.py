@@ -572,12 +572,13 @@ class OrderItem(models.Model):
 class ContactInquiry(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
+    phone = models.CharField(max_length=25, blank=True, default='', verbose_name='Mobile Number')
     subject = models.CharField(max_length=255)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Inquiry from {self.name} - {self.subject}"
+        return f"Inquiry from {self.name} ({self.phone or self.email}) - {self.subject}"
     
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist')

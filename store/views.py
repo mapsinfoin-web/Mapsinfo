@@ -1,4 +1,7 @@
+import re
+import time
 import uuid
+from django.utils.html import escape, strip_tags
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -925,22 +928,179 @@ def about(request):
     return render(request, 'store/about.html')
 
 
-def contact(request):
-    if request.method == 'POST':
-        name = (request.POST.get('name') or '').strip()
-        email = (request.POST.get('email') or '').strip()
-        subject = (request.POST.get('subject') or '').strip()
-        message = (request.POST.get('message') or '').strip()
+def _validate_contact_inquiry(name, email, phone, subject, message):
+    """
+    Rigorously validates contact form inputs against junk data, fake domains,
+    invalid mobile numbers, and spam submissions.
+    Returns: (is_valid, error_message, cleaned_dict)
+    """
+    cleaned_name = strip_tags(name or '').strip()
+    cleaned_email = strip_tags(email or '').strip()
+    cleaned_phone = strip_tags(phone or '').strip()
+    cleaned_subject = strip_tags(subject or '').strip()
+    cleaned_message = strip_tags(message or '').strip()
 
-        if not (name and email and subject and message):
-            messages.error(request, "Please fill in all the fields.")
+    # 1. Missing fields
+    if not cleaned_name:
+        return False, "Please enter your full name.", None
+    if not cleaned_email:
+        return False, "Please enter your email address.", None
+    if not cleaned_phone:
+        return False, "Please enter your mobile number.", None
+    if not cleaned_subject:
+        return False, "Please enter a subject.", None
+    if not cleaned_message:
+        return False, "Please enter your message.", None
+
+    # 2. Name validation
+    if len(cleaned_name) < 2 or len(cleaned_name) > 60:
+        return False, "Full name must be between 2 and 60 characters.", None
+
+    # Only alphabetic letters, spaces, dots, hyphens, and apostrophes
+    if not re.match(r"^[a-zA-Z\s.'\-]+$", cleaned_name):
+        return False, "Full name should only contain letters and spaces (numbers and symbols are not allowed).", None
+
+    # Must contain at least two actual alphabetic letters
+    letters = re.findall(r"[a-zA-Z]", cleaned_name)
+    if len(letters) < 2:
+        return False, "Please enter a genuine full name with at least 2 letters.", None
+
+    # Reject repeated junk characters (e.g., 'aaaaa', 'xxxxxx')
+    if re.search(r"(.)\1{3,}", cleaned_name.lower()):
+        return False, "Please enter a genuine full name without repeated random characters.", None
+
+    # 3. Email validation
+    EMAIL_PATTERN = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,10}$"
+    if not re.match(EMAIL_PATTERN, cleaned_email):
+        return False, "Please enter a valid email address with a domain extension (e.g. name@example.com).", None
+
+    domain_part = cleaned_email.split('@')[-1].lower()
+    if '.' not in domain_part:
+        return False, "Email address must include a valid domain extension like .com or .in (e.g. name@example.com).", None
+
+    domain_parts = domain_part.rsplit('.', 1)
+    domain_body, tld = domain_parts[0], domain_parts[1]
+    if len(domain_body) < 2 or len(tld) < 2:
+        return False, "Please enter a complete and valid email address (e.g. name@gmail.com).", None
+
+    # Reject fake/dummy domains like 'xxxxx', 'fake', 'mailinator', single repeated character domains
+    if re.search(r"^(.)\1+$", domain_body) or domain_body in ['xxxxx', 'test', 'tempmail', 'mailinator', 'example']:
+        return False, "Please provide a genuine, active email address so we can reach you.", None
+
+    # 4. Mobile Number validation
+    raw_digits = re.sub(r"[^\d+]", "", cleaned_phone)
+    digits_only = re.sub(r"\D", "", raw_digits)
+
+    standard_10 = ""
+    if len(digits_only) == 10:
+        standard_10 = digits_only
+    elif len(digits_only) == 11 and digits_only.startswith('0'):
+        standard_10 = digits_only[1:]
+    elif len(digits_only) == 12 and digits_only.startswith('91'):
+        standard_10 = digits_only[2:]
+    elif raw_digits.startswith('+91') and len(digits_only) == 12:
+        standard_10 = digits_only[2:]
+
+    if standard_10:
+        # Check prefix: In India, valid mobile numbers MUST start with 6, 7, 8, or 9
+        if not re.match(r"^[6-9]\d{9}$", standard_10):
+            return False, "Mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9 (numbers starting with 2, 3, 4, 5 are invalid).", None
+
+        # Check for dummy repetitive numbers (e.g., 9999999999, 8888888888, 1234567890)
+        if len(set(standard_10)) <= 2 or standard_10 in ['9876543210', '9898989898', '9090909090', '9191919191']:
+            return False, "Please enter a genuine, working mobile number.", None
+
+        cleaned_phone = standard_10
+    elif raw_digits.startswith('+') and 10 <= len(digits_only) <= 15:
+        # International phone with +CountryCode
+        if len(set(digits_only)) <= 2:
+            return False, "Please enter a genuine international phone number.", None
+        cleaned_phone = raw_digits
+    else:
+        return False, "Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210).", None
+
+    # 5. Subject validation
+    if len(cleaned_subject) < 3 or len(cleaned_subject) > 120:
+        return False, "Subject must be between 3 and 120 characters.", None
+
+    if len(re.sub(r"[^a-zA-Z0-9]", "", cleaned_subject)) < 2:
+        return False, "Please enter a meaningful subject for your inquiry.", None
+
+    # 6. Message validation
+    if len(cleaned_message) < 10 or len(cleaned_message) > 3000:
+        return False, "Message must be between 10 and 3,000 characters.", None
+
+    if len(re.sub(r"[^a-zA-Z0-9]", "", cleaned_message)) < 5:
+        return False, "Please enter a detailed message describing your inquiry.", None
+
+    cleaned_data = {
+        'name': cleaned_name,
+        'email': cleaned_email.lower(),
+        'phone': cleaned_phone,
+        'subject': cleaned_subject,
+        'message': cleaned_message,
+    }
+    return True, None, cleaned_data
+
+
+def contact(request):
+    form_data = {}
+    if request.method == 'POST':
+        # 1. Anti-bot honeypot check (hidden field)
+        if request.POST.get('website'):
+            # Automated bot triggered honeypot; silently succeed without saving
+            messages.success(request, "Thank you. Your inquiry has been forwarded to our atelier.")
             return redirect('store:contact')
 
-        ContactInquiry.objects.create(name=name, email=email, subject=subject, message=message)
-        messages.success(request, "Thank you. Your inquiry has been forwarded to our atelier.")
+        # 2. Rate limiting (anti-spam cooldown: 10s per session)
+        now = time.time()
+        last_ts = request.session.get('last_contact_ts', 0)
+        if now - last_ts < 10:
+            messages.error(request, "Please wait a few seconds before submitting another inquiry.")
+            return render(request, 'store/contact.html', {
+                'form_data': {
+                    'name': request.POST.get('name', ''),
+                    'email': request.POST.get('email', ''),
+                    'phone': request.POST.get('phone', ''),
+                    'subject': request.POST.get('subject', ''),
+                    'message': request.POST.get('message', ''),
+                }
+            })
+
+        # 3. Comprehensive server-side validation
+        is_valid, err_msg, cleaned = _validate_contact_inquiry(
+            name=request.POST.get('name'),
+            email=request.POST.get('email'),
+            phone=request.POST.get('phone'),
+            subject=request.POST.get('subject'),
+            message=request.POST.get('message'),
+        )
+
+        if not is_valid:
+            messages.error(request, err_msg)
+            return render(request, 'store/contact.html', {
+                'form_data': {
+                    'name': request.POST.get('name', ''),
+                    'email': request.POST.get('email', ''),
+                    'phone': request.POST.get('phone', ''),
+                    'subject': request.POST.get('subject', ''),
+                    'message': request.POST.get('message', ''),
+                }
+            })
+
+        # 4. Save validated and sanitized inquiry to DB
+        ContactInquiry.objects.create(
+            name=cleaned['name'],
+            email=cleaned['email'],
+            phone=cleaned['phone'],
+            subject=cleaned['subject'],
+            message=cleaned['message']
+        )
+        request.session['last_contact_ts'] = now
+        messages.success(request, "Thank you! Your inquiry has been received. Our advisors will contact you shortly.")
         return redirect('store:contact')
 
-    return render(request, 'store/contact.html')
+    return render(request, 'store/contact.html', {'form_data': form_data})
 
 def search_products(request):
     query = request.GET.get('q', '').strip()

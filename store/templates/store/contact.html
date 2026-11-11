@@ -86,10 +86,19 @@
         .note { font-size: 13.5px; color: var(--muted); line-height: 1.75; margin: 0; }
 
         /* ===== Form ===== */
-        .field { margin-bottom: 18px; }
-        .field label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
-        .field input, .field textarea { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); font-family: inherit; font-size: 15px; color: var(--ink); transition: all .2s; resize: vertical; }
+        .field { margin-bottom: 20px; text-align: left; }
+        .field label { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+        .field label .req { color: var(--red); margin-left: 2px; }
+        .field input, .field textarea { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--bg); font-family: inherit; font-size: 14.5px; color: var(--ink); transition: border-color .2s, box-shadow .2s, background .2s; resize: vertical; box-sizing: border-box; }
         .field input:focus, .field textarea:focus { outline: none; border-color: var(--navy); background: #fff; box-shadow: 0 0 0 4px rgba(31, 58, 102, .1); }
+        .field.is-invalid input, .field.is-invalid textarea { border-color: var(--red); background: #fff8f8; }
+        .field.is-invalid input:focus, .field.is-invalid textarea:focus { box-shadow: 0 0 0 4px rgba(229, 72, 77, .15); }
+        .field.is-valid input, .field.is-valid textarea { border-color: #16a34a; background: #fff; }
+        .field-hint { display: block; font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+        .field-error { display: none; font-size: 12px; color: var(--red); font-weight: 600; margin-top: 5px; line-height: 1.4; }
+        .field.is-invalid .field-error { display: block; }
+        .field.is-invalid .field-hint { display: none; }
+        .form-feedback-top { display: none; padding: 12px 16px; border-radius: 12px; background: #fee2e2; color: #991b1b; font-size: 13.5px; font-weight: 600; margin-bottom: 18px; }
         .btn-dark { display: block; width: 100%; padding: 16px; text-align: center; background: var(--navy); color: #fff; border-radius: 999px; font-size: 16px; font-weight: 600; transition: all .25s ease; border: none; cursor: pointer; font-family: inherit; margin-top: 6px; }
         .btn-dark:hover { background: var(--navy-2); transform: translateY(-2px); }
         .alert { padding: 13px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; background: #dcfce7; color: #166534; }
@@ -272,25 +281,61 @@
             <div class="alert {{ message.tags }}"><i class="fas fa-circle-info"></i> {{ message }}</div>
             {% endfor %}
 
-            <form action="{% url 'store:contact' %}" method="POST">
+            <form action="{% url 'store:contact' %}" method="POST" id="contactForm" novalidate>
                 {% csrf_token %}
-                <div class="field">
-                    <label for="c-name">Full name</label>
-                    <input type="text" id="c-name" name="name" required />
+                <!-- Anti-bot honeypot field (hidden from genuine users) -->
+                <div style="position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
+                    <input type="text" name="website" tabindex="-1" autocomplete="off" />
                 </div>
-                <div class="field">
-                    <label for="c-email">Email address</label>
-                    <input type="email" id="c-email" name="email" required />
+
+                <div id="formFeedbackTop" class="form-feedback-top"></div>
+
+                <div class="field" id="field-name">
+                    <label for="c-name">
+                        <span>Full name <span class="req">*</span></span>
+                    </label>
+                    <input type="text" id="c-name" name="name" value="{{ form_data.name|default:'' }}" placeholder="e.g. Manish Kumar" required autocomplete="name" maxlength="60" />
+                    <small class="field-hint">Your real full name (at least 2 letters, alphabets only)</small>
+                    <small class="field-error" id="err-name">Please enter your genuine full name (minimum 2 letters).</small>
                 </div>
-                <div class="field">
-                    <label for="c-subject">Subject</label>
-                    <input type="text" id="c-subject" name="subject" required />
+
+                <div class="field" id="field-email">
+                    <label for="c-email">
+                        <span>Email address <span class="req">*</span></span>
+                    </label>
+                    <input type="email" id="c-email" name="email" value="{{ form_data.email|default:'' }}" placeholder="e.g. name@example.com" required autocomplete="email" />
+                    <small class="field-hint">Must include a valid domain extension like .com or .in</small>
+                    <small class="field-error" id="err-email">Please enter a valid email address with a domain (e.g. name@example.com).</small>
                 </div>
-                <div class="field">
-                    <label for="c-message">Your message</label>
-                    <textarea id="c-message" name="message" rows="5" required></textarea>
+
+                <div class="field" id="field-phone">
+                    <label for="c-phone">
+                        <span>Mobile number <span class="req">*</span></span>
+                    </label>
+                    <input type="tel" id="c-phone" name="phone" value="{{ form_data.phone|default:'' }}" placeholder="e.g. 9876543210" required autocomplete="tel" maxlength="16" />
+                    <small class="field-hint">10 digits starting with 6, 7, 8, or 9</small>
+                    <small class="field-error" id="err-phone">Mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9.</small>
                 </div>
-                <button type="submit" class="btn-dark">Send message</button>
+
+                <div class="field" id="field-subject">
+                    <label for="c-subject">
+                        <span>Subject <span class="req">*</span></span>
+                    </label>
+                    <input type="text" id="c-subject" name="subject" value="{{ form_data.subject|default:'' }}" placeholder="e.g. Custom Bridal Necklace Inquiry" required maxlength="120" />
+                    <small class="field-hint">Brief summary of your inquiry (minimum 3 characters)</small>
+                    <small class="field-error" id="err-subject">Please enter a meaningful subject (at least 3 characters).</small>
+                </div>
+
+                <div class="field" id="field-message">
+                    <label for="c-message">
+                        <span>Your message <span class="req">*</span></span>
+                    </label>
+                    <textarea id="c-message" name="message" rows="5" placeholder="Tell us how we can help with custom orders, sizing, styling advice, or any question about our jewellery…" required minlength="10" maxlength="3000">{{ form_data.message|default:'' }}</textarea>
+                    <small class="field-hint">Minimum 10 characters</small>
+                    <small class="field-error" id="err-message">Please enter a message of at least 10 characters.</small>
+                </div>
+
+                <button type="submit" class="btn-dark" id="btnSubmitContact">Send message</button>
             </form>
         </div>
 
@@ -345,7 +390,224 @@
     </footer>
 
     <script>
-        
+        document.addEventListener('DOMContentLoaded', function () {
+            var form = document.getElementById('contactForm');
+            if (!form) return;
+
+            var nameInput = document.getElementById('c-name');
+            var emailInput = document.getElementById('c-email');
+            var phoneInput = document.getElementById('c-phone');
+            var subjectInput = document.getElementById('c-subject');
+            var messageInput = document.getElementById('c-message');
+            var feedbackTop = document.getElementById('formFeedbackTop');
+
+            function setInvalid(field, errEl, msg) {
+                field.classList.remove('is-valid');
+                field.classList.add('is-invalid');
+                if (errEl && msg) errEl.textContent = msg;
+            }
+
+            function setValid(field) {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+
+            function validateName() {
+                var val = nameInput.value.trim();
+                var field = document.getElementById('field-name');
+                var err = document.getElementById('err-name');
+
+                if (!val) {
+                    setInvalid(field, err, "Please enter your full name.");
+                    return false;
+                }
+                if (val.length < 2 || val.length > 60) {
+                    setInvalid(field, err, "Full name must be between 2 and 60 characters.");
+                    return false;
+                }
+                if (!/^[a-zA-Z\s.'\-]+$/.test(val)) {
+                    setInvalid(field, err, "Full name should only contain letters and spaces.");
+                    return false;
+                }
+                var letters = val.replace(/[^a-zA-Z]/g, '');
+                if (letters.length < 2) {
+                    setInvalid(field, err, "Please enter a genuine full name with at least 2 letters.");
+                    return false;
+                }
+                if (/(.)\1{3,}/i.test(val)) {
+                    setInvalid(field, err, "Please enter a genuine full name without repeated characters.");
+                    return false;
+                }
+                setValid(field);
+                return true;
+            }
+
+            function validateEmail() {
+                var val = emailInput.value.trim().toLowerCase();
+                var field = document.getElementById('field-email');
+                var err = document.getElementById('err-email');
+
+                if (!val) {
+                    setInvalid(field, err, "Please enter your email address.");
+                    return false;
+                }
+                var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,10}$/;
+                if (!emailRegex.test(val)) {
+                    setInvalid(field, err, "Please enter a valid email address with a domain extension (e.g. name@example.com).");
+                    return false;
+                }
+                var parts = val.split('@');
+                var domain = parts[1] || '';
+                if (domain.indexOf('.') === -1) {
+                    setInvalid(field, err, "Email must include a valid domain extension like .com or .in.");
+                    return false;
+                }
+                var dParts = domain.split('.');
+                var domainName = dParts[0];
+                var tld = dParts[dParts.length - 1];
+                if (domainName.length < 2 || tld.length < 2) {
+                    setInvalid(field, err, "Please enter a valid email domain (e.g. name@gmail.com).");
+                    return false;
+                }
+                var fakeDomains = ['xxxxx', 'test', 'tempmail', 'mailinator', 'example', 'fake'];
+                if (/^(.)\1+$/.test(domainName) || fakeDomains.indexOf(domainName) !== -1) {
+                    setInvalid(field, err, "Please enter a genuine, active email address.");
+                    return false;
+                }
+                setValid(field);
+                return true;
+            }
+
+            function validatePhone() {
+                var val = phoneInput.value.trim();
+                var field = document.getElementById('field-phone');
+                var err = document.getElementById('err-phone');
+
+                if (!val) {
+                    setInvalid(field, err, "Please enter your mobile number.");
+                    return false;
+                }
+
+                var rawDigits = val.replace(/[^\d+]/g, '');
+                var digitsOnly = val.replace(/\D/g, '');
+
+                var standard10 = "";
+                if (digitsOnly.length === 10) {
+                    standard10 = digitsOnly;
+                } else if (digitsOnly.length === 11 && digitsOnly.indexOf('0') === 0) {
+                    standard10 = digitsOnly.substring(1);
+                } else if (digitsOnly.length === 12 && digitsOnly.indexOf('91') === 0) {
+                    standard10 = digitsOnly.substring(2);
+                } else if (rawDigits.indexOf('+91') === 0 && digitsOnly.length === 12) {
+                    standard10 = digitsOnly.substring(2);
+                }
+
+                if (standard10) {
+                    if (!/^[6-9]\d{9}$/.test(standard10)) {
+                        setInvalid(field, err, "Mobile number must be a valid 10-digit number starting with 6, 7, 8, or 9 (numbers starting with 2, 3, 4, 5 are invalid).");
+                        return false;
+                    }
+                    var dummyList = ['9876543210', '9898989898', '9090909090', '9191919191'];
+                    var uniqueChars = {};
+                    for (var i = 0; i < standard10.length; i++) {
+                        uniqueChars[standard10[i]] = true;
+                    }
+                    if (Object.keys(uniqueChars).length <= 2 || dummyList.indexOf(standard10) !== -1) {
+                        setInvalid(field, err, "Please enter a genuine, working 10-digit mobile number.");
+                        return false;
+                    }
+                    setValid(field);
+                    return true;
+                } else if (rawDigits.indexOf('+') === 0 && digitsOnly.length >= 10 && digitsOnly.length <= 15) {
+                    setValid(field);
+                    return true;
+                } else {
+                    setInvalid(field, err, "Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210).");
+                    return false;
+                }
+            }
+
+            function validateSubject() {
+                var val = subjectInput.value.trim();
+                var field = document.getElementById('field-subject');
+                var err = document.getElementById('err-subject');
+
+                if (!val) {
+                    setInvalid(field, err, "Please enter a subject.");
+                    return false;
+                }
+                if (val.length < 3 || val.length > 120) {
+                    setInvalid(field, err, "Subject must be between 3 and 120 characters.");
+                    return false;
+                }
+                if (val.replace(/[^a-zA-Z0-9]/g, '').length < 2) {
+                    setInvalid(field, err, "Please enter a meaningful subject.");
+                    return false;
+                }
+                setValid(field);
+                return true;
+            }
+
+            function validateMessage() {
+                var val = messageInput.value.trim();
+                var field = document.getElementById('field-message');
+                var err = document.getElementById('err-message');
+
+                if (!val) {
+                    setInvalid(field, err, "Please enter your message.");
+                    return false;
+                }
+                if (val.length < 10 || val.length > 3000) {
+                    setInvalid(field, err, "Message must be between 10 and 3,000 characters.");
+                    return false;
+                }
+                if (val.replace(/[^a-zA-Z0-9]/g, '').length < 5) {
+                    setInvalid(field, err, "Please enter a detailed message describing your inquiry.");
+                    return false;
+                }
+                setValid(field);
+                return true;
+            }
+
+            nameInput.addEventListener('blur', validateName);
+            nameInput.addEventListener('input', function () { if (nameInput.value.length >= 2) validateName(); });
+
+            emailInput.addEventListener('blur', validateEmail);
+            emailInput.addEventListener('input', function () { if (emailInput.value.indexOf('@') !== -1) validateEmail(); });
+
+            phoneInput.addEventListener('blur', validatePhone);
+            phoneInput.addEventListener('input', function () { if (phoneInput.value.length >= 10) validatePhone(); });
+
+            subjectInput.addEventListener('blur', validateSubject);
+            subjectInput.addEventListener('input', function () { if (subjectInput.value.length >= 3) validateSubject(); });
+
+            messageInput.addEventListener('blur', validateMessage);
+            messageInput.addEventListener('input', function () { if (messageInput.value.length >= 10) validateMessage(); });
+
+            form.addEventListener('submit', function (e) {
+                var v1 = validateName();
+                var v2 = validateEmail();
+                var v3 = validatePhone();
+                var v4 = validateSubject();
+                var v5 = validateMessage();
+
+                if (!(v1 && v2 && v3 && v4 && v5)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (feedbackTop) {
+                        feedbackTop.textContent = "Please correct the highlighted errors before submitting.";
+                        feedbackTop.style.display = 'block';
+                        feedbackTop.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+
+                    var firstInvalid = form.querySelector('.field.is-invalid input, .field.is-invalid textarea');
+                    if (firstInvalid) firstInvalid.focus();
+                } else {
+                    if (feedbackTop) feedbackTop.style.display = 'none';
+                }
+            });
+        });
     </script>
     <script>
         (function () {
