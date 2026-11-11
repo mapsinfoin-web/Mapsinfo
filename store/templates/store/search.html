@@ -72,59 +72,7 @@
 
         /* ===== PRODUCT GRID ===== */
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-        .card { position: relative; background: #fff; border-radius: var(--radius); transition: transform .35s, box-shadow .35s; }
-        .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-        .thumb { position: relative; aspect-ratio: 1/1.1; border-radius: var(--radius); overflow: hidden; background: var(--soft-2); }
-        .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
-        .card:hover .thumb img { transform: scale(1.07); }
-        .tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .3px; background: #fff; color: var(--ink); }
-        .wish { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; background: #fff; border: none; display: grid; place-items: center; cursor: pointer; font-size: 15px; color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,.1); transition: all .2s; }
-        .wish:hover { color: var(--red); transform: scale(1.1); }
-        .wish.on { color: var(--red); }
-        .wish.on i { font-weight: 900; }
-        .quick { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; padding: 12px; border-radius: 12px; border: none; background: rgba(31,58,102,.95); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0; transform: translateY(12px); transition: all .3s; text-align: center; }
-        .card:hover .quick { opacity: 1; transform: translateY(0); }
-        .quick:hover { background: var(--accent); color: var(--ink); }
-        .card-body { padding: 16px 6px 6px; }
-        .cat-label { font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-        .card-body h3 { margin: 5px 0 8px; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.35; }
-        .card-color-swatches {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin: 4px 0 8px;
-        }
-        .card-swatch-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 0, 0, .2);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
-            display: inline-block;
-        }
-        .card-color-count {
-            font-size: 11px;
-            color: var(--muted);
-            font-weight: 600;
-            margin-left: 2px;
-        }
-        .price-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .price { font-size: 18px; font-weight: 700; color: var(--ink); }
-        .mrp { font-size: 13.5px; color: var(--muted); text-decoration: line-through; }
-        .discount-badge {
-            display: inline-flex;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: #fff;
-            background: var(--red);
-            padding: 2.5px 7px;
-            border-radius: 6px;
-            letter-spacing: .3px;
-            line-height: 1.2;
-            white-space: nowrap;
-        }
-        
+{% include 'store/includes/product_card_css.html' %}
         /* ===== FOOTER ===== */
 
         /* ===== TOAST + REVEAL ===== */
@@ -707,77 +655,7 @@
                     </div>
 
                     {% for product in page_obj %}
-                    <article class="card reveal"
-                             data-category="{{ product.category.slug|lower }}"
-                             data-price="{{ product.price }}"
-                             data-styles="{{ product.style_tags_str }}"
-                             data-created="{{ product.created|date:'U' }}"
-                             {% if product.mrp and product.mrp > product.price %}data-is-sale="true"{% endif %}
-                             data-in-stock="{% if product.in_stock %}true{% else %}false{% endif %}"
-                             data-colors="{{ product.color_tags_str }}"
-                             data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
-                             data-color-images='{{ product.color_images_json|safe }}'>
-                        <div class="thumb">
-                            {% if not product.in_stock %}
-                                <span class="tag" style="background: var(--navy); color: #fff;">OUT OF STOCK</span>
-                            {% elif product.offer %}
-                                <span class="tag" style="background: var(--brand); color: #fff;">{{ product.offer.badge_text|upper }}</span>
-                            {% endif %}
-
-                            <button class="wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" title="Wishlist" aria-label="Add to wishlist">
-                                <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
-                            </button>
-
-                            <a href="{% url 'store:product_detail' product.pk %}">
-                                {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
-                                {% else %}
-                                <div style="height:100%;display:grid;place-items:center;color:var(--muted);">No Image</div>
-                                {% endif %}
-                            </a>
-
-                            {% if not product.in_stock %}
-                                <button class="quick" style="background: var(--muted); cursor: not-allowed;" disabled>Out of Stock</button>
-                            {% else %}
-                                <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="quick"><i class="fas fa-shopping-cart" style="margin-right:6px;"></i>+ Quick Add</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="card-body">
-                            <span class="cat-label">{{ product.category.name }}</span>
-                            <h3><a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a></h3>
-                            {% if product.available_colors %}
-                            <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
-                                {% for c in product.available_colors|slice:":5" %}
-                                <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
-                                   class="card-swatch-dot"
-                                   style="background-color: {{ c.hex_code }};"
-                                   title="{{ c.name }}"
-                                   {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
-                                   onclick="event.stopPropagation();"></a>
-                                {% endfor %}
-                                {% if product.available_colors|length > 1 %}
-                                <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                            <div class="price-row">
-                                {% if product.mrp and product.mrp > product.price %}
-                                    <span class="mrp">₹{{ product.mrp }}</span>
-                                    <span class="price">₹{{ product.price }}</span>
-                                    <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
-                                {% elif product.mrp %}
-                                    <span class="mrp">₹{{ product.mrp }}</span>
-                                    <span class="price">₹{{ product.price }}</span>
-                                {% else %}
-                                    <span class="price">₹{{ product.price }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </article>
+                    {% include 'store/includes/product_card.html' with product=product card_class='reveal' %}
                     {% empty %}
                     <div class="empty" style="grid-column: 1 / -1; padding: 100px 0;">
                         <i class="fas fa-search" style="font-size: 40px; color: var(--line); margin-bottom: 20px;"></i>
@@ -1227,6 +1105,7 @@
             }
         }
     </script>
+    {% include 'store/includes/product_card_js.html' %}
     {% include 'store/includes/floating_whatsapp.html' %}
 </body>
 </html>

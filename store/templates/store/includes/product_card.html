@@ -1,0 +1,106 @@
+{% load static %}
+<article class="col-card card{% if card_class %} {{ card_class }}{% endif %}"
+         {% if card_id %}id="{{ card_id }}"{% else %}id="product-card-{{ product.pk }}"{% endif %}
+         data-category="{{ product.category.slug|default:'' }}"
+         data-price="{{ product.price }}"
+         data-style="{{ product.style|default:'' }}"
+         data-styles="{{ product.style_tags_str|default:'' }}"
+         data-colors="{{ product.color_tags_str|default:'' }}"
+         data-created="{{ product.created|date:'U' }}"
+         data-is-sale="{% if product.mrp and product.mrp > product.price %}true{% else %}false{% endif %}"
+         data-in-stock="{% if product.in_stock %}true{% else %}false{% endif %}"
+         data-default-img="{% if product.image %}{{ product.image.url }}{% endif %}"
+         data-color-images='{{ product.color_images_json|default:"{}"|safe }}'>
+    <div class="col-thumb thumb">
+        <div class="col-badges">
+            {% if not product.in_stock %}
+                <span class="col-tag out">SOLD OUT</span>
+            {% elif product.offer %}
+                <span class="col-tag bogo">{{ product.offer.badge_text|upper }}</span>
+            {% endif %}
+        </div>
+
+        <button class="col-wish wish {% if product.pk in user_wishlist %}on{% endif %}" type="button" data-id="{{ product.pk }}" title="Wishlist" aria-label="Add to wishlist">
+            <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
+        </button>
+
+        <a class="col-img-link" href="{% url 'store:product_detail' product.pk %}" aria-label="{{ product.title }}">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
+            {% else %}
+            <div class="col-no-image">No Image</div>
+            {% endif %}
+        </a>
+    </div>
+
+    <div class="col-body card-body">
+        <div class="col-rating-row">
+            <div class="col-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span class="col-score">4.9</span>
+            </div>
+            {% if product.in_stock %}
+            <span class="col-stock-badge in"><span class="dot"></span> In Stock</span>
+            {% else %}
+            <span class="col-stock-badge out"><span class="dot"></span> Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <span class="col-category cat-label">{{ product.category.name|default:product.category }}</span>
+        <h3 class="col-title">
+            <a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a>
+        </h3>
+
+        {% if product.available_colors %}
+        <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
+            {% for c in product.available_colors|slice:":5" %}
+            <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+               class="card-swatch-dot"
+               style="background-color: {{ c.hex_code }};"
+               title="{{ c.name }}"
+               {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
+               onclick="event.stopPropagation();"></a>
+            {% endfor %}
+            {% if product.available_colors|length > 1 %}
+            <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="col-price-row price-row">
+            <div class="col-prices">
+                {% if product.mrp and product.mrp > product.price %}
+                <span class="col-mrp mrp">₹{{ product.mrp }}</span>
+                <span class="col-price price">₹{{ product.price }}</span>
+                <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
+                {% elif product.mrp %}
+                <span class="col-mrp mrp">₹{{ product.mrp }}</span>
+                <span class="col-price price">₹{{ product.price }}</span>
+                {% else %}
+                <span class="col-price price">₹{{ product.price }}</span>
+                {% endif %}
+            </div>
+            {% if product.offer %}
+            <span class="col-discount-pill">{{ product.offer.badge_text }}</span>
+            {% endif %}
+        </div>
+
+        <div class="col-actions">
+            {% if not product.in_stock %}
+            <button type="button" class="col-btn-action disabled" disabled><i class="fas fa-ban"></i> Out of Stock</button>
+            {% else %}
+            <form action="{% url 'store:add_cart' product.pk %}" method="POST" class="add-to-cart-form" style="margin:0; padding:0; flex:1;">
+                {% csrf_token %}
+                <button type="submit" class="col-btn-action add"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+            </form>
+            {% endif %}
+            <a href="{% url 'store:product_detail' product.pk %}" class="col-btn-action detail" title="View Details" aria-label="View Details">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</article>
