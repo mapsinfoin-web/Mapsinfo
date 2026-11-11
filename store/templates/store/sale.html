@@ -68,6 +68,7 @@
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; scroll-padding-top: 100px; overflow-x: hidden; }
         body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, h5, h6 { text-transform: capitalize; }
         a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
         img { max-width: 100%; display: block; }
         button { font-family: inherit; }
@@ -405,7 +406,7 @@
                     {% empty %}
                     <div style="grid-column: 1 / -1; text-align: center; padding: 80px 20px;">
                         <i class="fas fa-tags" style="font-size: 40px; color: var(--line); margin-bottom: 20px;"></i>
-                        <h3>No sale items found right now</h3>
+                        <h3>No Sale Items Found Right Now</h3>
                         <p style="color: var(--muted); margin-top: 8px;">Check back soon or explore our full collections.</p>
                         <a href="{% url 'store:collections' %}" class="btn btn-dark" style="margin-top: 20px;">View All Collections</a>
                     </div>

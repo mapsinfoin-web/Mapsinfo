@@ -97,6 +97,7 @@
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; scroll-padding-top: 100px; overflow-x: hidden; }
         body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, h5, h6 { text-transform: capitalize; }
         a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
         img { max-width: 100%; display: block; }
         button { font-family: inherit; }
@@ -844,7 +845,7 @@
                 <div class="hero-main">
                     <div class="hero-copy">
                         <span class="hero-drop-text">New Season Drop · 2026</span>
-                        <h1>Jewellery that <em>feels</em> like you.</h1>
+                        <h1>Jewellery That <em>Feels</em> Like You.</h1>
                         <p>Considered pieces from small ateliers — made to be chosen once and worn every day. Free shipping above ₹999.</p>
                         <div class="hero-btns">
                             <a href="{% url 'store:collections' %}" class="btn btn-gold">Shop Collection <i class="fas fa-arrow-right"></i></a>
@@ -874,7 +875,7 @@
         <section class="section cat-section">
             <div class="container">
                 <div class="sec-head reveal">
-                    <div><span class="eyebrow">Shop by category</span><h2>Find your signature</h2></div>
+                    <div><span class="eyebrow">Shop by category</span><h2>Find Your Signature</h2></div>
                     <a href="{% url 'store:collections' %}" class="view-all">All collections <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="cat-row">
@@ -1107,7 +1108,7 @@
                 </div>
                 <div class="reveal">
                     <span class="eyebrow">Our craft</span>
-                    <h2>Every piece begins as <em>an idea</em>, not an inventory line.</h2>
+                    <h2>Every Piece Begins As <em>An Idea</em>, Not An Inventory Line.</h2>
                     <p>MAPSKART works with small ateliers who still set stones by hand and finish metal under a loupe, not a conveyor belt. We think of jewellery as a wearable decision — something chosen once and kept for years.</p>
                     <p>That philosophy shapes everything from the alloys we use to the boxes pieces travel in. A think trend, not a passing one.</p>
                     <div class="stats">
@@ -1125,7 +1126,7 @@
             <div class="reviews">
                 <div class="container">
                     <div class="sec-head reveal" style="justify-content:center;text-align:center;">
-                        <div><span class="eyebrow">Worn &amp; loved</span><h2>4.9/5 from 12,000+ happy wearers</h2></div>
+                        <div><span class="eyebrow">Worn &amp; loved</span><h2>4.9/5 From 12,000+ Happy Wearers</h2></div>
                     </div>
                     <div class="rev-grid">
                         <div class="rev reveal">
@@ -1152,7 +1153,7 @@
         <section class="section">
             <div class="container">
                 <div class="sec-head reveal">
-                    <div><span class="eyebrow">@mapskart</span><h2>Styled by you</h2></div>
+                    <div><span class="eyebrow">@mapskart</span><h2>Styled By You</h2></div>
                     <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" class="view-all">Follow us <i class="fab fa-instagram"></i></a>
                 </div>
                 <div class="insta-grid reveal">
@@ -1171,7 +1172,7 @@
             <div class="container">
                 <div class="news-box reveal">
                     <span class="eyebrow">Stay in the loop</span>
-                    <h2>Get 10% off your first order</h2>
+                    <h2>Get 10% Off Your First Order</h2>
                     <p>Join our list for early access to limited drops and private sales. No spam, ever.</p>
                     <form class="news-form" action="#" method="post">
                         {% csrf_token %}
