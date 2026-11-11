@@ -110,14 +110,13 @@
         .header.scrolled { box-shadow: 0 6px 24px rgba(19,38,57,.08); }
         .header .container, .footer .container { max-width: 1280px; margin: 0 auto; }
         .header-main { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
-        .logo, .brand-logo { --logo-h: 65px; --m-up: .12; --m-gap: .3; display: flex; align-items: center; }
-        .logo { flex-shrink: 0; }
-        .logo img, .brand-logo img { display: block; height: var(--logo-h); width: auto; }
-        .logo img:first-child, .brand-logo img:first-child { transform: translateY(calc(var(--logo-h) * var(--m-up) * -1)); }
-        .logo img + img, .brand-logo img + img { margin-left: calc(var(--logo-h) * var(--m-gap) * -1); }
+        .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+        .logo img { display: block; height: 48px; width: auto; max-width: 100%; object-fit: contain; }
+        .brand-logo { display: inline-flex; align-items: center; margin-bottom: 18px; }
+        .brand-logo img { display: block; height: 50px; width: auto; max-width: 100%; object-fit: contain; }
         .nav { display: flex; gap: 6px; }
         .nav a { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--ink); border-radius: 999px; transition: background .2s, color .2s; }
-        .nav a:hover, .nav a.active { background: var(--soft); color: var(--brand); }
+        .nav a:hover, .nav a.active { background: var(--soft); color: var(--brand); font-weight: 600; }
         .nav a.sale { color: var(--red); font-weight: 600; }
         .search { flex: 1; max-width: 460px; position: relative; margin-left: auto; }
         .search input { width: 100%; padding: 12px 18px 12px 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--soft); font-size: 14px; font-family: inherit; color: var(--ink); transition: all .2s; }
@@ -169,14 +168,22 @@
     <!-- ===== ANNOUNCEMENT BAR ===== -->
     <div class="announce" aria-label="Offers">
         <div class="announce-track">
-            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            {% for notif in store_announcements %}
+            <span>
+                {% if notif.notification_type == 'restock' %}<i class="fas fa-rotate"></i>
+                {% elif notif.notification_type == 'collection' %}<i class="fas fa-gem"></i>
+                {% elif notif.notification_type == 'sale' %}<i class="fas fa-fire"></i>
+                {% else %}<i class="fas fa-bullhorn"></i>{% endif %}
+                <strong>{{ notif.title }}:</strong> {{ notif.message }}
+                {% if notif.get_target_url %}<a href="{{ notif.get_target_url }}" style="color:var(--accent); text-decoration:underline; margin-left:6px;">{{ notif.link_text|default:"Explore" }}</a>{% endif %}
+            </span>
+            {% endfor %}
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
             <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
             <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
-            <span><i class="fas fa-truck-fast"></i>Free shipping on orders above ₹999</span>
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
             <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
-            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
-            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
         </div>
     </div>
 

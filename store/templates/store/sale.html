@@ -77,35 +77,32 @@
         .serif { font-family: 'Inter', sans-serif; }
 
         /* ===== ANNOUNCEMENT BAR ===== */
-        .bar { background: var(--navy-2); color: #fff; font-size: 12.5px; font-weight: 500; letter-spacing: .3px; overflow: hidden; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.08); }
-        .bar-inner { display: inline-flex; gap: 48px; padding: 10px 0; animation: marquee 32s linear infinite; }
-        .bar-inner span { display: inline-flex; align-items: center; gap: 8px; }
-        .bar-inner i { color: var(--accent); font-size: 11px; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .announce { background: var(--navy); color: #fff; font-size: 12.5px; letter-spacing: .4px; overflow: hidden; white-space: nowrap; }
+        .announce-track { display: inline-flex; gap: 60px; padding: 10px 0; animation: marquee 28s linear infinite; }
+        .announce:hover .announce-track { animation-play-state: paused; }
+        .announce span i { color: var(--accent); margin-right: 8px; }
+        @keyframes marquee { to { transform: translateX(-50%); } }
 
         /* ===== HEADER ===== */
-        .header { position: sticky; top: 0; z-index: 100; background: rgba(245, 248, 252, .92); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); border-bottom: 1px solid var(--line); transition: background .3s, box-shadow .3s; }
-        .header-main { display: flex; align-items: center; justify-content: space-between; height: 78px; gap: 24px; }
-                .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); transition: box-shadow .3s; }
+        .header.scrolled { box-shadow: 0 6px 24px rgba(19,38,57,.08); }
+        .header-main { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
+        .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
         .logo img { display: block; height: 48px; width: auto; max-width: 100%; object-fit: contain; }
         .brand-logo { display: inline-flex; align-items: center; margin-bottom: 18px; }
         .brand-logo img { display: block; height: 50px; width: auto; max-width: 100%; object-fit: contain; }
-        .nav { display: flex; align-items: center; gap: 32px; font-size: 14.5px; font-weight: 500; color: var(--ink); }
-        .nav a { position: relative; padding: 6px 0; transition: color .2s ease; }
-        .nav a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: var(--brand); transition: width .25s ease; border-radius: 2px; }
-        .nav a:hover { color: var(--brand); }
-        .nav a:hover::after { width: 100%; }
-        .nav a.sale { color: var(--red); font-weight: 700; }
-        .nav a.sale::after { background: var(--red); }
-        .nav a.sale.active::after { width: 100%; }
-        .search { position: relative; flex: 1; max-width: 320px; }
-        .search input { width: 100%; height: 42px; border-radius: 999px; border: 1px solid var(--line); background: #fff; padding: 0 16px 0 40px; font-size: 13.5px; color: var(--ink); outline: none; transition: all .2s; }
-        .search input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(31,58,102,.1); }
-        .search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; }
-        .actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { position: relative; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: #fff; display: grid; place-items: center; color: var(--ink); cursor: pointer; transition: all .2s; }
-        .icon-btn:hover { background: var(--soft); transform: translateY(-1px); }
-        .badge { position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+        .nav { display: flex; gap: 6px; }
+        .nav a { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--ink); border-radius: 999px; transition: background .2s, color .2s; }
+        .nav a:hover, .nav a.active { background: var(--soft); color: var(--brand); font-weight: 600; }
+        .nav a.sale { color: var(--red); font-weight: 600; }
+        .search { flex: 1; max-width: 460px; position: relative; margin-left: auto; }
+        .search input { width: 100%; padding: 12px 18px 12px 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--soft); font-size: 14px; font-family: inherit; color: var(--ink); transition: all .2s; }
+        .search input:focus { background: #fff; border-color: var(--brand); outline: none; box-shadow: 0 0 0 4px rgba(31,58,102,.14); }
+        .search i { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+        .actions { display: flex; align-items: center; gap: 4px; }
+        .icon-btn { position: relative; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); font-size: 18px; background: none; border: none; cursor: pointer; transition: background .2s, color .2s; }
+        .icon-btn:hover { background: var(--soft); color: var(--brand); }
+        .header .badge { position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; letter-spacing: 0; text-transform: none; }
         .nav-toggle { display: none; }
 
         /* ===== BUTTONS ===== */
@@ -230,6 +227,13 @@
         .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: rgba(255,255,255,.6); flex-wrap: wrap; gap: 15px; }
 
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 1100px) {
+            .nav { display: none; }
+            .nav.open { display: flex; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: #fff; padding: 12px 24px 20px; border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+            .nav-toggle { display: grid; }
+            .search { max-width: none; }
+        }
+
         @media (max-width: 1024px) {
             .grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
             .footer-top { grid-template-columns: 1fr 1fr; }
@@ -237,23 +241,6 @@
 
         @media (max-width: 768px) {
             .container { padding: 0 16px; }
-            .header { z-index: 900; }
-            .nav-toggle { display: grid; }
-            .nav {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #fff;
-                flex-direction: column;
-                padding: 18px 24px;
-                gap: 14px;
-                border-bottom: 1px solid var(--line);
-                display: none;
-                box-shadow: 0 10px 30px rgba(19, 38, 57, .12);
-                z-index: 999;
-            }
-            .nav.open { display: flex; }
 
             /* Sale Hero */
             .sale-hero { padding: 20px 0 10px; }
@@ -338,13 +325,13 @@
         }
 
         @media (max-width: 640px) {
-            .container { padding: 0 12px; }
-            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; height: auto; }
+            .container { padding: 0 16px; }
+            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
             .logo { flex-basis: 100%; justify-content: center; }
-            .logo img { height: 38px; }
+            .logo img { height: 40px; }
             .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
-            .actions { order: 3; margin-left: 0; gap: 4px; }
-            .icon-btn { width: 38px; height: 38px; font-size: 16px; }
+            .actions { order: 3; margin-left: 0; gap: 0; }
+            .icon-btn { width: 38px; height: 38px; font-size: 17px; }
 
             .filter-tabs { margin: 0 -12px; padding: 4px 12px 10px; width: calc(100% + 24px); }
             .grid { gap: 10px; }
@@ -364,13 +351,24 @@
 </head>
 <body>
     <!-- ===== ANNOUNCEMENT BAR ===== -->
-    <div class="bar">
-        <div class="bar-inner">
-            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
-            <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
-            <span><i class="fas fa-gift"></i>Complimentary premium gift box with every order</span>
-            <span><i class="fas fa-tag"></i>Festive Sale 🔥 Up to 50% OFF</span>
-            <span><i class="fas fa-truck-fast"></i>Fast Delivery across Delhi, Gurgaon, Noida, Faridabad &amp; Ghaziabad</span>
+    <div class="announce" aria-label="Offers">
+        <div class="announce-track">
+            {% for notif in store_announcements %}
+            <span>
+                {% if notif.notification_type == 'restock' %}<i class="fas fa-rotate"></i>
+                {% elif notif.notification_type == 'collection' %}<i class="fas fa-gem"></i>
+                {% elif notif.notification_type == 'sale' %}<i class="fas fa-fire"></i>
+                {% else %}<i class="fas fa-bullhorn"></i>{% endif %}
+                <strong>{{ notif.title }}:</strong> {{ notif.message }}
+                {% if notif.get_target_url %}<a href="{{ notif.get_target_url }}" style="color:var(--accent); text-decoration:underline; margin-left:6px;">{{ notif.link_text|default:"Explore" }}</a>{% endif %}
+            </span>
+            {% endfor %}
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
+            <span><i class="fas fa-shield-heart"></i>Anti-tarnish • Skin safe</span>
+            <span><i class="fas fa-ban"></i>No returns • All products are non-returnable</span>
+            <span><i class="fas fa-truck-fast"></i>Express Delivery across Delhi NCR · Free shipping above ₹999</span>
+            <span><i class="fas fa-tag"></i>Festive Sale — Up to 50% OFF</span>
         </div>
     </div>
 
