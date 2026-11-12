@@ -1,0 +1,994 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+/* ==========================================================================
+   CATEGORY & SUBCATEGORY VISUAL TREE MANAGER STYLES
+   ========================================================================== */
+.cat-tree-manager {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin-bottom: 25px;
+}
+
+/* --- Top Toolbar & Stat Bar --- */
+.cat-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.cat-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cat-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.cat-stat-pill strong {
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.cat-view-tabs {
+    display: inline-flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.cat-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cat-tab-btn:hover {
+    color: #0f172a;
+}
+
+.cat-tab-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.cat-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cat-search-box {
+    position: relative;
+    min-width: 260px;
+}
+
+.cat-search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    font-size: 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #f8fafc;
+    box-sizing: border-box;
+}
+
+.cat-search-box input:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.cat-search-box .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.btn-primary-action {
+    background: #0f172a;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none !important;
+    transition: background 0.15s ease;
+}
+
+.btn-primary-action:hover {
+    background: #1e293b;
+}
+
+.btn-success-action {
+    background: #059669;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none !important;
+    transition: background 0.15s ease;
+}
+
+.btn-success-action:hover {
+    background: #047857;
+}
+
+/* --- Visual Tree Container --- */
+.tree-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* --- Main Category Tree Card --- */
+.main-cat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s ease;
+}
+
+.main-cat-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.main-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    border-left: 5px solid #2563eb;
+}
+
+.main-cat-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.main-cat-icon {
+    font-size: 26px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.main-cat-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.slug-chip {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.cat-header-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-tag {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-tag.sub-count {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.main-cat-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155 !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-icon-action:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a !important;
+}
+
+.btn-icon-action.danger:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626 !important;
+}
+
+/* --- Tree Branch Layout with Graphical Lines --- */
+.subcat-tree-branch {
+    position: relative;
+    padding: 20px 24px 24px 44px;
+    background: #ffffff;
+}
+
+/* Vertical trunk connecting line */
+.subcat-tree-branch::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 30px;
+    left: 28px;
+    width: 2px;
+    background: #cbd5e1;
+}
+
+.subcat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+/* Subcategory Leaf Card */
+.subcat-node-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.subcat-node-card:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+
+.subcat-node-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.subcat-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.subcat-slug {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.subcat-prod-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.subcat-prod-badge.active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* Keywords Chips */
+.subcat-keywords {
+    margin-top: 6px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.keyword-chip {
+    font-size: 11px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.keyword-chip-hint {
+    font-size: 11px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Subcategory Card Footer */
+.subcat-node-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.subcat-order-text {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.subcat-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-mini-action {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155 !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-mini-action:hover {
+    background: #f8fafc;
+    color: #0f172a !important;
+    border-color: #94a3b8;
+}
+
+.btn-mini-action.danger:hover {
+    background: #fef2f2;
+    color: #dc2626 !important;
+    border-color: #fca5a5;
+}
+
+/* Add Subcategory Ghost Card */
+.add-subcat-ghost-card {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.add-subcat-ghost-card:hover {
+    background: #f1f5f9;
+    border-color: #059669;
+    color: #059669;
+}
+
+.add-subcat-ghost-card .ghost-icon {
+    font-size: 22px;
+}
+
+.add-subcat-ghost-card .ghost-text {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* --- QUICK ADD MODAL --- */
+.cat-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+}
+
+.cat-modal-overlay.open {
+    display: flex;
+}
+
+.cat-modal-card {
+    background: #ffffff;
+    width: 90%;
+    max-width: 520px;
+    border-radius: 14px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: catModalFade 0.2s ease-out;
+}
+
+@keyframes catModalFade {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.cat-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.cat-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cat-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.cat-modal-close:hover {
+    color: #0f172a;
+    background: #e2e8f0;
+}
+
+.cat-modal-body {
+    padding: 24px;
+}
+
+.form-row-group {
+    margin-bottom: 16px;
+}
+
+.form-row-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.form-row-group input,
+.form-row-group select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    background: #ffffff;
+}
+
+.form-row-group input:focus,
+.form-row-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.form-hint {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.cat-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-secondary {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #f1f5f9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="cat-tree-manager">
+        <!-- Top Toolbar with Stats & Mode Switcher -->
+        <div class="cat-toolbar">
+            <div class="cat-stats">
+                <div class="cat-stat-pill">
+                    <span>👑 Main Categories:</span>
+                    <strong>{{ total_main_categories }}</strong>
+                </div>
+                <div class="cat-stat-pill">
+                    <span>🌿 Sub-categories:</span>
+                    <strong>{{ total_subcategories }}</strong>
+                </div>
+                <div class="cat-stat-pill">
+                    <span>💎 Total Products:</span>
+                    <strong>{{ tree_total_products }}</strong>
+                </div>
+            </div>
+
+            <!-- View Switcher Tabs -->
+            <div class="cat-view-tabs">
+                <button type="button" class="cat-tab-btn active" id="tab-tree-btn" onclick="switchCategoryView('tree')">
+                    <span>🌳</span> Visual Tree View
+                </button>
+                <button type="button" class="cat-tab-btn" id="tab-table-btn" onclick="switchCategoryView('table')">
+                    <span>📋</span> Standard Table List
+                </button>
+            </div>
+
+            <!-- Actions & Search -->
+            <div class="cat-actions-group">
+                <div class="cat-search-box" id="tree-search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="cat-tree-search" placeholder="Quick filter tree by name or keyword..." onkeyup="filterCategoryTree(this.value)">
+                </div>
+
+                <a href="{% url 'admin:store_category_add' %}" class="btn-primary-action" title="Create a new root category like Earrings, Necklaces, etc.">
+                    <span>➕</span> Add Main Category
+                </a>
+
+                <button type="button" class="btn-success-action" onclick="openQuickAddModal()" title="Quickly add a sub-category under any parent">
+                    <span>➕</span> Add Sub-Category
+                </button>
+            </div>
+        </div>
+
+        <!-- VISUAL TREE VIEW CONTAINER -->
+        <div id="cat-tree-view" class="tree-container">
+            {% for main in category_tree %}
+            <div class="main-cat-card" data-cat-id="{{ main.id }}" data-cat-name="{{ main.name|lower }}" style="--accent-border: {{ main.theme.border }};">
+                <!-- Main Category Root Header -->
+                <div class="main-cat-header" style="border-left-color: {{ main.theme.border }};">
+                    <div class="main-cat-title-group">
+                        <div class="main-cat-icon">{{ main.icon }}</div>
+                        <div>
+                            <h2 class="main-cat-title">
+                                {{ main.name }}
+                                <span class="slug-chip">/{{ main.slug }}</span>
+                            </h2>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                                Display Order: <strong>#{{ main.order }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cat-header-badges">
+                        <span class="badge-tag">{{ main.product_count }} Active Products</span>
+                        <span class="badge-tag sub-count">{{ main.sub_count }} Sub-categories</span>
+                    </div>
+
+                    <div class="main-cat-actions">
+                        <button type="button" class="btn-icon-action" style="background: {{ main.theme.bg }}; border-color: {{ main.theme.border }}; color: {{ main.theme.badge }} !important;" onclick="openQuickAddModal('{{ main.id }}', '{{ main.name|escapejs }}')">
+                            <span>➕</span> Add Sub-Category
+                        </button>
+                        <a href="{{ main.edit_url }}" class="btn-icon-action" title="Edit Main Category">
+                            <span>✏️</span> Edit
+                        </a>
+                        <a href="{{ main.delete_url }}" class="btn-icon-action danger" title="Delete Main Category">
+                            <span>🗑️</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Subcategory Tree Branch with Graphical Connectors -->
+                <div class="subcat-tree-branch">
+                    <div class="subcat-grid">
+                        {% for sub in main.subcategories %}
+                        <div class="subcat-node-card" data-sub-name="{{ sub.name|lower }}" data-sub-slug="{{ sub.slug|lower }}" data-sub-keywords="{{ sub.keywords|lower }}">
+                            <div>
+                                <div class="subcat-node-header">
+                                    <div>
+                                        <h4 class="subcat-name">{{ sub.name }}</h4>
+                                        <div class="subcat-slug">slug: <strong>{{ sub.slug }}</strong></div>
+                                    </div>
+                                    <span class="subcat-prod-badge {% if sub.product_count > 0 %}active{% endif %}">
+                                        {{ sub.product_count }} prod
+                                    </span>
+                                </div>
+
+                                <div class="subcat-keywords">
+                                    {% if sub.keyword_list %}
+                                        {% for kw in sub.keyword_list %}
+                                        <span class="keyword-chip">{{ kw }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="keyword-chip-hint">No auto-match keywords</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="subcat-node-footer">
+                                <span class="subcat-order-text">Order: #{{ sub.order }}</span>
+                                <div class="subcat-footer-actions">
+                                    <a href="{{ sub.edit_url }}" class="btn-mini-action" title="Edit Sub-category">
+                                        <span>✏️</span> Edit
+                                    </a>
+                                    <a href="{{ sub.delete_url }}" class="btn-mini-action danger" title="Delete Sub-category">
+                                        <span>🗑️</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Inline Ghost Add Card at the end of the branch -->
+                        <div class="add-subcat-ghost-card" onclick="openQuickAddModal('{{ main.id }}', '{{ main.name|escapejs }}')">
+                            <span class="ghost-icon">➕</span>
+                            <span class="ghost-text">Add Sub-category to {{ main.name }}</span>
+                            <span style="font-size: 11px; opacity: 0.7;">Click to quickly create new style</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px; text-align: center;">
+                <p style="font-size: 16px; color: #64748b; margin-bottom: 16px;">No categories found yet.</p>
+                <a href="{% url 'admin:store_category_add' %}" class="btn-primary-action">➕ Create First Main Category</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- STANDARD DJANGO CHANGELIST TABLE (Hidden by default, toggleable via tab) -->
+    <div id="cat-table-view" style="display: none;">
+        {% if cl.formset and cl.formset.errors %}
+            <p class="errornote">
+            {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+            </p>
+            {{ cl.formset.non_form_errors }}
+        {% endif %}
+        <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+            <div class="changelist-form-container">
+                {% block filters %}
+                    {% if cl.has_filters %}
+                    <search id="changelist-filter" aria-labelledby="changelist-filter-header">
+                        <h2 id="changelist-filter-header">{% translate 'Filter' %}</h2>
+                        {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
+                            {% if cl.is_facets_optional %}<h3>
+                                {% if cl.add_facets %}<a href="{{ cl.remove_facet_link }}" class="hidelink">{% translate "Hide counts" %}</a>
+                                {% else %}<a href="{{ cl.add_facet_link }}" class="viewlink">{% translate "Show counts" %}</a>{% endif %}
+                            </h3>{% endif %}
+                            {% if cl.has_active_filters %}<h3>
+                                <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
+                            </h3>{% endif %}
+                        </div>{% endif %}
+                        {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+                    </search>
+                    {% endif %}
+                {% endblock %}
+                <div>
+                    {% block search %}{% search_form cl %}{% endblock %}
+                    {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+
+                    <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+                    {% if cl.formset %}
+                        <div>{{ cl.formset.management_form }}</div>
+                    {% endif %}
+
+                    {% block result_list %}
+                        {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                        {% result_list cl %}
+                        {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                    {% endblock %}
+                    {% block pagination %}
+                        <div class="changelist-footer">
+                        {% pagination cl %}
+                        {% if cl.formset and cl.result_count %}<input type="submit" name="_save" class="default" value="{% translate 'Save' %}">{% endif %}
+                        </div>
+                    {% endblock %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     QUICK ADD SUB-CATEGORY MODAL POPUP
+     ========================================================================== -->
+<div id="cat-quick-add-modal" class="cat-modal-overlay" onclick="handleModalBackdropClick(event)">
+    <div class="cat-modal-card">
+        <div class="cat-modal-header">
+            <h3><span>🌿</span> Quick Add Sub-Category</h3>
+            <button type="button" class="cat-modal-close" onclick="closeQuickAddModal()">&times;</button>
+        </div>
+
+        <form method="post" action="{% url 'admin:store_category_quick_add' %}" id="quick-add-form" onsubmit="return handleQuickAddSubmit(event)">
+            {% csrf_token %}
+            <div class="cat-modal-body">
+                <!-- Parent Category Selection -->
+                <div class="form-row-group">
+                    <label for="quick_parent_id">Parent Category <span style="color:#ef4444;">*</span></label>
+                    <select name="parent" id="quick_parent_id" required>
+                        <option value="">-- Select Parent (e.g. Earrings, Necklaces) --</option>
+                        {% for p in all_main_categories %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="form-hint">The main category this subcategory will branch under.</span>
+                </div>
+
+                <!-- Sub-category Name -->
+                <div class="form-row-group">
+                    <label for="quick_name">Sub-category / Style Name <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="name" id="quick_name" placeholder="e.g. Chandelier Earrings, Pearl Studs, Chokers" required oninput="autoGenerateSlug(this.value)">
+                    <span class="form-hint">The title displayed to customers in filters and style badges.</span>
+                </div>
+
+                <!-- Slug -->
+                <div class="form-row-group">
+                    <label for="quick_slug">URL Slug <span style="color:#64748b; font-weight: normal;">(auto-generated)</span></label>
+                    <input type="text" name="slug" id="quick_slug" placeholder="e.g. chandelier-earrings">
+                    <span class="form-hint">Used in URLs and product style tags. Automatically created from name.</span>
+                </div>
+
+                <!-- Auto-Match Keywords -->
+                <div class="form-row-group">
+                    <label for="quick_keywords">Auto-Match Keywords <span style="color:#64748b; font-weight: normal;">(optional)</span></label>
+                    <input type="text" name="keywords" id="quick_keywords" placeholder="e.g. chandelier, bridal, long dangler, crystal">
+                    <span class="form-hint">Products matching these words in title are automatically tagged with this subcategory.</span>
+                </div>
+
+                <!-- Order -->
+                <div class="form-row-group">
+                    <label for="quick_order">Display Order <span style="color:#64748b; font-weight: normal;">(optional)</span></label>
+                    <input type="number" name="order" id="quick_order" value="0" min="0" max="999">
+                    <span class="form-hint">Lower numbers appear first in the customer filter list.</span>
+                </div>
+            </div>
+
+            <div class="cat-modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeQuickAddModal()">Cancel</button>
+                <button type="submit" class="btn-success-action" id="quick-save-btn">
+                    <span>💾</span> Create Sub-Category
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     CLIENT JAVASCRIPT: VIEW SWITCHER, LIVE FILTER, MODAL
+     ========================================================================== -->
+<script>
+function switchCategoryView(viewName) {
+    const treeView = document.getElementById('cat-tree-view');
+    const tableView = document.getElementById('cat-table-view');
+    const treeBtn = document.getElementById('tab-tree-btn');
+    const tableBtn = document.getElementById('tab-table-btn');
+    const searchWrapper = document.getElementById('tree-search-wrapper');
+
+    if (viewName === 'table') {
+        treeView.style.display = 'none';
+        tableView.style.display = 'block';
+        treeBtn.classList.remove('active');
+        tableBtn.classList.add('active');
+        if (searchWrapper) searchWrapper.style.display = 'none';
+        localStorage.setItem('admin_category_view', 'table');
+    } else {
+        treeView.style.display = 'flex';
+        tableView.style.display = 'none';
+        treeBtn.classList.add('active');
+        tableBtn.classList.remove('active');
+        if (searchWrapper) searchWrapper.style.display = 'block';
+        localStorage.setItem('admin_category_view', 'tree');
+    }
+}
+
+// Restore saved preference on load
+document.addEventListener('DOMContentLoaded', function() {
+    const saved = localStorage.getItem('admin_category_view');
+    if (saved === 'table') {
+        switchCategoryView('table');
+    }
+});
+
+function openQuickAddModal(parentId, parentName) {
+    const modal = document.getElementById('cat-quick-add-modal');
+    const parentSelect = document.getElementById('quick_parent_id');
+    const nameInput = document.getElementById('quick_name');
+    const slugInput = document.getElementById('quick_slug');
+    const keywordsInput = document.getElementById('quick_keywords');
+    const orderInput = document.getElementById('quick_order');
+
+    // Reset inputs
+    nameInput.value = '';
+    slugInput.value = '';
+    keywordsInput.value = '';
+    orderInput.value = '0';
+
+    if (parentId && parentSelect) {
+        parentSelect.value = parentId;
+    } else if (parentSelect && parentSelect.options.length > 1) {
+        parentSelect.selectedIndex = 1;
+    }
+
+    modal.classList.add('open');
+    setTimeout(() => nameInput.focus(), 100);
+}
+
+function closeQuickAddModal() {
+    const modal = document.getElementById('cat-quick-add-modal');
+    modal.classList.remove('open');
+}
+
+function handleModalBackdropClick(event) {
+    if (event.target === document.getElementById('cat-quick-add-modal')) {
+        closeQuickAddModal();
+    }
+}
+
+function autoGenerateSlug(text) {
+    const slugInput = document.getElementById('quick_slug');
+    if (!slugInput) return;
+    const slug = text.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-');
+    slugInput.value = slug;
+}
+
+function filterCategoryTree(query) {
+    const q = (query || '').toLowerCase().trim();
+    const mainCards = document.querySelectorAll('.main-cat-card');
+
+    mainCards.forEach(card => {
+        const catName = card.getAttribute('data-cat-name') || '';
+        const subCards = card.querySelectorAll('.subcat-node-card');
+        let anySubMatches = false;
+
+        subCards.forEach(sub => {
+            const subName = sub.getAttribute('data-sub-name') || '';
+            const subSlug = sub.getAttribute('data-sub-slug') || '';
+            const subKeywords = sub.getAttribute('data-sub-keywords') || '';
+
+            if (!q || subName.includes(q) || subSlug.includes(q) || subKeywords.includes(q) || catName.includes(q)) {
+                sub.style.display = '';
+                anySubMatches = true;
+            } else {
+                sub.style.display = 'none';
+            }
+        });
+
+        if (!q || catName.includes(q) || anySubMatches) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function handleQuickAddSubmit(event) {
+    const saveBtn = document.getElementById('quick-save-btn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span>⏳</span> Saving...';
+    }
+    return true; // Let standard form POST proceed
+}
+</script>
+{% endblock %}

@@ -81,6 +81,7 @@ class ProductColorAdmin(admin.ModelAdmin):
 # --- CATEGORY ---
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    change_list_template = "admin/store/category/change_list.html"
     list_display = ['name', 'parent', 'slug', 'keywords', 'order', 'product_count']
     list_filter = ['parent']
     list_editable = ['parent', 'order']
@@ -93,6 +94,190 @@ class CategoryAdmin(admin.ModelAdmin):
         direct = obj.products.filter(is_active=True).count()
         tagged = obj.tagged_products.filter(is_active=True).count()
         return direct + tagged
+
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        if 'parent' in request.GET:
+            initial['parent'] = request.GET['parent']
+        return initial
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'quick-add/',
+                self.admin_site.admin_view(self.quick_add_view),
+                name='store_category_quick_add',
+            ),
+        ]
+        return custom_urls + urls
+
+    def quick_add_view(self, request):
+        from django.http import JsonResponse, HttpResponseRedirect
+        from django.utils.text import slugify
+
+        if request.method != 'POST':
+            return HttpResponseRedirect(reverse('admin:store_category_changelist'))
+
+        name = request.POST.get('name', '').strip()
+        parent_id = request.POST.get('parent')
+        raw_slug = request.POST.get('slug', '').strip()
+        keywords = request.POST.get('keywords', '').strip()
+        order_val = request.POST.get('order', '0').strip()
+
+        is_ajax = (
+            request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+            'application/json' in request.headers.get('accept', '')
+        )
+
+        if not name:
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': 'Category name is required.'}, status=400)
+            messages.error(request, 'Category name is required.')
+            return HttpResponseRedirect(reverse('admin:store_category_changelist'))
+
+        parent = None
+        if parent_id:
+            try:
+                parent = Category.objects.get(pk=parent_id)
+            except Category.DoesNotExist:
+                if is_ajax:
+                    return JsonResponse({'success': False, 'error': 'Selected parent category does not exist.'}, status=400)
+                messages.error(request, 'Selected parent category does not exist.')
+                return HttpResponseRedirect(reverse('admin:store_category_changelist'))
+
+        # Generate unique slug
+        base_slug = slugify(raw_slug) if raw_slug else slugify(name)
+        if not base_slug:
+            base_slug = 'category'
+        unique_slug = base_slug
+        counter = 1
+        while Category.objects.filter(slug=unique_slug).exists():
+            unique_slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        try:
+            order = int(order_val)
+        except ValueError:
+            order = 0
+
+        new_cat = Category.objects.create(
+            name=name,
+            slug=unique_slug,
+            parent=parent,
+            keywords=keywords,
+            order=order
+        )
+
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'id': new_cat.id,
+                'name': new_cat.name,
+                'slug': new_cat.slug,
+                'parent_id': parent.id if parent else None,
+                'parent_name': parent.name if parent else None,
+                'keywords': new_cat.keywords,
+                'order': new_cat.order,
+                'edit_url': reverse('admin:store_category_change', args=[new_cat.id]),
+                'delete_url': reverse('admin:store_category_delete', args=[new_cat.id]),
+            })
+
+        parent_label = f" under {parent.name}" if parent else ""
+        messages.success(request, f'Sub-category "{new_cat.name}"{parent_label} was created successfully!')
+        return HttpResponseRedirect(reverse('admin:store_category_changelist'))
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+
+        # Fetch all main categories (parent is null)
+        main_categories = list(
+            Category.objects.filter(parent__isnull=True)
+            .prefetch_related('subcategories', 'products', 'tagged_products')
+            .order_by('order', 'id')
+        )
+
+        icon_map = {
+            'earring': '💎',
+            'necklace': '📿',
+            'ring': '💍',
+            'bracelet': '✨',
+        }
+
+        color_theme_map = {
+            'earring': {'border': '#6366f1', 'bg': '#eef2ff', 'badge': '#4338ca'},
+            'necklace': {'border': '#059669', 'bg': '#ecfdf5', 'badge': '#047857'},
+            'ring': {'border': '#d97706', 'bg': '#fffbeb', 'badge': '#b45309'},
+            'bracelet': {'border': '#ec4899', 'bg': '#fdf2f8', 'badge': '#be185d'},
+        }
+
+        category_tree = []
+        total_subcategories = 0
+        total_products = 0
+
+        for main in main_categories:
+            direct_prods = main.products.filter(is_active=True).count()
+            total_products += direct_prods
+            subs = list(main.subcategories.all().order_by('order', 'name'))
+            total_subcategories += len(subs)
+
+            sub_items = []
+            for s in subs:
+                s_direct = s.products.filter(is_active=True).count()
+                s_tagged = s.tagged_products.filter(is_active=True).count()
+                prod_count = s_direct + s_tagged
+                kw_list = [k.strip() for k in s.keywords.split(',') if k.strip()] if s.keywords else []
+
+                sub_items.append({
+                    'id': s.id,
+                    'name': s.name,
+                    'slug': s.slug,
+                    'keywords': s.keywords,
+                    'keyword_list': kw_list,
+                    'order': s.order,
+                    'product_count': prod_count,
+                    'edit_url': reverse('admin:store_category_change', args=[s.id]),
+                    'delete_url': reverse('admin:store_category_delete', args=[s.id]),
+                })
+
+            icon = '🏷️'
+            theme = {'border': '#64748b', 'bg': '#f8fafc', 'badge': '#475569'}
+            slug_lower = (main.slug or '').lower()
+            name_lower = (main.name or '').lower()
+
+            for key, ico in icon_map.items():
+                if key in slug_lower or key in name_lower:
+                    icon = ico
+                    break
+
+            for key, th in color_theme_map.items():
+                if key in slug_lower or key in name_lower:
+                    theme = th
+                    break
+
+            category_tree.append({
+                'id': main.id,
+                'name': main.name,
+                'slug': main.slug,
+                'icon': icon,
+                'theme': theme,
+                'order': main.order,
+                'product_count': direct_prods,
+                'subcategories': sub_items,
+                'sub_count': len(sub_items),
+                'edit_url': reverse('admin:store_category_change', args=[main.id]),
+                'delete_url': reverse('admin:store_category_delete', args=[main.id]),
+                'add_sub_url': f"{reverse('admin:store_category_add')}?parent={main.id}",
+            })
+
+        extra_context['category_tree'] = category_tree
+        extra_context['total_main_categories'] = len(main_categories)
+        extra_context['total_subcategories'] = total_subcategories
+        extra_context['tree_total_products'] = total_products
+        extra_context['all_main_categories'] = [{'id': m.id, 'name': m.name} for m in main_categories]
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 
 # --- PRODUCT ---
