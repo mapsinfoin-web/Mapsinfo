@@ -799,7 +799,7 @@
                         {% if c.image %}
                         <img src="{{ c.image.url }}" alt="{{ c.name }}" class="swatch-img" loading="lazy" />
                         {% else %}
-                        <span class="swatch-dot" style="background-color: {{ c.hex_code }};"></span>
+                        <span class="swatch-dot" style="background: {{ c.display_hex|default:c.hex_code }};"></span>
                         {% endif %}
                         <span class="swatch-title">{{ c.name }}</span>
                     </button>

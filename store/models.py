@@ -393,6 +393,85 @@ class ProductGallery(models.Model):
         verbose_name_plural = 'Product Galleries'
 
 
+COLOR_NAME_TO_HEX = {
+    'blue': '#2563EB',
+    'sapphire': '#1D4ED8',
+    'royal blue': '#1E40AF',
+    'sky blue': '#38BDF8',
+    'light blue': '#60A5FA',
+    'navy': '#1E3A8A',
+    'pink': '#EC4899',
+    'rose pink': '#F472B6',
+    'hot pink': '#DB2777',
+    'baby pink': '#FBCFE8',
+    'magenta': '#D946EF',
+    'green': '#059669',
+    'emerald': '#047857',
+    'emerald green': '#047857',
+    'mint': '#6EE7B7',
+    'olive': '#65A30D',
+    'sage': '#84CC16',
+    'purple': '#9333EA',
+    'violet': '#7C3AED',
+    'lavender': '#C084FC',
+    'crystal': '#CBD5E1',
+    'clear': '#E2E8F0',
+    'white': '#FFFFFF',
+    'silver': '#94A3B8',
+    'grey': '#94A3B8',
+    'gray': '#94A3B8',
+    'yellow': '#EAB308',
+    'yello': '#EAB308',
+    'gold': '#D4AF37',
+    'yellow gold': '#D4AF37',
+    'rose gold': '#B76E79',
+    'red': '#DC2626',
+    'ruby': '#E11D48',
+    'maroon': '#881337',
+    'wine': '#831843',
+    'black': '#1E293B',
+    'multicolour': '#8B5CF6',
+    'multicolor': '#8B5CF6',
+    'multi': '#8B5CF6',
+    'bronze': '#CD7F32',
+    'copper': '#B87333',
+    'champagne': '#F7E7CE',
+    'peach': '#FDBA74',
+    'orange': '#F97316',
+    'coral': '#FB7185',
+    'turquoise': '#14B8A6',
+    'teal': '#0D9488',
+    'brown': '#78350F',
+    'amber': '#D97706',
+}
+
+def resolve_color_hex(name, current_hex=None):
+    """
+    Returns the real hex color code based on color name or explicit custom hex.
+    If current_hex was explicitly set to a custom hex code (other than default gold), it keeps it.
+    Otherwise, it maps the name to its true jewellery color hex.
+    """
+    if not name:
+        return current_hex or '#D4AF37'
+    n = name.strip().lower()
+    if current_hex and current_hex.strip().upper() not in ('#D4AF37', 'D4AF37'):
+        return current_hex.strip()
+    if 'gold' in n:
+        if 'rose' in n:
+            return '#B76E79'
+        if 'white' in n:
+            return '#F8FAFC'
+        return '#D4AF37'
+    if n in ('yellow', 'yello'):
+        return '#EAB308'
+    if n in COLOR_NAME_TO_HEX:
+        return COLOR_NAME_TO_HEX[n]
+    for k, v in COLOR_NAME_TO_HEX.items():
+        if k in n:
+            return v
+    return current_hex or '#D4AF37'
+
+
 class ProductColor(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='colors')
     order = models.PositiveIntegerField(
@@ -428,6 +507,11 @@ class ProductColor(models.Model):
         ordering = ['order', 'id']
         verbose_name = 'Product Color Option'
         verbose_name_plural = 'Product Color Options'
+
+    @property
+    def display_hex(self):
+        """Returns the actual visual hex color code for this variant."""
+        return resolve_color_hex(self.name, self.hex_code)
 
     @property
     def effective_price(self):
@@ -470,6 +554,9 @@ class ProductColor(models.Model):
         return urls
 
     def save(self, *args, **kwargs):
+        # Auto-assign real hex code if hex_code is empty or left as default gold on non-gold colors
+        if not self.hex_code or (self.hex_code.strip().upper() in ('#D4AF37', 'D4AF37') and 'gold' not in (self.name or '').lower()):
+            self.hex_code = resolve_color_hex(self.name, self.hex_code)
         if not self.sku:
             base = (self.product.sku if self.product and self.product.sku else "PRD").strip()
             name_clean = re.sub(r'[^A-Za-z0-9]', '', self.name or '').upper()

@@ -60,7 +60,7 @@
             {% for c in product.available_colors|slice:":5" %}
             <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
                class="card-swatch-dot"
-               style="background-color: {{ c.hex_code }};"
+               style="background: {{ c.display_hex|default:c.hex_code }};"
                title="{{ c.name }}"
                {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
                onclick="event.stopPropagation();"></a>

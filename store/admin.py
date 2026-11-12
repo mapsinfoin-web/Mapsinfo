@@ -53,12 +53,20 @@ class ColorGalleryInline(admin.TabularInline):
 
 @admin.register(ProductColor)
 class ProductColorAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'name', 'sku', 'price', 'mrp', 'hex_code', 'is_available']
+    list_display = ['product', 'order', 'name', 'color_preview', 'sku', 'price', 'mrp', 'is_available']
     list_editable = ['order', 'sku', 'price', 'mrp', 'is_available']
     list_filter = ['is_available', 'product__category']
     search_fields = ['name', 'sku', 'product__title', 'product__sku']
     ordering = ['product', 'order', 'id']
     inlines = [ColorGalleryInline]
+
+    @admin.display(description='Colour')
+    def color_preview(self, obj):
+        hex_val = obj.display_hex or obj.hex_code or '#ccc'
+        return format_html(
+            '<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:{};border:1px solid rgba(0,0,0,0.25);vertical-align:middle;margin-right:8px;"></span><code>{}</code>',
+            hex_val, hex_val
+        )
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
