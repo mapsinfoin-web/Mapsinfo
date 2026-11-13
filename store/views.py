@@ -844,10 +844,8 @@ def collections(request):
     for sub in subcategories:
         sub.product_count = sum(1 for p in base_products if sub.slug.lower() in p.style_tags or (p.category and p.category.slug.lower() == sub.slug.lower()))
 
-    if active_sub_slug:
-        products_list = [p for p in base_products if active_sub_slug in p.style_tags or (p.category and p.category.slug.lower() == active_sub_slug)]
-    else:
-        products_list = base_products
+    # All products in current category context passed to DOM for instant filter drawer switching
+    products_list = base_products
 
     products = attach_offers(products_list)
     color_filters = _get_collection_color_filters(products)

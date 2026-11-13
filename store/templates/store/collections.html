@@ -136,105 +136,6 @@
             color: var(--accent);
         }
 
-        /* ===== STARTING OF PAGE: Sub-categories Strip ===== */
-        .subcategories-bar {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto 24px;
-            padding: 0 24px;
-            box-sizing: border-box;
-        }
-        .subcat-label-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            padding: 0 4px;
-            text-align: center;
-        }
-        .subcat-title {
-            font-size: 12.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--muted);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .subcat-title i {
-            color: var(--blue);
-        }
-        .subcat-scroll-track {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 6px 4px 12px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--line) transparent;
-            -webkit-overflow-scrolling: touch;
-        }
-        .subcat-scroll-track::-webkit-scrollbar {
-            height: 4px;
-        }
-        .subcat-scroll-track::-webkit-scrollbar-thumb {
-            background: var(--line);
-            border-radius: 999px;
-        }
-        .subcat-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 18px;
-            border-radius: 999px;
-            background: #fff;
-            border: 1.5px solid var(--line);
-            color: var(--ink);
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: all .25s ease;
-            box-shadow: 0 2px 8px rgba(19, 38, 57, .04);
-            flex-shrink: 0;
-        }
-        .subcat-pill:hover {
-            border-color: var(--navy);
-            color: var(--navy);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(31, 58, 102, .1);
-        }
-        .subcat-pill.active {
-            background: var(--navy);
-            color: #fff;
-            border-color: var(--navy);
-            box-shadow: 0 4px 14px rgba(31, 58, 102, .22);
-        }
-        .subcat-pill i {
-            font-size: 12.5px;
-            color: var(--blue);
-            transition: color .2s;
-        }
-        .subcat-pill.active i {
-            color: var(--accent);
-        }
-        .subcat-badge-count {
-            background: var(--soft);
-            color: var(--muted);
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 999px;
-            line-height: 1.2;
-            transition: all .2s;
-        }
-        .subcat-pill.active .subcat-badge-count {
-            background: rgba(255, 255, 255, .22);
-            color: #fff;
-        }
-
         /* ===== Main Category Cards (Spotlight Banner) ===== */
         .cat-cards-grid {
             max-width: 1200px;
@@ -713,43 +614,6 @@
         </div>
     </section>
 
-    <!-- ===== STARTING OF PAGE: SUB-CATEGORIES STRIP ===== -->
-    {% if subcategories %}
-    <nav class="subcategories-bar" aria-label="Sub-categories">
-        <div class="subcat-label-row">
-            <span class="subcat-title"><i class="fas fa-tags"></i> Sub-categories:</span>
-            {% if active_sub_slug %}
-            <a href="{% if active_cat_slug %}{% url 'store:collections' %}?cat={{ active_cat_slug }}{% else %}{% url 'store:collections' %}{% endif %}" style="font-size: 12px; color: var(--navy); text-decoration: underline; font-weight: 600;">Show All Sub-categories</a>
-            {% endif %}
-        </div>
-        <div class="subcat-scroll-track">
-            <a href="{% if active_cat_slug %}{% url 'store:collections' %}?cat={{ active_cat_slug }}{% else %}{% url 'store:collections' %}{% endif %}" 
-               class="subcat-pill {% if not active_sub_slug %}active{% endif %}"
-               title="All {% if active_main_cat %}{{ active_main_cat.name }}{% else %}Jewellery{% endif %}">
-                <i class="fas fa-shapes"></i> All {% if active_main_cat %}{{ active_main_cat.name }}{% else %}Jewellery{% endif %}
-            </a>
-            {% for sub in subcategories %}
-            <a href="{% if active_cat_slug %}{% url 'store:collections' %}?cat={{ active_cat_slug }}&sub={{ sub.slug }}{% else %}{% url 'store:collections' %}?sub={{ sub.slug }}{% endif %}" 
-               class="subcat-pill {% if active_sub_slug == sub.slug %}active{% endif %}"
-               title="{{ sub.name }}">
-                {% if 'jhumk' in sub.slug %}<i class="fas fa-gem"></i>
-                {% elif 'stud' in sub.slug %}<i class="fas fa-star"></i>
-                {% elif 'drop' in sub.slug %}<i class="fas fa-tint"></i>
-                {% elif 'halo' in sub.slug or 'hoop' in sub.slug %}<i class="fas fa-circle-notch"></i>
-                {% elif 'chandbali' in sub.slug %}<i class="fas fa-moon"></i>
-                {% elif 'layer' in sub.slug %}<i class="fas fa-layer-group"></i>
-                {% elif 'pendant' in sub.slug %}<i class="fas fa-certificate"></i>
-                {% elif 'choker' in sub.slug %}<i class="fas fa-crown"></i>
-                {% elif 'solitaire' in sub.slug %}<i class="fas fa-ring"></i>
-                {% elif 'charm' in sub.slug %}<i class="fas fa-heart"></i>
-                {% else %}<i class="fas fa-tag"></i>{% endif %}
-                {{ sub.name }}
-            </a>
-            {% endfor %}
-        </div>
-    </nav>
-    {% endif %}
-
     <!-- ===== MAIN CATEGORY SPOTLIGHT CARDS (When All Jewellery is selected) ===== -->
     {% if not active_cat_slug and not active_sub_slug %}
     <div class="cat-cards-grid">
@@ -798,6 +662,38 @@
 
         <!-- Filter Drawer -->
         <div class="filter-drawer" id="filterDrawer">
+            {% if subcategories %}
+            <div class="filter-row">
+                <div class="filter-group" style="grid-column: 1 / -1;">
+                    <div class="filter-group-header">
+                        <h4 class="filter-group-title"><i class="fas fa-tags"></i> Sub-categories:</h4>
+                    </div>
+                    <div class="filter-pills" id="subcatFilterPills">
+                        <button type="button" class="filter-pill active" data-sub="all" onclick="setSubcatFilter('all')">
+                            <i class="fas fa-shapes"></i> All Sub-categories
+                        </button>
+                        {% for sub in subcategories %}
+                        <button type="button" class="filter-pill" data-sub="{{ sub.slug }}" onclick="setSubcatFilter('{{ sub.slug }}')">
+                            {% if 'jhumk' in sub.slug %}<i class="fas fa-gem"></i>
+                            {% elif 'stud' in sub.slug %}<i class="fas fa-star"></i>
+                            {% elif 'drop' in sub.slug %}<i class="fas fa-tint"></i>
+                            {% elif 'halo' in sub.slug or 'hoop' in sub.slug %}<i class="fas fa-circle-notch"></i>
+                            {% elif 'chandbali' in sub.slug %}<i class="fas fa-moon"></i>
+                            {% elif 'layer' in sub.slug %}<i class="fas fa-layer-group"></i>
+                            {% elif 'pendant' in sub.slug %}<i class="fas fa-certificate"></i>
+                            {% elif 'choker' in sub.slug %}<i class="fas fa-crown"></i>
+                            {% elif 'solitaire' in sub.slug %}<i class="fas fa-ring"></i>
+                            {% elif 'charm' in sub.slug %}<i class="fas fa-heart"></i>
+                            {% else %}<i class="fas fa-tag"></i>{% endif %}
+                            <span>{{ sub.name }}</span>
+                            <span class="pill-count">({{ sub.product_count|default:"0" }})</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="filter-row">
                 <!-- Price Range -->
                 <div class="filter-group">
@@ -936,6 +832,7 @@
 
     <script>
         var filterState = {
+            subcat: '{{ active_sub_slug|default:"all" }}',
             color: 'all',
             price: 'all',
             special: null,
@@ -956,6 +853,21 @@
                 btn.classList.remove('open');
                 btn.setAttribute('aria-expanded', 'false');
             }
+        }
+
+        function setSubcatFilter(subSlug) {
+            filterState.subcat = (subSlug || 'all').toLowerCase();
+            updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', filterState.subcat);
+            try {
+                var url = new URL(window.location.href);
+                if (filterState.subcat && filterState.subcat !== 'all') {
+                    url.searchParams.set('sub', filterState.subcat);
+                } else {
+                    url.searchParams.delete('sub');
+                }
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
+            applyAllFilters();
         }
 
         function setColorFilter(colorSlug) {
@@ -999,18 +911,26 @@
         }
 
         function resetAllFilters() {
+            filterState.subcat = 'all';
             filterState.color = 'all';
             filterState.price = 'all';
             filterState.special = null;
+            updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', 'all');
             updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', 'all');
             updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', 'all');
             var specialPills = document.querySelectorAll('#specialFilterPills .filter-pill');
             specialPills.forEach(function (p) { p.classList.remove('active'); });
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.delete('sub');
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
             applyAllFilters();
         }
 
         function removeChip(type) {
-            if (type === 'color') setColorFilter('all');
+            if (type === 'subcat') setSubcatFilter('all');
+            else if (type === 'color') setColorFilter('all');
             else if (type === 'price') setPriceFilter('all');
             else if (type === 'special') toggleSpecialFilter(filterState.special);
         }
@@ -1047,6 +967,13 @@
             var activeFilterCount = 0;
             var chipsHtml = '';
 
+            if (filterState.subcat && filterState.subcat !== 'all') {
+                activeFilterCount++;
+                var subBtn = document.querySelector('#subcatFilterPills .filter-pill[data-sub="' + filterState.subcat + '"]');
+                var subSpan = subBtn ? subBtn.querySelector('span') : null;
+                var subLabel = subSpan ? subSpan.textContent.trim() : filterState.subcat;
+                chipsHtml += '<span class="chip" onclick="removeChip(\'subcat\')"><i class="fas fa-tag"></i> ' + subLabel + ' <i class="fas fa-times"></i></span>';
+            }
             if (filterState.price !== 'all') {
                 activeFilterCount++;
                 var priceLabels = {
@@ -1084,6 +1011,8 @@
             cards.forEach(function (card) {
                 var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
+                var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
+                var cardCategory = (card.getAttribute('data-category') || '').toLowerCase();
                 var isSale = card.getAttribute('data-is-sale') === 'true';
                 var inStock = card.getAttribute('data-in-stock') === 'true';
                 var colorImages = {};
@@ -1100,6 +1029,7 @@
                     card.setAttribute('data-base-url', baseDetailUrl);
                 }
 
+                var matchSubcat = (filterState.subcat === 'all') || (cardStyles.indexOf(filterState.subcat) !== -1) || (cardCategory === filterState.subcat);
                 var matchColor = (filterState.color === 'all') || (cardColors.indexOf(filterState.color) !== -1);
 
                 var matchPrice = true;
@@ -1122,7 +1052,7 @@
                     matchSpecial = inStock;
                 }
 
-                if (matchColor && matchPrice && matchSpecial) {
+                if (matchSubcat && matchColor && matchPrice && matchSpecial) {
                     card.classList.remove('hide');
                     visibleCount++;
 
@@ -1147,6 +1077,12 @@
             if (emptyMessageEl) {
                 emptyMessageEl.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
             }
+        }
+
+        // Initialize subcategory filter if active_sub_slug was passed
+        if (filterState.subcat && filterState.subcat !== 'all') {
+            updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', filterState.subcat);
+            applyAllFilters();
         }
 
         function previewCardColor(swatchEl) {
