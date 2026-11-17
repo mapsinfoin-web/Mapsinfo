@@ -1,0 +1,242 @@
+{% load static %}
+{% include 'store/includes/header_css.html' %}
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header">
+    <div class="container header-main">
+        <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
+            <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
+        </a>
+
+        <nav class="nav" id="nav">
+            <a href="{% url 'store:all_products' %}" class="nav-link{% if request.path == '/' %} active{% endif %}">Home</a>
+
+            <!-- 1. COLLECTIONS MEGA-MENU -->
+            <div class="nav-item has-megamenu">
+                <a href="{% url 'store:collections' %}" class="nav-link nav-dropdown-trigger{% if '/collections' in request.path and not active_occasion %} active{% endif %}">
+                    Collections <i class="fas fa-chevron-down nav-arrow"></i>
+                </a>
+                <div class="megamenu megamenu-collections">
+                    <div class="megamenu-grid">
+                        <!-- Column 1: Earrings -->
+                        <div class="megamenu-col">
+                            <h4 class="megamenu-heading">
+                                <a href="{% url 'store:collection_detail' 'earrings' %}"><i class="fas fa-gem"></i> Earrings</a>
+                            </h4>
+                            <ul class="megamenu-list">
+                                <li><a href="{% url 'store:collection_detail' 'earrings' %}?sub=studs">Studs &amp; Solitaires</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'earrings' %}?sub=drops">Drops &amp; Line Dangles</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'earrings' %}?sub=halos">Halos &amp; Royal Hoops</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'earrings' %}?sub=jhumke">Traditional Jhumke</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'earrings' %}?sub=chandbali">Heritage Chandbalis</a></li>
+                                <li class="megamenu-all"><a href="{% url 'store:collection_detail' 'earrings' %}">All Earrings &rarr;</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Column 2: Necklaces & Sets -->
+                        <div class="megamenu-col">
+                            <h4 class="megamenu-heading">
+                                <a href="{% url 'store:collection_detail' 'necklaces' %}"><i class="fas fa-layer-group"></i> Necklaces &amp; Sets</a>
+                            </h4>
+                            <ul class="megamenu-list">
+                                <li><a href="{% url 'store:collection_detail' 'necklaces' %}?sub=chokers-sets">Heritage Bridal Sets</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'necklaces' %}?sub=chokers-sets-1">Chokers &amp; Collars</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'necklaces' %}?sub=drop-necklace">Drop Necklaces</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'necklaces' %}?sub=layered-necklaces">Layered Chains</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'necklaces' %}?sub=pendants">Pendants &amp; Solitaires</a></li>
+                                <li class="megamenu-all"><a href="{% url 'store:collection_detail' 'necklaces' %}">All Necklaces &rarr;</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Column 3: Rings & Bracelets -->
+                        <div class="megamenu-col">
+                            <h4 class="megamenu-heading">
+                                <a href="{% url 'store:collection_detail' 'bracelets' %}"><i class="fas fa-circle-notch"></i> Rings &amp; Cuffs</a>
+                            </h4>
+                            <ul class="megamenu-list">
+                                <li><a href="{% url 'store:collection_detail' 'rings' %}?sub=solitaire-rings">Solitaire Rings</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'rings' %}?sub=statement-rings">Statement Rings</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'rings' %}?sub=adjustable-rings">Adjustable Rings</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'bracelets' %}?sub=tennis-bracelets">Tennis Bracelets</a></li>
+                                <li><a href="{% url 'store:collection_detail' 'bracelets' %}?sub=bangles-cuffs">Cuffs &amp; Bangles</a></li>
+                                <li class="megamenu-all"><a href="{% url 'store:collections' %}">Full Directory &rarr;</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Column 4: Curated Signature Promo Card -->
+                        <div class="megamenu-featured">
+                            <div class="megamenu-card">
+                                <span class="megamenu-card-tag">ATELIER SIGNATURE</span>
+                                <h5>Signature Velvet Packaging</h5>
+                                <p>Every order is pre-packed in our signature velvet box or pouch with branded unboxing elements. 100% skin-safe.</p>
+                                <a href="{% url 'store:collections' %}" class="btn-megamenu-cta">Explore All Jewellery &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. WEDDING & OCCASIONS MEGA-MENU (Competitor Benchmark Feature!) -->
+            <div class="nav-item has-megamenu">
+                <a href="{% url 'store:collections' %}?occasion=bridal" class="nav-link nav-dropdown-trigger highlight-nav{% if active_occasion %} active{% endif %}">
+                    <span class="nav-sparkle">✨</span> Wedding &amp; Occasions <i class="fas fa-chevron-down nav-arrow"></i>
+                </a>
+                <div class="megamenu megamenu-occasions">
+                    <div class="megamenu-occasions-grid">
+                        <!-- Haldi -->
+                        <a href="{% url 'store:collections' %}?occasion=haldi" class="occasion-tile haldi-tile">
+                            <div class="occasion-tile-icon" style="background:#FEF3C7; color:#D97706;">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#D97706;">Auspicious Yellow</span>
+                                <h4>Haldi Ceremony</h4>
+                                <p>Warm gold tones, floral kundan &amp; pearl drop pieces.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Mehendi -->
+                        <a href="{% url 'store:collections' %}?occasion=mehendi" class="occasion-tile mehendi-tile">
+                            <div class="occasion-tile-icon" style="background:#D1FAE5; color:#059669;">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#059669;">Verdant Greens</span>
+                                <h4>Mehendi Ceremony</h4>
+                                <p>Vibrant emerald crystals, statement cuffs &amp; boho drops.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Sangeet & Cocktail -->
+                        <a href="{% url 'store:collections' %}?occasion=sangeet" class="occasion-tile sangeet-tile">
+                            <div class="occasion-tile-icon" style="background:#DBEAFE; color:#2563EB;">
+                                <i class="fas fa-glass-cheers"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#2563EB;">High-Shine Glam</span>
+                                <h4>Sangeet &amp; Cocktail</h4>
+                                <p>Sparkling baguette crystals &amp; royal blue dazzle.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Main Wedding / Bridal -->
+                        <a href="{% url 'store:collections' %}?occasion=bridal" class="occasion-tile bridal-tile">
+                            <div class="occasion-tile-icon" style="background:#FEE2E2; color:#DC2626;">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#DC2626;">Royal Bride</span>
+                                <h4>Main Wedding &amp; Bridal</h4>
+                                <p>Choker sets with matching maang tikka &amp; heavy jhumkas.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Reception -->
+                        <a href="{% url 'store:collections' %}?occasion=reception" class="occasion-tile reception-tile">
+                            <div class="occasion-tile-icon" style="background:#EDE9FE; color:#7C3AED;">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#7C3AED;">Red Carpet</span>
+                                <h4>Reception Elegance</h4>
+                                <p>Tiara flow crystal sets &amp; sleek solitaire bracelets.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Occasion Concierge Banner Card -->
+                        <div class="occasion-banner-tile">
+                            <div class="occasion-banner-inner">
+                                <span class="occasion-banner-pill">DELHI ATELIER CONCIERGE</span>
+                                <h3>Bridal Styling Assistance</h3>
+                                <p>Need help matching jewellery with your bridal lehenga? Chat with our styling concierge.</p>
+                                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="btn-wa-concierge">
+                                    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{% url 'store:all_products' %}#latest-arrivals" class="nav-link">Latest Arrivals</a>
+            <a href="{% url 'store:sale' %}" class="nav-link sale"><span class="sale-badge">SALE</span> Up to 50%</a>
+            <a href="{% url 'store:about' %}" class="nav-link{% if request.path == '/about/' %} active{% endif %}">About</a>
+            <a href="{% url 'store:contact' %}" class="nav-link{% if request.path == '/contact/' %} active{% endif %}">Contact</a>
+        </nav>
+
+        <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
+            <i class="fas fa-search"></i>
+            <input type="search" name="q" placeholder="Search jewellery, haldi, bridal…" aria-label="Search products" required />
+        </form>
+
+        <div class="actions">
+            {% include 'store/includes/notification_bell.html' %}
+
+            <a href="{% url 'store:wishlist' %}" class="icon-btn" title="Wishlist" aria-label="Wishlist">
+                <i class="far fa-heart"></i>
+                <span class="badge" id="wishCount" {% if not user_wishlist %}style="display:none"{% endif %}>{{ user_wishlist|length|default:0 }}</span>
+            </a>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
+            <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            {% else %}
+            <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
+            {% endif %}
+
+            <a href="{% url 'store:cart_detail' %}" class="icon-btn" title="Cart" aria-label="Cart">
+                <i class="fas fa-shopping-cart"></i>
+                {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+            </a>
+
+            <button type="button" class="icon-btn nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+        </div>
+    </div>
+</header>
+
+<script>
+(function() {
+    var navToggle = document.getElementById('navToggle');
+    var nav = document.getElementById('nav');
+    if (navToggle && nav) {
+        navToggle.addEventListener('click', function() {
+            var open = nav.classList.toggle('open');
+            navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            var icon = navToggle.querySelector('i');
+            if (icon) {
+                icon.className = open ? 'fas fa-times' : 'fas fa-bars';
+            }
+        });
+    }
+
+    // Mobile Mega-Menu Accordion Toggles
+    document.querySelectorAll('.has-megamenu .nav-dropdown-trigger').forEach(function(trigger) {
+        trigger.addEventListener('click', function(e) {
+            if (window.innerWidth <= 1100) {
+                e.preventDefault();
+                var parent = trigger.closest('.has-megamenu');
+                if (parent) {
+                    parent.classList.toggle('active-mobile');
+                }
+            }
+        });
+    });
+
+    // Header elevation on scroll
+    var header = document.getElementById('header');
+    if (header) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 20) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }, { passive: true });
+    }
+})();
+</script>

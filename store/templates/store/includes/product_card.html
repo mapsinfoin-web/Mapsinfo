@@ -24,9 +24,12 @@
             <i class="{% if product.pk in user_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
         </button>
 
-        <a class="col-img-link" href="{% url 'store:product_detail' product.pk %}" aria-label="{{ product.title }}">
+        <a class="col-img-link{% if product.secondary_image %} has-secondary{% endif %}" href="{% url 'store:product_detail' product.pk %}" aria-label="{{ product.title }}">
             {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
+            <img class="primary-img" src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy" />
+            {% if product.secondary_image %}
+            <img class="secondary-img" src="{{ product.secondary_image.url }}" alt="{{ product.title }} alternate view" loading="lazy" />
+            {% endif %}
             {% else %}
             <div class="col-no-image">No Image</div>
             {% endif %}

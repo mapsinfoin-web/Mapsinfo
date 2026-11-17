@@ -43,7 +43,7 @@ class OutOfStock(Exception):
 
 def all_products(request):
     # Only fetch active products with prefetched relations for instant loading
-    all_active = list(Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').order_by('-created'))
+    all_active = list(Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories', 'gallery_images').order_by('-created'))
     # 4 newest active products for Latest Arrivals
     recent_products = all_active[:4]
     recent_ids = {p.pk for p in recent_products}
@@ -138,8 +138,46 @@ def product_detail(request, pk):
             if c.name.lower() == requested_color.lower():
                 selected_color_obj = c
                 break
-    # If no ?color= query parameter was provided in the URL, selected_color_obj remains None
-    # so that the product's primary/main image (product.image) is displayed by default.
+
+    # Curated "Complete The Look" / Pair With Cross-sell
+    pair_products = list(product.pair_with.filter(is_active=True, stock__gt=0)[:2])
+    if not pair_products:
+        cat_slug = (product.category.slug.lower() if product.category and product.category.slug else '')
+        if 'earring' in cat_slug:
+            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).filter(
+                Q(category__slug='necklaces') | Q(category__slug='bracelets')
+            ).exclude(pk=product.pk)
+        elif 'necklace' in cat_slug:
+            pair_qs = Product.objects.filter(is_active=True, stock__gt=0, category__slug='earrings').exclude(pk=product.pk)
+        elif 'ring' in cat_slug:
+            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).filter(
+                Q(category__slug='bracelets') | Q(category__slug='earrings')
+            ).exclude(pk=product.pk)
+        else:
+            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).exclude(pk=product.pk)
+
+        # Match color if possible
+        color_tags = product.color_tags
+        matched = []
+        if color_tags:
+            for tag in color_tags:
+                tag_matches = list(pair_qs.filter(title__icontains=tag)[:2])
+                if tag_matches:
+                    matched.extend(tag_matches)
+                    break
+        if not matched:
+            matched = list(pair_qs[:2])
+        pair_products = matched[:2]
+
+    pair_product = pair_products[0] if pair_products else None
+    combo_total = None
+    combo_discounted = None
+    combo_savings = None
+    if pair_product:
+        combo_total = product.price + pair_product.price
+        # 10% combo bundle discount
+        combo_discounted = round(combo_total * Decimal('0.90'))
+        combo_savings = combo_total - combo_discounted
 
     return render(request, 'store/product_detail.html', {
         'product': product,
@@ -147,6 +185,10 @@ def product_detail(request, pk):
         'gift_choices': gift_choices,   # free gifts the customer can pick (active + in stock)
         'trust_words': _trust_words(product),   # [(icon, text), ...] shown under the price
         'selected_color_obj': selected_color_obj,
+        'pair_product': pair_product,
+        'combo_total': combo_total,
+        'combo_discounted': combo_discounted,
+        'combo_savings': combo_savings,
     })
 # ---------------------------------------------------------------------------
 # CART HELPERS
@@ -303,6 +345,33 @@ def add_cart(request, product_id):
 
     if went_to_gifts:
         return redirect(_cart_url())
+    return redirect('store:cart_detail')
+
+
+def add_combo_cart(request, product_id, pair_id):
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    pair = get_object_or_404(Product, id=pair_id, is_active=True)
+    cart = _get_cart(request, create=True)
+
+    # Add product
+    if product.in_stock:
+        item = CartItem.objects.filter(product=product, cart=cart).first()
+        if item:
+            item.quantity += 1
+            item.save()
+        else:
+            CartItem.objects.create(product=product, cart=cart, quantity=1)
+
+    # Add pair product
+    if pair.in_stock:
+        p_item = CartItem.objects.filter(product=pair, cart=cart).first()
+        if p_item:
+            p_item.quantity += 1
+            p_item.save()
+        else:
+            CartItem.objects.create(product=pair, cart=cart, quantity=1)
+
+    messages.success(request, f"✨ Complete The Look combo added! Both {product.title} and {pair.title} are in your cart.")
     return redirect('store:cart_detail')
 
 
@@ -819,15 +888,64 @@ def collections(request):
     
     active_cat_slug = request.GET.get('cat', '').strip().lower()
     active_sub_slug = request.GET.get('sub', '').strip().lower()
+    active_occasion = request.GET.get('occasion', '').strip().lower()
 
     # Determine active main category
     active_main_cat = None
     if active_cat_slug:
         active_main_cat = next((c for c in main_categories if c.slug.lower() == active_cat_slug), None)
     
-    # Base products for category context
-    base_products_qs = Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct().order_by('-created')
-    if active_main_cat:
+    # Occasion curation mapping for wedding & festive looks
+    OCCASION_MAP = {
+        'haldi': {
+            'key': 'haldi',
+            'title': 'Haldi Ceremony Jewellery',
+            'eyebrow': 'Wedding Occasion Edit',
+            'desc': 'Radiant yellow stones, gold tones, and floral kundan pieces curated for auspicious Haldi celebrations.',
+            'query': Q(title__icontains='gold') | Q(title__icontains='yellow') | Q(colors__name__icontains='yellow') | Q(sub_categories__slug__in=['jhumke', 'chandbali']),
+            'badge': 'Haldi Yellow & Gold',
+        },
+        'mehendi': {
+            'key': 'mehendi',
+            'title': 'Mehendi Ceremony Jewellery',
+            'eyebrow': 'Wedding Occasion Edit',
+            'desc': 'Vibrant emerald greens, verdant crystals, and statement cuffs designed for celebratory Mehendi ceremonies.',
+            'query': Q(title__icontains='green') | Q(title__icontains='verdant') | Q(title__icontains='emerald') | Q(colors__name__icontains='green'),
+            'badge': 'Mehendi Green & Cuffs',
+        },
+        'sangeet': {
+            'key': 'sangeet',
+            'title': 'Sangeet & Cocktail Glam',
+            'eyebrow': 'Wedding Occasion Edit',
+            'desc': 'High-sparkle baguette crystals, radiant zircons, and royal sapphire blue pieces made to dazzle the dance floor.',
+            'query': Q(title__icontains='baguette') | Q(title__icontains='crystal') | Q(title__icontains='blue') | Q(title__icontains='crown') | Q(title__icontains='starlight'),
+            'badge': 'Sangeet High Glam',
+        },
+        'bridal': {
+            'key': 'bridal',
+            'title': 'Grand Wedding & Bridal Sets',
+            'eyebrow': 'Royal Wedding Edit',
+            'desc': 'Heritage bridal chokers, necklace sets with matching maang tikka, and royal jhumkas for your wedding ceremony.',
+            'query': Q(category__slug='necklaces') | Q(sub_categories__slug__in=['chokers-sets', 'chokers-sets-1']) | Q(title__icontains='set') | Q(title__icontains='bridal'),
+            'badge': 'Royal Bridal Sets',
+        },
+        'reception': {
+            'key': 'reception',
+            'title': 'Reception Elegance Collection',
+            'eyebrow': 'Red Carpet Wedding Edit',
+            'desc': 'Contemporary solitaire studs, tiara flow crystal sets, and sleek tennis bracelets for modern red-carpet glam.',
+            'query': Q(title__icontains='tiara') | Q(title__icontains='solitaire') | Q(title__icontains='serenity') | Q(title__icontains='halo') | Q(sub_categories__slug__in=['tennis-bracelets', 'studs']),
+            'badge': 'Reception Red Carpet',
+        },
+    }
+
+    occasion_data = OCCASION_MAP.get(active_occasion)
+
+    # Base products for category / occasion context
+    base_products_qs = Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories', 'gallery_images').distinct().order_by('-created')
+    if occasion_data:
+        base_products_qs = base_products_qs.filter(occasion_data['query'])
+    elif active_main_cat:
         base_products_qs = base_products_qs.filter(Q(category=active_main_cat) | Q(category__parent=active_main_cat) | Q(sub_categories__parent=active_main_cat))
     
     base_products = list(base_products_qs)
@@ -856,6 +974,8 @@ def collections(request):
         'active_main_cat': active_main_cat,
         'active_cat_slug': active_cat_slug,
         'active_sub_slug': active_sub_slug,
+        'active_occasion': active_occasion,
+        'occasion_data': occasion_data,
         'subcategories': subcategories,
         'total_count': total_count,
         'products': products,
@@ -882,7 +1002,7 @@ def collection_detail(request, slug):
     all_main_products_qs = Product.objects.filter(
         Q(category=main_cat) | Q(category__parent=main_cat) | Q(sub_categories__parent=main_cat),
         is_active=True
-    ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').distinct().order_by('-created')
+    ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories', 'gallery_images').distinct().order_by('-created')
     all_main_products = list(all_main_products_qs)
     total_main_count = len(all_main_products)
 
@@ -1104,11 +1224,28 @@ def search_products(request):
     query = request.GET.get('q', '').strip()
 
     if query:
-        # Filter for active products matching the query in title or description
+        q_lower = query.lower()
+        occasion_filter = None
+        if 'haldi' in q_lower:
+            occasion_filter = Q(title__icontains='gold') | Q(title__icontains='yellow') | Q(colors__name__icontains='yellow') | Q(sub_categories__slug__in=['jhumke', 'chandbali'])
+        elif 'mehendi' in q_lower or 'mehndi' in q_lower:
+            occasion_filter = Q(title__icontains='green') | Q(title__icontains='verdant') | Q(title__icontains='emerald') | Q(colors__name__icontains='green')
+        elif 'sangeet' in q_lower or 'cocktail' in q_lower:
+            occasion_filter = Q(title__icontains='baguette') | Q(title__icontains='crystal') | Q(title__icontains='blue') | Q(title__icontains='crown') | Q(title__icontains='starlight')
+        elif 'bridal' in q_lower or 'wedding' in q_lower or 'dulhan' in q_lower:
+            occasion_filter = Q(category__slug='necklaces') | Q(sub_categories__slug__in=['chokers-sets', 'chokers-sets-1']) | Q(title__icontains='set') | Q(title__icontains='bridal')
+        elif 'reception' in q_lower:
+            occasion_filter = Q(title__icontains='tiara') | Q(title__icontains='solitaire') | Q(title__icontains='serenity') | Q(title__icontains='halo') | Q(sub_categories__slug__in=['tennis-bracelets', 'studs'])
+
+        base_search = Q(title__icontains=query) | Q(description__icontains=query) | Q(category__name__icontains=query) | Q(sub_categories__name__icontains=query)
+        if occasion_filter:
+            base_search = base_search | occasion_filter
+
+        # Filter for active products matching the query
         product_list = Product.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query),
+            base_search,
             is_active=True
-        ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories').order_by('-id')
+        ).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories', 'gallery_images').distinct().order_by('-id')
     else:
         product_list = Product.objects.none()
 

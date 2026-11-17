@@ -1,6 +1,49 @@
 # store/context_processors.py
-from .models import Cart, CartItem, Wishlist, Notification
+from .models import Cart, CartItem, Wishlist, Notification, Category
 from .views import _cart_id
+
+WEDDING_OCCASIONS = [
+    {
+        'key': 'haldi',
+        'name': 'Haldi Ceremony',
+        'subtitle': 'Radiant Gold, Yellow & Kundan',
+        'icon': 'fa-sun',
+        'color': '#D97706',
+        'bg': '#FEF3C7',
+    },
+    {
+        'key': 'mehendi',
+        'name': 'Mehendi Ceremony',
+        'subtitle': 'Emerald Greens & Statement Cuffs',
+        'icon': 'fa-leaf',
+        'color': '#059669',
+        'bg': '#D1FAE5',
+    },
+    {
+        'key': 'sangeet',
+        'name': 'Sangeet & Cocktail',
+        'subtitle': 'Baguettes, Zircon & Royal Sapphire',
+        'icon': 'fa-glass-cheers',
+        'color': '#2563EB',
+        'bg': '#DBEAFE',
+    },
+    {
+        'key': 'bridal',
+        'name': 'Grand Wedding & Bridal',
+        'subtitle': 'Heritage Chokers with Maang Tikka',
+        'icon': 'fa-crown',
+        'color': '#DC2626',
+        'bg': '#FEE2E2',
+    },
+    {
+        'key': 'reception',
+        'name': 'Reception Elegance',
+        'subtitle': 'Tiara Sets & Solitaire Drops',
+        'icon': 'fa-gem',
+        'color': '#7C3AED',
+        'bg': '#EDE9FE',
+    },
+]
 
 def cart_item_count(request):
     # Don't run this logic if we are in the Django admin panel
@@ -36,10 +79,18 @@ def cart_item_count(request):
         notifications = []
         announcements = []
 
+    nav_categories = []
+    try:
+        nav_categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('order', 'id'))
+    except Exception:
+        nav_categories = []
+
     return {
         'cart_count': count,
         'user_wishlist': user_wishlist,
         'store_notifications': notifications,
         'store_notifications_count': len(notifications),
         'store_announcements': announcements,
+        'nav_categories': nav_categories,
+        'wedding_occasions': WEDDING_OCCASIONS,
     }

@@ -58,6 +58,24 @@ class Product(models.Model):
     # Single source of truth for availability. "In stock" is computed from this number.
     stock = models.PositiveIntegerField(default=10, help_text="Units available. 0 = Out of Stock")
 
+    # Jewellery Specifications
+    weight_grams = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True,
+        help_text="Weight in grams (e.g. 12.50). Critical for customer confidence with earrings and chokers."
+    )
+    dimensions = models.CharField(
+        max_length=150, blank=True, default='',
+        help_text="Dimensions string (e.g. 'Length: 5.2 cm | Width: 2.1 cm' or 'Drop: 45 cm (Adjustable)')"
+    )
+    closure_type = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text="Fastening type (e.g. 'Push-back stud', 'Lobster clasp', 'Adjustable cord / Dori', 'Openable cuff')"
+    )
+    pair_with = models.ManyToManyField(
+        'self', blank=True, symmetrical=False, related_name='paired_by',
+        help_text="Optional 1-2 curated matching pieces to feature in 'Complete The Look' on the PDP."
+    )
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True, help_text="Uncheck to hide this product from the store.")
@@ -92,6 +110,25 @@ class Product(models.Model):
         return 0
 
     @property
+    def secondary_image(self):
+        """Returns the first gallery image or secondary color image for card hover preview, if available."""
+        if hasattr(self, '_prefetched_objects_cache') and 'gallery_images' in self._prefetched_objects_cache:
+            for g in self.gallery_images.all():
+                if g.image:
+                    return g.image
+        else:
+            try:
+                g = self.gallery_images.filter(image__isnull=False).exclude(image='').first()
+                if g and g.image:
+                    return g.image
+            except Exception:
+                pass
+        for c in self.available_colors:
+            if c.image and (not self.image or c.image.name != self.image.name):
+                return c.image
+        return None
+
+    @property
     def available_colors(self):
         """Returns active colors for this product if defined, otherwise empty list."""
         if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:
@@ -110,6 +147,64 @@ class Product(models.Model):
         if 'earring' in cat_slug or 'earring' in title_lower:
             return 'Includes velvet jewellery box'
         return 'Includes velvet jewellery pouch'
+
+    @property
+    def display_weight(self):
+        """Returns formatted weight string, or realistic estimate if not yet set in DB."""
+        if self.weight_grams:
+            val = f"{self.weight_grams:.1f}".rstrip('0').rstrip('.')
+            return f"{val}g"
+        cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
+        title_lower = (self.title.lower() if self.title else '')
+        if 'earring' in cat_slug or 'earring' in title_lower:
+            if 'stud' in cat_slug or 'stud' in title_lower:
+                return "6g (Featherlight)"
+            return "12g (Lightweight Comfort)"
+        if 'necklace' in cat_slug or 'set' in title_lower or 'choker' in title_lower:
+            return "48g (Comfort Fit)"
+        if 'ring' in cat_slug:
+            return "4g (Featherlight)"
+        if 'bracelet' in cat_slug:
+            return "14g"
+        return "12g (Lightweight)"
+
+    @property
+    def display_dimensions(self):
+        """Returns dimensions string, or standard dimension if not yet explicitly set."""
+        if self.dimensions:
+            return self.dimensions
+        cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
+        title_lower = (self.title.lower() if self.title else '')
+        if 'earring' in cat_slug or 'earring' in title_lower:
+            if 'stud' in cat_slug or 'stud' in title_lower:
+                return "Diameter: 1.2 cm"
+            return "Length: 4.8 cm | Width: 2.2 cm"
+        if 'necklace' in cat_slug or 'set' in title_lower or 'choker' in title_lower:
+            return "Choker Drop: 20 cm + 15 cm Adjustable Cord"
+        if 'ring' in cat_slug:
+            return "Standard Size (Adjustable Band)"
+        if 'bracelet' in cat_slug:
+            return "Diameter: 6.0 cm (Fits all wrists)"
+        return "Standard Artisan Dimensions"
+
+    @property
+    def display_closure(self):
+        """Returns closure type, or standard closure based on category."""
+        if self.closure_type:
+            return self.closure_type
+        cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
+        title_lower = (self.title.lower() if self.title else '')
+        if 'earring' in cat_slug or 'earring' in title_lower:
+            if 'stud' in title_lower:
+                return "Comfort Push-Back Post"
+            return "Hypoallergenic Push-Back Clasp"
+        if 'necklace' in cat_slug or 'set' in title_lower or 'choker' in title_lower:
+            return "Adjustable Silk Thread Dori & Clasp"
+        if 'ring' in cat_slug:
+            return "Smooth Comfort Fit Band"
+        if 'bracelet' in cat_slug:
+            return "Secure Box Clasp with Safety Latch"
+        return "Secure Handcrafted Fastening"
 
     @property
     def color_tags(self):

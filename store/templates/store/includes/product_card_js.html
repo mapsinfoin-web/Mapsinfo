@@ -29,9 +29,16 @@
             if (!newSrc) return;
             var card = dot.closest('.card, .col-card, article');
             if (!card) return;
-            var img = card.querySelector('.col-img-link img, .thumb img, img');
-            if (img) {
-                img.src = newSrc;
+            var primaryImg = card.querySelector('.col-img-link .primary-img, .col-img-link img, .thumb img');
+            if (primaryImg) {
+                primaryImg.src = newSrc;
+                var secImg = card.querySelector('.col-img-link .secondary-img');
+                if (secImg) {
+                    secImg.style.opacity = '0';
+                    card.addEventListener('mouseleave', function() {
+                        secImg.style.opacity = '';
+                    }, { once: true });
+                }
             }
         };
     }
