@@ -66,13 +66,34 @@
         @media (prefers-reduced-motion: reduce) { .animate-up { animation: none; opacity: 1; } }
 
         /* ===== Product layout ===== */
-        .crumb { max-width: 1100px; width: 100%; margin: 0 auto; padding: 26px 24px 0; font-size: 13px; color: var(--muted); }
-        .crumb a { color: var(--navy); font-weight: 600; }
+        .crumb { max-width: 1240px; width: 100%; margin: 0 auto; padding: 22px 24px 0; font-size: 13.5px; color: var(--muted); box-sizing: border-box; }
+        .crumb a { color: var(--navy); font-weight: 600; text-decoration: none; }
         .crumb a:hover { text-decoration: underline; }
-        .product { flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; padding: 22px 24px 80px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 44px; align-items: start; }
+        .product {
+            flex: 1;
+            max-width: 1240px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 24px 80px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+            gap: 40px;
+            align-items: start;
+            box-sizing: border-box;
+        }
 
         /* Gallery */
-        .gallery { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            min-width: 0;
+            position: sticky;
+            top: 90px;
+            align-self: start;
+            box-sizing: border-box;
+        }
         /* Main photo: clear luxury framing with breathing room, no blurry bleed or cutoffs */
         .main-image {
             position: relative;
@@ -121,13 +142,60 @@
             z-index: 2;
         }
         .no-image { color: var(--muted); font-size: 15px; }
-        .thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; }
-        .thumb { width: 74px; height: 74px; flex-shrink: 0; object-fit: contain; padding: 3px; border-radius: 14px; border: 2px solid transparent; background: #fff; cursor: pointer; box-shadow: var(--shadow); transition: border-color .2s, transform .2s; }
+        .thumbs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 2px 10px;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(19, 38, 57, .25) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+        .thumbs::-webkit-scrollbar {
+            height: 6px;
+        }
+        .thumbs::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 999px;
+        }
+        .thumbs::-webkit-scrollbar-thumb {
+            background: rgba(19, 38, 57, .25);
+            border-radius: 999px;
+        }
+        .thumbs::-webkit-scrollbar-thumb:hover {
+            background: rgba(19, 38, 57, .45);
+        }
+        .thumb {
+            width: 74px;
+            height: 74px;
+            flex-shrink: 0;
+            object-fit: contain;
+            padding: 3px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: border-color .2s, transform .2s;
+            box-sizing: border-box;
+        }
         .thumb:hover { transform: translateY(-2px); }
         .thumb.active { border-color: var(--navy); }
 
         /* Info card */
-        .info { background: #fff; border-radius: 26px; box-shadow: var(--shadow); padding: 34px 34px 30px; }
+        .info {
+            min-width: 0;
+            width: 100%;
+            background: #fff;
+            border-radius: 26px;
+            box-shadow: var(--shadow);
+            padding: 34px 34px 30px;
+            box-sizing: border-box;
+        }
         .sku { display: inline-block; font-size: 11.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); font-weight: 700; margin-bottom: 12px; }
         .title { font-family: 'Inter', sans-serif; font-size: 34px; font-weight: 700; color: var(--ink); margin: 0 0 14px; line-height: 1.2; letter-spacing: -.6px; }
         .price { font-size: 28px; font-weight: 800; color: var(--ink); margin: 0 0 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -306,7 +374,7 @@
         /* ===== Responsive ===== */
         @media (max-width: 900px) {
             .product { grid-template-columns: 1fr; gap: 26px; padding-bottom: 60px; }
-            .gallery { max-width: 500px; margin: 0 auto; }
+            .gallery { max-width: 540px; margin: 0 auto; position: static; }
         }
         @media (max-width: 760px) {
             .crumb { padding: 18px 16px 0; }
@@ -1053,60 +1121,6 @@
                 {% endfor %}
             </template>
             {% endif %}
-
-            <!-- Action buttons placed at bottom of product gallery -->
-            <div class="gallery-actions">
-                {% if product.in_stock %}
-                    {% if product.is_low_stock %}
-                    <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
-                    {% endif %}
-
-                    {% if offer and gift_choices %}
-                    <!-- Buy 1 Get 1 Free: customer picks gift, one click adds both -->
-                    <div class="gift-offer">
-                        <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
-                        <form action="{% url 'store:add_cart' product.id %}" method="POST">
-                            {% csrf_token %}
-                            {% if product.available_colors %}
-                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                            {% endif %}
-                            <p class="gift-offer-sub">Choose your FREE gift:</p>
-                            {% for g in gift_choices %}
-                            <label class="gift-choice">
-                                <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
-                                {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" loading="lazy" />{% endif %}
-                                <span class="gift-name">{{ g.title }}</span>
-                                <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
-                            </label>
-                            {% endfor %}
-                            <div class="gallery-actions-btns">
-                                <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart + Free Gift</button>
-                                <button type="submit" class="btn btn-buy" formaction="{% url 'store:buy_now' product.pk %}"><i class="fas fa-bolt"></i> Buy Now + Free Gift</button>
-                            </div>
-                        </form>
-                    </div>
-                    {% else %}
-                    <div class="gallery-actions-btns">
-                        <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form">
-                            {% csrf_token %}
-                            {% if product.available_colors %}
-                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                            {% endif %}
-                            <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
-                        </form>
-                        <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form">
-                            {% csrf_token %}
-                            {% if product.available_colors %}
-                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
-                            {% endif %}
-                            <button type="submit" class="btn btn-buy"><i class="fas fa-bolt"></i> Buy Now</button>
-                        </form>
-                    </div>
-                    {% endif %}
-                {% else %}
-                    <button class="btn disabled" disabled><i class="fas fa-circle-xmark"></i> Out of Stock</button>
-                {% endif %}
-            </div>
         </div>
 
         <!-- Right: details -->
@@ -1189,6 +1203,60 @@
                 </div>
             </div>
             {% endif %}
+
+            <!-- Action buttons (Add to Cart / Buy Now / Free Gift) placed directly under product price & color -->
+            <div class="gallery-actions">
+                {% if product.in_stock %}
+                    {% if product.is_low_stock %}
+                    <p class="stock-note"><i class="fas fa-fire"></i> Only {{ product.stock }} left in stock</p>
+                    {% endif %}
+
+                    {% if offer and gift_choices %}
+                    <!-- Buy 1 Get 1 Free: customer picks gift, one click adds both -->
+                    <div class="gift-offer">
+                        <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
+                        <form action="{% url 'store:add_cart' product.id %}" method="POST">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <p class="gift-offer-sub">Choose your FREE gift:</p>
+                            {% for g in gift_choices %}
+                            <label class="gift-choice">
+                                <input type="radio" name="gift" value="{{ g.id }}" {% if forloop.first %}checked{% endif %} />
+                                {% if g.image %}<img src="{{ g.image.url }}" alt="{{ g.title }}" loading="lazy" />{% endif %}
+                                <span class="gift-name">{{ g.title }}</span>
+                                <span class="gift-price"><s>₹{{ g.price }}</s> <b>FREE</b></span>
+                            </label>
+                            {% endfor %}
+                            <div class="gallery-actions-btns">
+                                <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart + Free Gift</button>
+                                <button type="submit" class="btn btn-buy" formaction="{% url 'store:buy_now' product.pk %}"><i class="fas fa-bolt"></i> Buy Now + Free Gift</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="gallery-actions-btns">
+                        <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <button type="submit" class="btn btn-add"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+                        </form>
+                        <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form">
+                            {% csrf_token %}
+                            {% if product.available_colors %}
+                            <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
+                            {% endif %}
+                            <button type="submit" class="btn btn-buy"><i class="fas fa-bolt"></i> Buy Now</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <button class="btn disabled" disabled><i class="fas fa-circle-xmark"></i> Out of Stock</button>
+                {% endif %}
+            </div>
 
             <ul class="trust">
                 {% for icon, word in trust_words %}
