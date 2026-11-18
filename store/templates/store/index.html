@@ -114,7 +114,7 @@
         @keyframes marquee { to { transform: translateX(-50%); } }
 
         /* ===== HEADER ===== */
-        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); transition: box-shadow .3s; }
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.88); /* backdrop-filter removed for fixed mobile menu */ border-bottom: 1px solid var(--line); transition: box-shadow .3s; }
         .header.scrolled { box-shadow: 0 6px 24px rgba(19,38,57,.08); }
         .header-main { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
         .logo { display: inline-flex; align-items: center; flex-shrink: 0; }

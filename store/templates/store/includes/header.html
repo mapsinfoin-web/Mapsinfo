@@ -17,6 +17,9 @@
                     Collections <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 <div class="megamenu megamenu-collections">
+                    <div class="megamenu-mobile-all-link">
+                        <a href="{% url 'store:collections' %}"><i class="fas fa-th-large"></i> Explore All Collections Directory &rarr;</a>
+                    </div>
                     <div class="megamenu-grid">
                         <!-- Column 1: Earrings -->
                         <div class="megamenu-col">
@@ -106,6 +109,9 @@
                     <span class="nav-sparkle">✨</span> Wedding &amp; Occasions <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 <div class="megamenu megamenu-occasions">
+                    <div class="megamenu-mobile-all-link">
+                        <a href="{% url 'store:collections' %}?occasion=wedding-bridal"><i class="fas fa-crown"></i> Explore All Wedding &amp; Occasion Edits &rarr;</a>
+                    </div>
                     <div class="megamenu-occasions-grid">
                         <!-- Wedding & Bridal -->
                         <a href="{% url 'store:collections' %}?occasion=wedding-bridal" class="occasion-tile bridal-tile">
@@ -193,6 +199,26 @@
             <a href="{% url 'store:sale' %}" class="nav-link sale"><span class="sale-badge">SALE</span> Up to 50%</a>
             <a href="{% url 'store:about' %}" class="nav-link{% if request.path == '/about/' %} active{% endif %}">About</a>
             <a href="{% url 'store:contact' %}" class="nav-link{% if request.path == '/contact/' %} active{% endif %}">Contact</a>
+
+            <!-- Mobile Navigation Quick Actions & Atelier Concierge Strip -->
+            <div class="nav-mobile-footer">
+                <div class="nav-mobile-actions">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:my_orders' %}" class="nav-mobile-btn"><i class="far fa-user-circle"></i> My Orders</a>
+                    <a href="{% url 'store:logout_user' %}" class="nav-mobile-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    {% else %}
+                    <a href="{% url 'store:login_user' %}" class="nav-mobile-btn primary"><i class="far fa-user"></i> Log In / Register</a>
+                    <a href="{% url 'store:wishlist' %}" class="nav-mobile-btn"><i class="far fa-heart"></i> Wishlist</a>
+                    {% endif %}
+                </div>
+                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="nav-mobile-wa">
+                    <i class="fab fa-whatsapp"></i> Chat with Delhi Atelier Concierge
+                </a>
+                <div class="nav-mobile-trust">
+                    <span><i class="fas fa-certificate"></i> Anti-Tarnish Guarantee</span>
+                    <span><i class="fas fa-truck-fast"></i> Delhi NCR Dispatch</span>
+                </div>
+            </div>
         </nav>
 
         <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
@@ -232,6 +258,16 @@
     var header = document.getElementById('header');
 
     if (navToggle && nav) {
+        function updateNavPosition() {
+            if (nav.classList.contains('open') && header) {
+                var rect = header.getBoundingClientRect();
+                var topPos = Math.max(Math.round(rect.bottom), 0);
+                nav.style.top = topPos + 'px';
+                nav.style.height = 'calc(100vh - ' + topPos + 'px)';
+                nav.style.maxHeight = 'calc(100vh - ' + topPos + 'px)';
+            }
+        }
+
         function toggleNav(e) {
             if (e) {
                 e.preventDefault();
@@ -247,18 +283,39 @@
                 icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
             }
 
-            if (isOpen && header) {
-                var rect = header.getBoundingClientRect();
-                var topPos = Math.max(Math.round(rect.bottom), 0);
-                nav.style.top = topPos + 'px';
+            if (isOpen) {
+                updateNavPosition();
                 document.body.classList.add('nav-open');
             } else {
                 document.body.classList.remove('nav-open');
+                nav.style.top = '';
+                nav.style.height = '';
+                nav.style.maxHeight = '';
             }
         }
 
         // Capture phase ensures this handler runs FIRST and prevents duplicate listeners from firing
         navToggle.addEventListener('click', toggleNav, true);
+
+        // Keep position accurate on resize and orientation change
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1100 && nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                navToggle.setAttribute('aria-expanded', 'false');
+                var icon = navToggle.querySelector('i');
+                if (icon) icon.className = 'fas fa-bars';
+                document.body.classList.remove('nav-open');
+                nav.style.top = '';
+                nav.style.height = '';
+                nav.style.maxHeight = '';
+            } else if (nav.classList.contains('open')) {
+                updateNavPosition();
+            }
+        });
+
+        window.addEventListener('orientationchange', function() {
+            setTimeout(updateNavPosition, 100);
+        });
 
         // Close drawer when clicking outside nav
         document.addEventListener('click', function(e) {
@@ -268,6 +325,9 @@
                 var icon = navToggle.querySelector('i');
                 if (icon) icon.className = 'fas fa-bars';
                 document.body.classList.remove('nav-open');
+                nav.style.top = '';
+                nav.style.height = '';
+                nav.style.maxHeight = '';
             }
         });
 
@@ -280,6 +340,9 @@
                     var icon = navToggle.querySelector('i');
                     if (icon) icon.className = 'fas fa-bars';
                     document.body.classList.remove('nav-open');
+                    nav.style.top = '';
+                    nav.style.height = '';
+                    nav.style.maxHeight = '';
                 }
             });
         });
