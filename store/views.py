@@ -65,6 +65,13 @@ def all_products(request):
     attach_offers(page_obj, offers)
     attach_offers(recent_products, offers)
 
+    # Trending Bestsellers (top pieces with offers)
+    trending_products = all_active[:8]
+    attach_offers(trending_products, offers)
+
+    # Featured UGC Reviews for Social Proof Wall
+    ugc_reviews = list(ProductReview.objects.filter(is_approved=True).select_related('product').order_by('-helpful_count', '-created_at')[:8])
+
     # IDs of products the logged-in user has hearted (used to paint the hearts + header badge)
     user_wishlist = []
     if request.user.is_authenticated:
@@ -78,6 +85,8 @@ def all_products(request):
         'page_obj': page_obj,
         'categories': categories,
         'recent_products': recent_products,
+        'trending_products': trending_products,
+        'ugc_reviews': ugc_reviews,
         'color_filters': color_filters,
         'style_filters': style_filters,
         'price_summary': price_summary,

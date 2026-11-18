@@ -690,6 +690,601 @@
             .col-tab { white-space: nowrap; }
         }
 
+        
+        /* ===== 1. INSTAGRAM-STYLE CIRCULAR CATEGORY BUBBLES ===== */
+        .story-bubbles-section {
+            padding: 16px 0 12px;
+            background: #FFFFFF;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+            position: relative;
+            z-index: 10;
+        }
+        .story-bubbles-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 6px 16px 12px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-snap-type: x mandatory;
+            justify-content: flex-start;
+        }
+        .story-bubbles-scroll::-webkit-scrollbar { display: none; }
+        @media (min-width: 1024px) {
+            .story-bubbles-scroll {
+                justify-content: center;
+                gap: 30px;
+            }
+        }
+        .story-bubble-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            cursor: pointer;
+            position: relative;
+        }
+        .story-bubble-ring {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            padding: 2.5px;
+            background: linear-gradient(135deg, #E2B755 0%, #D4AF37 50%, #996515 100%);
+            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.22);
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .story-bubble-ring.hot {
+            background: linear-gradient(135deg, #EF4444 0%, #F59E0B 50%, #DC2626 100%);
+        }
+        .story-bubble-item:hover .story-bubble-ring {
+            transform: scale(1.08);
+            box-shadow: 0 8px 22px rgba(212, 175, 55, 0.38);
+        }
+        .story-bubble-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #fff;
+            padding: 2px;
+            overflow: hidden;
+        }
+        .story-bubble-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease;
+        }
+        .story-bubble-item:hover .story-bubble-img {
+            transform: scale(1.08);
+        }
+        .story-bubble-badge {
+            position: absolute;
+            bottom: -3px;
+            right: -2px;
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: #fff;
+            font-size: 8.5px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1.5px solid #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .story-bubble-badge.gold {
+            background: linear-gradient(135deg, #D4AF37, #996515);
+        }
+        .story-bubble-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1E293B;
+            text-align: center;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s;
+        }
+        .story-bubble-item:hover .story-bubble-label {
+            color: #0F172A;
+            font-weight: 700;
+        }
+
+        /* ===== 2. EDITORIAL HERO CAROUSEL ===== */
+        .hero-carousel-section {
+            position: relative;
+            overflow: hidden;
+            background: #0B132B;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: 10px;
+        }
+        .hero-slider-wrap {
+            position: relative;
+            width: 100%;
+            min-height: 520px;
+        }
+        @media (min-width: 900px) {
+            .hero-slider-wrap {
+                min-height: 580px;
+            }
+        }
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s ease;
+            display: flex;
+            align-items: center;
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+        .hero-slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(11, 19, 43, 0.92) 0%, rgba(11, 19, 43, 0.68) 50%, rgba(11, 19, 43, 0.3) 100%);
+            z-index: 1;
+        }
+        @media (max-width: 768px) {
+            .hero-slide-overlay {
+                background: linear-gradient(180deg, rgba(11, 19, 43, 0.55) 0%, rgba(11, 19, 43, 0.92) 100%);
+            }
+        }
+        .hero-slide-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+            padding: 60px 0;
+            color: #FFFFFF;
+        }
+        .hero-slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(212, 175, 55, 0.18);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            color: #F8E7B2;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            backdrop-filter: blur(8px);
+        }
+        .hero-slide-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 48px;
+            line-height: 1.15;
+            font-weight: 700;
+            margin: 0 0 16px;
+            letter-spacing: -0.5px;
+        }
+        .hero-slide-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, #F8E7B2 0%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @media (max-width: 768px) {
+            .hero-slide-title {
+                font-size: 32px;
+            }
+        }
+        .hero-slide-desc {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #CBD5E1;
+            margin: 0 0 28px;
+            font-weight: 300;
+            max-width: 520px;
+        }
+        .hero-slide-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+            color: #0F172A;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 13px 26px;
+            border-radius: 999px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+            transition: all 0.25s ease;
+        }
+        .hero-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(212, 175, 55, 0.45);
+            color: #0B132B;
+        }
+        .hero-btn-ghost {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 13px 24px;
+            border-radius: 999px;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .hero-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .hero-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(11, 19, 43, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        .hero-nav-arrow:hover {
+            background: #D4AF37;
+            border-color: #D4AF37;
+            color: #0F172A;
+            transform: translateY(-50%) scale(1.08);
+        }
+        .hero-nav-arrow.prev { left: 24px; }
+        .hero-nav-arrow.next { right: 24px; }
+        @media (max-width: 768px) {
+            .hero-nav-arrow { display: none; }
+        }
+        .hero-dots-wrap {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+        .hero-dot {
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+        .hero-dot.active {
+            width: 44px;
+            background: #D4AF37;
+        }
+
+        /* ===== 3. TRUST STRIP ENHANCEMENTS ===== */
+        .trust-item {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .trust-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            border-color: #D4AF37;
+        }
+        .trust-item i {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05)) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: #B8860B !important;
+        }
+
+        /* ===== 6. SHOP BY BUDGET / GIFT FINDER ===== */
+        .budget-section {
+            padding: 44px 0 20px;
+        }
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 991px) {
+            .budget-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 580px) {
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .budget-card {
+            position: relative;
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+            overflow: hidden;
+        }
+        .budget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #D4AF37, #F59E0B);
+            opacity: 0;
+            transition: opacity 0.28s;
+        }
+        .budget-card:hover {
+            transform: translateY(-5px);
+            border-color: #D4AF37;
+            box-shadow: 0 12px 28px rgba(212, 175, 55, 0.15);
+        }
+        .budget-card:hover::before {
+            opacity: 1;
+        }
+        .budget-badge {
+            align-self: flex-start;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: #FEF3C7;
+            color: #B45309;
+            margin-bottom: 14px;
+        }
+        .budget-badge.luxury {
+            background: #EDE9FE;
+            color: #6D28D9;
+        }
+        .budget-badge.hot {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        .budget-price {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 8px;
+        }
+        .budget-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .budget-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #D4AF37;
+            transition: gap 0.2s;
+        }
+        .budget-card:hover .budget-cta {
+            gap: 12px;
+            color: #B8860B;
+        }
+
+        /* ===== 8. THE MAPSKART VELVET UNBOXING EXPERIENCE ===== */
+        .unboxing-section {
+            padding: 60px 0;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+            margin-top: 40px;
+            position: relative;
+        }
+        .unboxing-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 50px;
+            align-items: center;
+            background: #FFFFFF;
+            border-radius: 32px;
+            padding: 48px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.05);
+        }
+        @media (max-width: 991px) {
+            .unboxing-wrap {
+                grid-template-columns: 1fr;
+                padding: 28px;
+                gap: 32px;
+            }
+        }
+        .unboxing-visual {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(11, 19, 43, 0.15);
+            aspect-ratio: 4 / 3.5;
+        }
+        .unboxing-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .unboxing-seal-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(11, 19, 43, 0.92);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #FFFFFF;
+            padding: 12px 18px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+        .unboxing-seal-badge i {
+            font-size: 24px;
+            color: #D4AF37;
+        }
+        .unboxing-seal-badge strong {
+            display: block;
+            font-size: 12.5px;
+            letter-spacing: 0.5px;
+            color: #F8E7B2;
+        }
+        .unboxing-seal-badge span {
+            font-size: 11px;
+            color: #CBD5E1;
+        }
+        .unboxing-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+        }
+        @media (max-width: 640px) {
+            .unboxing-features {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+        .unboxing-feature-card {
+            background: #F8FAFC;
+            border: 1px solid #EEF2F6;
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.25s;
+        }
+        .unboxing-feature-card:hover {
+            background: #FFFFFF;
+            border-color: #D4AF37;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+        .unboxing-feature-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .unboxing-feature-card h4 i {
+            color: #D4AF37;
+            font-size: 14px;
+        }
+        .unboxing-feature-card p {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* ===== 9. CUSTOMER REVIEWS & VERIFIED PHOTO UGC WALL ===== */
+        .ugc-wall-section {
+            padding: 30px 0 20px;
+        }
+        .ugc-photo-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 10px 4px 18px;
+            scrollbar-width: thin;
+        }
+        .ugc-photo-card {
+            flex: 0 0 210px;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 3 / 4;
+            background: #E2E8F0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            transition: transform 0.28s, box-shadow 0.28s;
+        }
+        .ugc-photo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+        }
+        .ugc-photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ugc-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.88) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 14px;
+            color: #fff;
+        }
+        .ugc-tag {
+            align-self: flex-start;
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            padding: 2px 7px;
+            border-radius: 999px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .ugc-buyer-name {
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ugc-buyer-name i {
+            color: #10B981;
+            font-size: 11px;
+        }
+
         /* ===== DEAL BANNER ===== */
         .deal { margin-top: 72px; }
         .deal-box { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; border-radius: 32px; overflow: hidden; background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%); color: #fff; }
@@ -896,68 +1491,209 @@
     {% include 'store/includes/header.html' %}
 
     <main>
-        <!-- ===== HERO ===== -->
-        <section class="hero">
-            <div class="container hero-grid">
-                <div class="hero-main">
-                    <div class="hero-copy">
-                        <span class="hero-drop-text">New Season Drop · 2026</span>
-                        <h1>Jewellery That <em>Feels</em> Like You.</h1>
-                        <p>Considered pieces from small ateliers — made to be chosen once and worn every day. Free shipping above ₹999.</p>
-                        <div class="hero-btns">
-                            <a href="{% url 'store:collections' %}" class="btn btn-gold">Shop Collection <i class="fas fa-arrow-right"></i></a>
-                            <a href="#all-products" class="btn btn-ghost">Trending Now</a>
+        <!-- ===== 1. MOBILE INSTAGRAM-STYLE CIRCULAR CATEGORY BUBBLES (Suggestion #1) ===== -->
+        <section class="story-bubbles-section">
+            <div class="container">
+                <div class="story-bubbles-scroll" role="navigation" aria-label="Quick Category Stories">
+                    <!-- 1. Earrings -->
+                    <a href="{% url 'store:collection_detail' 'earrings' %}" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=260&auto=format&fit=crop" alt="Earrings" class="story-bubble-img" loading="lazy" />
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="hero-side">
-                    <a href="{% url 'store:collection_detail' 'earrings' %}" class="promo reveal" style="background-image:url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=800&auto=format&fit=crop')">
-                        <small>Under ₹799</small>
-                        <h3>Everyday Earrings</h3>
-                        <span class="link">Shop now <i class="fas fa-arrow-right"></i></span>
+                        <span class="story-bubble-label">Earrings</span>
                     </a>
-                    <a href="{% url 'store:collection_detail' 'layered-necklaces' %}" class="promo reveal" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=800&auto=format&fit=crop')">
-                        <small>Bestsellers &middot; Sub-collection</small>
-                        <h3> Necklaces</h3>
-                        <span class="link">Explore Sub-collection <i class="fas fa-arrow-right"></i></span>
+
+                    <!-- 2. Necklaces -->
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=260&auto=format&fit=crop" alt="Necklaces" class="story-bubble-img" loading="lazy" />
+                            </div>
+                        </div>
+                        <span class="story-bubble-label">Necklaces</span>
+                    </a>
+
+                    <!-- 3. Chokers -->
+                    <a href="{% url 'store:collections' %}?style=chokers" class="story-bubble-item">
+                        <div class="story-bubble-ring hot">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=260&auto=format&fit=crop" alt="Chokers" class="story-bubble-img" loading="lazy" />
+                            </div>
+                            <span class="story-bubble-badge">HOT</span>
+                        </div>
+                        <span class="story-bubble-label">Chokers</span>
+                    </a>
+
+                    <!-- 4. Rings -->
+                    <a href="{% url 'store:collection_detail' 'rings' %}" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=260&auto=format&fit=crop" alt="Rings" class="story-bubble-img" loading="lazy" />
+                            </div>
+                        </div>
+                        <span class="story-bubble-label">Rings</span>
+                    </a>
+
+                    <!-- 5. Bracelets -->
+                    <a href="{% url 'store:collection_detail' 'bracelets' %}" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=260&auto=format&fit=crop" alt="Bracelets" class="story-bubble-img" loading="lazy" />
+                            </div>
+                        </div>
+                        <span class="story-bubble-label">Bracelets</span>
+                    </a>
+
+                    <!-- 6. Wedding Edit -->
+                    <a href="{% url 'store:collections' %}?occasion=bridal" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?q=80&w=260&auto=format&fit=crop" alt="Wedding Edit" class="story-bubble-img" loading="lazy" />
+                            </div>
+                            <span class="story-bubble-badge gold">BRIDAL</span>
+                        </div>
+                        <span class="story-bubble-label">Wedding Edit</span>
+                    </a>
+
+                    <!-- 7. Anti-Tarnish -->
+                    <a href="{% url 'store:collections' %}?metal=anti-tarnish" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=260&auto=format&fit=crop" alt="Anti-Tarnish Gold" class="story-bubble-img" loading="lazy" />
+                            </div>
+                            <span class="story-bubble-badge gold">PURE</span>
+                        </div>
+                        <span class="story-bubble-label">Anti-Tarnish</span>
+                    </a>
+
+                    <!-- 8. Under 499 -->
+                    <a href="{% url 'store:collections' %}?price=under-999&max_price=499" class="story-bubble-item">
+                        <div class="story-bubble-ring">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=260&auto=format&fit=crop" alt="Under 499" class="story-bubble-img" loading="lazy" />
+                            </div>
+                            <span class="story-bubble-badge">₹499</span>
+                        </div>
+                        <span class="story-bubble-label">Under ₹499</span>
+                    </a>
+
+                    <!-- 9. Sale 50% -->
+                    <a href="{% url 'store:sale' %}" class="story-bubble-item">
+                        <div class="story-bubble-ring hot">
+                            <div class="story-bubble-inner">
+                                <img src="https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=260&auto=format&fit=crop" alt="Sale Deals" class="story-bubble-img" loading="lazy" />
+                            </div>
+                            <span class="story-bubble-badge">50% OFF</span>
+                        </div>
+                        <span class="story-bubble-label" style="color:#DC2626; font-weight:700;">Sale 50%</span>
                     </a>
                 </div>
             </div>
         </section>
 
-        
-
-        <!-- ===== SHOP BY CATEGORY ===== -->
-        <section class="section cat-section">
-            <div class="container">
-                <div class="sec-head reveal">
-                    <div><span class="eyebrow">Shop by category</span><h2>Find Your Signature</h2></div>
-                    <a href="{% url 'store:collections' %}" class="view-all">All collections <i class="fas fa-arrow-right"></i></a>
+        <!-- ===== 2. EDITORIAL HERO CAROUSEL (Suggestion #2) ===== -->
+        <section class="hero-carousel-section">
+            <div class="hero-slider-wrap">
+                <!-- Slide 1: Royal Wedding & Bridal Edit -->
+                <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=1600&auto=format&fit=crop');">
+                    <div class="hero-slide-overlay"></div>
+                    <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
+                        <div class="hero-slide-content">
+                            <span class="hero-slide-tag"><i class="fas fa-crown"></i> Royal Bridal Atelier · 2026</span>
+                            <h1 class="hero-slide-title">Grand Celebrations, <em>Handcrafted</em> Forever.</h1>
+                            <p class="hero-slide-desc">Choker sets, maang tikkas, and heirloom jhumkas crafted with timeless Kundan and pearls for Haldi, Sangeet &amp; Reception.</p>
+                            <div class="hero-slide-actions">
+                                <a href="{% url 'store:collections' %}?occasion=bridal" class="hero-btn-primary">Shop Wedding Edit <i class="fas fa-arrow-right"></i></a>
+                                <a href="#wedding-occasions" class="hero-btn-ghost">Explore Ceremonies <i class="fas fa-chevron-down"></i></a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="cat-row">
-                    <a href="{% url 'store:collection_detail' 'earrings' %}" class="cat reveal">
-                        <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop')"></div>
-                        <div class="cat-info"><div><h3>Earrings</h3><p>Light-catching halos &amp; drops</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="{% url 'store:collection_detail' 'necklaces' %}" class="cat reveal">
-                        <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=600&auto=format&fit=crop')"></div>
-                        <div class="cat-info"><div><h3>Necklaces</h3><p>Pendants for every story</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="{% url 'store:collection_detail' 'rings' %}" class="cat reveal">
-                        <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1622398925373-3f91b1e275f5?w=900&auto=format&fit=crop&q=60')"></div>
-                        <div class="cat-info"><div><h3>Rings</h3><p>Solitaires &amp; statements</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="{% url 'store:collection_detail' 'bracelets' %}" class="cat reveal">
-                        <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop')"></div>
-                        <div class="cat-info"><div><h3>Bracelets</h3><p>Fluid lines of light</p></div><span class="cat-arrow"><i class="fas fa-arrow-right"></i></span></div>
-                    </a>
+
+                <!-- Slide 2: Minimalist Daily Luxe & Anti-Tarnish -->
+                <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=1600&auto=format&fit=crop');">
+                    <div class="hero-slide-overlay"></div>
+                    <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
+                        <div class="hero-slide-content">
+                            <span class="hero-slide-tag"><i class="fas fa-shield-halved"></i> 100% Skin-Safe &amp; Waterproof</span>
+                            <h1 class="hero-slide-title">Anti-Tarnish Gold. <em>Made For</em> Everyday Life.</h1>
+                            <p class="hero-slide-desc">Lead &amp; nickel-free 18K gold plated essentials that never fade in sweat or water. Designed for comfortable 24/7 wear.</p>
+                            <div class="hero-slide-actions">
+                                <a href="{% url 'store:collections' %}?metal=anti-tarnish" class="hero-btn-primary">Shop Anti-Tarnish Gold <i class="fas fa-arrow-right"></i></a>
+                                <a href="#trending-bestsellers" class="hero-btn-ghost">View Bestsellers <i class="fas fa-arrow-down"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: High-Shine Crystal & Cocktail Glam -->
+                <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1600&auto=format&fit=crop');">
+                    <div class="hero-slide-overlay"></div>
+                    <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
+                        <div class="hero-slide-content">
+                            <span class="hero-slide-tag"><i class="fas fa-wand-magic-sparkles"></i> Sparkling Zirconia Atelier</span>
+                            <h1 class="hero-slide-title">Steal The <em>Evening Light</em>.</h1>
+                            <p class="hero-slide-desc">Precision-cut crystal halos, baguette tennis bracelets, and chandelier drops that capture every flash of light.</p>
+                            <div class="hero-slide-actions">
+                                <a href="{% url 'store:collections' %}?occasion=cocktail" class="hero-btn-primary">Explore Cocktail Glam <i class="fas fa-arrow-right"></i></a>
+                                <a href="#budget-finder" class="hero-btn-ghost">Shop Under ₹999 <i class="fas fa-tag"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carousel Navigation -->
+                <button type="button" class="hero-nav-arrow prev" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+                <button type="button" class="hero-nav-arrow next" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
+
+                <div class="hero-dots-wrap">
+                    <button type="button" class="hero-dot active" aria-label="Go to slide 1"></button>
+                    <button type="button" class="hero-dot" aria-label="Go to slide 2"></button>
+                    <button type="button" class="hero-dot" aria-label="Go to slide 3"></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 3. TRUST STRIP (4 Pillars) ===== -->
+        <section class="trust reveal">
+            <div class="container">
+                <div class="trust-grid">
+                    <div class="trust-item">
+                        <i class="fas fa-truck-fast"></i>
+                        <div>
+                            <strong>Insured Express Transit</strong>
+                            <span>Delhi NCR dispatch · Free shipping above ₹999</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-certificate"></i>
+                        <div>
+                            <strong>Anti-Tarnish Purity</strong>
+                            <span>100% skin-safe &amp; hypoallergenic guarantee</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-gem"></i>
+                        <div>
+                            <strong>Velvet Keepsake Box</strong>
+                            <span>Signature royal box &amp; care cloth included</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-qrcode"></i>
+                        <div>
+                            <strong>Instant UPI &amp; Cards</strong>
+                            <span>Paytm QR, Google Pay &amp; 256-bit secure checkout</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ===== SHOP BY WEDDING & OCCASION (Competitor Benchmark Feature) ===== -->
-        <section class="section wedding-section" style="padding: 24px 0 10px;">
+        <section class="section wedding-section" id="wedding-occasions" style="padding: 24px 0 10px;">
             <div class="container">
                 <div class="sec-head reveal">
                     <div>
@@ -1031,20 +1767,72 @@
             </div>
         </section>
 
-        <!-- ===== LATEST ARRIVALS (real products from Django) ===== -->
-        <section class="section" id="latest-arrivals" style="scroll-margin-top: 90px;"><a id="shop" style="display:none;"></a>
+        <!-- ===== 5. TRENDING BESTSELLERS ===== -->
+        <section class="section" id="trending-bestsellers" style="scroll-margin-top: 90px;"><a id="latest-arrivals"></a><a id="shop" style="display:none;"></a>
             <div class="container">
                 <div class="sec-head reveal">
-                    <div><span class="eyebrow">Just in</span><h2>Latest Arrivals</h2></div>
-                    <a href="{% url 'store:collections' %}" class="view-all">See full collection <i class="fas fa-arrow-right"></i></a>
+                    <div>
+                        <span class="eyebrow"><i class="fas fa-wand-magic-sparkles" style="color:#D4AF37;"></i> Curated Atelier Favourites</span>
+                        <h2>Trending Bestsellers</h2>
+                    </div>
+                    <a href="{% url 'store:collections' %}" class="view-all">All Bestsellers <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="collection-grid">
-                    {% for product in recent_products %}
+                    {% for product in trending_products %}
                     {% include 'store/includes/product_card.html' with product=product card_class='reveal' %}
                     {% empty %}
-                    <p class="empty">Our collection is currently being updated.</p>
+                    {% for product in recent_products|slice:":8" %}
+                    {% include 'store/includes/product_card.html' with product=product card_class='reveal' %}
                     {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 6. SHOP BY BUDGET / GIFT FINDER (Suggestion #3) ===== -->
+        <section class="section budget-section" id="budget-finder">
+            <div class="container">
+                <div class="sec-head reveal">
+                    <div>
+                        <span class="eyebrow"><i class="fas fa-gift" style="color:#D4AF37;"></i> Curated For Every Pocket</span>
+                        <h2>Shop by Budget &amp; Gift Finder</h2>
+                    </div>
+                    <a href="{% url 'store:collections' %}" class="view-all">Explore All Gifts <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="budget-grid reveal">
+                    <!-- Under 299 -->
+                    <a href="{% url 'store:collections' %}?price=under-999&max_price=299" class="budget-card">
+                        <span class="budget-badge">Everyday Value</span>
+                        <div class="budget-price">Under ₹299</div>
+                        <p class="budget-desc">Charming daily studs, dainty midi rings &amp; delicate stacking chains for effortless elegance.</p>
+                        <span class="budget-cta">Shop Under ₹299 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- Under 499 -->
+                    <a href="{% url 'store:collections' %}?price=under-999&max_price=499" class="budget-card">
+                        <span class="budget-badge hot">Most Popular</span>
+                        <div class="budget-price">Under ₹499</div>
+                        <p class="budget-desc">Statement hoops, dual-tone pendants, pearl drops &amp; stylish ear cuffs for chic daily wear.</p>
+                        <span class="budget-cta">Shop Under ₹499 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- Under 999 -->
+                    <a href="{% url 'store:collections' %}?price=under-999" class="budget-card">
+                        <span class="budget-badge">Festive Choice</span>
+                        <div class="budget-price">Under ₹999</div>
+                        <p class="budget-desc">Kundan choker sets, crystal chandeliers &amp; bridal cocktail earrings that command attention.</p>
+                        <span class="budget-cta">Shop Under ₹999 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- Luxury Above 1499 -->
+                    <a href="{% url 'store:collections' %}?price=above-2000" class="budget-card">
+                        <span class="budget-badge luxury">Heirloom Atelier</span>
+                        <div class="budget-price">Luxury Above ₹1,499</div>
+                        <p class="budget-desc">Grand bridal heritage sets, layered polki necklaces &amp; heirloom pieces made to be treasured.</p>
+                        <span class="budget-cta">Explore Luxury Edit <i class="fas fa-arrow-right"></i></span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1253,28 +2041,145 @@
             </div>
         </section>
 
-        <!-- ===== REVIEWS ===== -->
-        <section class="container">
-            <div class="reviews">
-                <div class="container">
-                    <div class="sec-head reveal" style="justify-content:center;text-align:center;">
-                        <div><span class="eyebrow">Worn &amp; loved</span><h2>4.9/5 From 12,000+ Happy Wearers</h2></div>
+        <!-- ===== 8. THE MAPSKART VELVET UNBOXING EXPERIENCE (Suggestion #4) ===== -->
+        <section class="section unboxing-section" id="unboxing-experience">
+            <div class="container">
+                <div class="unboxing-wrap reveal">
+                    <div class="unboxing-visual">
+                        <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=900&auto=format&fit=crop" alt="MAPSKART Signature Royal Navy Velvet Box Unboxing" loading="lazy" />
+                        <div class="unboxing-seal-badge">
+                            <i class="fas fa-certificate"></i>
+                            <div>
+                                <strong>Anti-Tarnish Purity Seal</strong>
+                                <span>100% Skin-Safe Guarantee</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="rev-grid">
-                        <div class="rev reveal">
-                            <div class="stars">★★★★★</div>
-                            <p>The ring arrived better finished than the photos even suggested. It doesn't feel mass-produced at all.</p>
-                            <div class="rev-user"><div class="avatar">A</div><div><strong>Ayesha R.</strong><span><i class="fas fa-circle-check"></i>Verified buyer · Delhi</span></div></div>
+
+                    <div class="unboxing-content">
+                        <span class="eyebrow"><i class="fas fa-box-open" style="color:#D4AF37;"></i> The Signature Unboxing</span>
+                        <h2 style="font-family:'Playfair Display',Georgia,serif; font-size:36px; line-height:1.2; margin:10px 0 16px; color:#0F172A;">
+                            The MAPSKART Velvet Unboxing Experience
+                        </h2>
+                        <p style="color:#64748B; line-height:1.7; font-size:15px; margin:0 0 20px;">
+                            Every piece is treated like a priceless heirloom. Handcrafted and nestled in bespoke keepsake packaging designed to make unboxing and gifting an unforgettable ritual.
+                        </p>
+
+                        <div class="unboxing-features">
+                            <div class="unboxing-feature-card">
+                                <h4><i class="fas fa-gem"></i> Signature Velvet Box</h4>
+                                <p>Plush royal navy velvet casing with custom-moulded cushioning to protect prongs.</p>
+                            </div>
+                            <div class="unboxing-feature-card">
+                                <h4><i class="fas fa-circle-check"></i> Digital Certificate Seal</h4>
+                                <p>Authentic purity seal guaranteeing lead-free, nickel-free &amp; anti-tarnish finish.</p>
+                            </div>
+                            <div class="unboxing-feature-card">
+                                <h4><i class="fas fa-wand-magic-sparkles"></i> Jewellery Care Cloth</h4>
+                                <p>Complimentary ultra-soft microfiber polishing cloth for lasting brilliant shine.</p>
+                            </div>
+                            <div class="unboxing-feature-card">
+                                <h4><i class="fas fa-gift"></i> Ready-to-Gift Packaging</h4>
+                                <p>Delivered with elegant satin ribbon and complimentary handwritten gift card option.</p>
+                            </div>
                         </div>
-                        <div class="rev reveal">
-                            <div class="stars">★★★★★</div>
-                            <p>My go-to gift shop now. The packaging alone makes it feel like an occasion every time.</p>
-                            <div class="rev-user"><div class="avatar">K</div><div><strong>Karan M.</strong><span><i class="fas fa-circle-check"></i>Verified buyer · Bengaluru</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 9. CUSTOMER REVIEWS & VERIFIED PHOTO WALL ===== -->
+        <section class="section ugc-wall-section" id="reviews">
+            <div class="container">
+                <div class="sec-head reveal" style="text-align:center; justify-content:center; margin-bottom:28px;">
+                    <div>
+                        <span class="eyebrow" style="color:#D4AF37;"><i class="fas fa-camera"></i> Styled By Real Wearers</span>
+                        <h2 style="margin-bottom:8px;">Verified Atelier Reviews &amp; Customer Photo Wall</h2>
+                        <div style="display:inline-flex; align-items:center; gap:8px; background:#FEF3C7; color:#92400E; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700;">
+                            <i class="fas fa-star" style="color:#F59E0B;"></i> 4.9 / 5 Rating from 12,000+ Verified Buyers across India
                         </div>
-                        <div class="rev reveal">
-                            <div class="stars">★★★★★</div>
-                            <p>Three years on, my necklace still looks new. Customer care was patient with all my sizing questions too.</p>
-                            <div class="rev-user"><div class="avatar">P</div><div><strong>Priya S.</strong><span><i class="fas fa-circle-check"></i>Verified buyer · Mumbai</span></div></div>
+                    </div>
+                </div>
+
+                <!-- UGC Photo Wall Strip -->
+                <div class="ugc-photo-scroll reveal">
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing MAPSKART Halo Earrings" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#BridalGlam</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Aanya S. · Delhi</span>
+                        </div>
+                    </div>
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing MAPSKART Layered Necklace" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#OfficeLuxe</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Ritu M. · Bengaluru</span>
+                        </div>
+                    </div>
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing Royal Bridal Choker" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#WeddingEdit</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Pooja K. · Jaipur</span>
+                        </div>
+                    </div>
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing Cocktail Zirconia Set" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#CocktailNight</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Sanjana T. · Mumbai</span>
+                        </div>
+                    </div>
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing Tennis Bracelet" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#EverydayLuxe</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Meera D. · Pune</span>
+                        </div>
+                    </div>
+                    <div class="ugc-photo-card">
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=400&auto=format&fit=crop" alt="Customer Wearing Solitaire Rings" loading="lazy" />
+                        <div class="ugc-card-overlay">
+                            <span class="ugc-tag">#EngagementVibes</span>
+                            <span class="ugc-buyer-name"><i class="fas fa-circle-check"></i> Divya P. · Hyderabad</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verified Testimonials Grid -->
+                <div class="rev-grid" style="margin-top:28px;">
+                    <div class="rev reveal">
+                        <div class="stars" style="color:#F59E0B; margin-bottom:10px;">★★★★★</div>
+                        <p>"The royal navy velvet box unboxing felt like opening high jewellery from Cartier or Tanishq. The anti-tarnish finish has held up beautifully even after wearing it to 3 summer weddings in Delhi!"</p>
+                        <div class="rev-user">
+                            <div class="avatar" style="background:linear-gradient(135deg,#D4AF37,#1E3A8A);">A</div>
+                            <div>
+                                <strong>Aanya Sharma</strong>
+                                <span><i class="fas fa-circle-check"></i> Verified Buyer · Delhi NCR</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rev reveal">
+                        <div class="stars" style="color:#F59E0B; margin-bottom:10px;">★★★★★</div>
+                        <p>"Ordered the Kundan choker for my sister's Sangeet ceremony. Shipped same day from Delhi and reached Bengaluru in 48 hours. The weight and shine in person look 10x better than the photos!"</p>
+                        <div class="rev-user">
+                            <div class="avatar" style="background:linear-gradient(135deg,#059669,#1E3A8A);">R</div>
+                            <div>
+                                <strong>Ritu Mehta</strong>
+                                <span><i class="fas fa-circle-check"></i> Verified Buyer · Bengaluru</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rev reveal">
+                        <div class="stars" style="color:#F59E0B; margin-bottom:10px;">★★★★★</div>
+                        <p>"100% skin safe is real. I have sensitive skin and usually get rashes from imitation jewellery. MAPSKART's anti-tarnish earrings have zero nickel and I wore them non-stop for 14 hours comfortably."</p>
+                        <div class="rev-user">
+                            <div class="avatar" style="background:linear-gradient(135deg,#7C3AED,#1E3A8A);">P</div>
+                            <div>
+                                <strong>Pooja Kulkarni</strong>
+                                <span><i class="fas fa-circle-check"></i> Verified Buyer · Mumbai</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1814,7 +2719,93 @@
                 img.src = newSrc;
             }
         }
-    });
+
+        /* Editorial Hero Carousel Rotator */
+        (function() {
+            var slides = document.querySelectorAll('.hero-slide');
+            var dots = document.querySelectorAll('.hero-dot');
+            var prevBtn = document.querySelector('.hero-nav-arrow.prev');
+            var nextBtn = document.querySelector('.hero-nav-arrow.next');
+            var sliderWrap = document.querySelector('.hero-slider-wrap');
+            if (!slides.length) return;
+
+            var currentIndex = 0;
+            var totalSlides = slides.length;
+            var timer = null;
+            var intervalTime = 6000;
+
+            function goToSlide(index) {
+                slides[currentIndex].classList.remove('active');
+                if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+                currentIndex = (index + totalSlides) % totalSlides;
+                slides[currentIndex].classList.add('active');
+                if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+            }
+
+            function nextSlide() {
+                goToSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(currentIndex - 1);
+            }
+
+            function startTimer() {
+                stopTimer();
+                timer = setInterval(nextSlide, intervalTime);
+            }
+
+            function stopTimer() {
+                if (timer) clearInterval(timer);
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    nextSlide();
+                    startTimer();
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    prevSlide();
+                    startTimer();
+                });
+            }
+
+            dots.forEach(function(dot, idx) {
+                dot.addEventListener('click', function() {
+                    goToSlide(idx);
+                    startTimer();
+                });
+            });
+
+            if (sliderWrap) {
+                sliderWrap.addEventListener('mouseenter', stopTimer);
+                sliderWrap.addEventListener('mouseleave', startTimer);
+
+                // Touch Swipe
+                var startX = 0;
+                sliderWrap.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                    stopTimer();
+                }, { passive: true });
+
+                sliderWrap.addEventListener('touchend', function(e) {
+                    var diffX = e.changedTouches[0].clientX - startX;
+                    if (diffX > 40) {
+                        prevSlide();
+                    } else if (diffX < -40) {
+                        nextSlide();
+                    }
+                    startTimer();
+                }, { passive: true });
+            }
+
+            startTimer();
+        })();
+
+        });
      </script>
     {% include 'store/includes/floating_whatsapp.html' %}
 </body>
