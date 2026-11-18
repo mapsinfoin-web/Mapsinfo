@@ -139,45 +139,52 @@ def product_detail(request, pk):
                 selected_color_obj = c
                 break
 
-    # Curated "Complete The Look" / Pair With Cross-sell
-    pair_products = list(product.pair_with.filter(is_active=True, stock__gt=0)[:2])
-    if not pair_products:
-        cat_slug = (product.category.slug.lower() if product.category and product.category.slug else '')
-        if 'earring' in cat_slug:
-            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).filter(
-                Q(category__slug='necklaces') | Q(category__slug='bracelets')
-            ).exclude(pk=product.pk)
-        elif 'necklace' in cat_slug:
-            pair_qs = Product.objects.filter(is_active=True, stock__gt=0, category__slug='earrings').exclude(pk=product.pk)
-        elif 'ring' in cat_slug:
-            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).filter(
-                Q(category__slug='bracelets') | Q(category__slug='earrings')
-            ).exclude(pk=product.pk)
-        else:
-            pair_qs = Product.objects.filter(is_active=True, stock__gt=0).exclude(pk=product.pk)
+    # Curated "You May Also Like" / Related Products Recommendations
+    suggested_products = []
+    existing_ids = [product.pk]
 
-        # Match color if possible
+    # 1. First, check explicitly paired pieces via product.pair_with
+    pair_qs = list(product.pair_with.filter(is_active=True, stock__gt=0).exclude(pk=product.pk)[:4])
+    suggested_products.extend(pair_qs)
+    existing_ids.extend([p.pk for p in pair_qs])
+
+    # 2. Match products in same category or matching color/style
+    if len(suggested_products) < 4:
+        cat_filter = Q(category=product.category) if product.category else Q()
         color_tags = product.color_tags
-        matched = []
+        color_filter = Q()
         if color_tags:
             for tag in color_tags:
-                tag_matches = list(pair_qs.filter(title__icontains=tag)[:2])
-                if tag_matches:
-                    matched.extend(tag_matches)
-                    break
-        if not matched:
-            matched = list(pair_qs[:2])
-        pair_products = matched[:2]
+                color_filter |= Q(title__icontains=tag)
 
-    pair_product = pair_products[0] if pair_products else None
-    combo_total = None
-    combo_discounted = None
-    combo_savings = None
-    if pair_product:
-        combo_total = product.price + pair_product.price
-        # 10% combo bundle discount
-        combo_discounted = round(combo_total * Decimal('0.90'))
-        combo_savings = combo_total - combo_discounted
+        # Same category + matching color first
+        if color_tags:
+            matched_color_qs = list(
+                Product.objects.filter(is_active=True, stock__gt=0)
+                .filter(cat_filter & color_filter)
+                .exclude(pk__in=existing_ids)[:4]
+            )
+            suggested_products.extend(matched_color_qs)
+            existing_ids.extend([p.pk for p in matched_color_qs])
+
+        # Same category
+        if len(suggested_products) < 4 and product.category:
+            same_cat_qs = list(
+                Product.objects.filter(is_active=True, stock__gt=0, category=product.category)
+                .exclude(pk__in=existing_ids)[: 4 - len(suggested_products)]
+            )
+            suggested_products.extend(same_cat_qs)
+            existing_ids.extend([p.pk for p in same_cat_qs])
+
+        # Complementary active pieces from other collections
+        if len(suggested_products) < 4:
+            other_qs = list(
+                Product.objects.filter(is_active=True, stock__gt=0)
+                .exclude(pk__in=existing_ids)[: 4 - len(suggested_products)]
+            )
+            suggested_products.extend(other_qs)
+
+    attach_offers(suggested_products)
 
     # Customer Reviews & Photo UGC
     reviews_qs = product.reviews.filter(is_approved=True).select_related('user').order_by('-created_at')
@@ -224,10 +231,7 @@ def product_detail(request, pk):
         'gift_choices': gift_choices,   # free gifts the customer can pick (active + in stock)
         'trust_words': _trust_words(product),   # [(icon, text), ...] shown under the price
         'selected_color_obj': selected_color_obj,
-        'pair_product': pair_product,
-        'combo_total': combo_total,
-        'combo_discounted': combo_discounted,
-        'combo_savings': combo_savings,
+        'suggested_products': suggested_products[:4],
         'reviews': reviews_qs[:30],
         'photo_reviews': photo_reviews[:16],
         'rating_stats': rating_stats,
