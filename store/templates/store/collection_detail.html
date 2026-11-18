@@ -700,7 +700,7 @@
                     <!-- By Metal / Finish -->
                     <div class="filter-group">
                         <div class="filter-group-header">
-                            <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> By Metal / Finish:</h4>
+                            <h4 class="filter-group-title"><i class="fas fa-wand-magic-sparkles"></i> By Metal / Finish:</h4>
                         </div>
                         <div class="filter-pills" id="finishFilterPills">
                             <button type="button" class="filter-pill active" data-finish="all" onclick="setFinishFilter('all')">
@@ -765,11 +765,11 @@
                     <!-- Special Filters -->
                     <div class="filter-group" style="grid-column: 1 / -1;">
                         <div class="filter-group-header">
-                            <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> Availability &amp; Special:</h4>
+                            <h4 class="filter-group-title"><i class="fas fa-wand-magic-sparkles"></i> Availability &amp; Special:</h4>
                         </div>
                         <div class="filter-pills" id="specialFilterPills">
                             <button type="button" class="filter-pill" data-special="new" onclick="toggleSpecialFilter('new')">
-                                <i class="fas fa-sparkles" style="color:var(--brand);"></i> New Season Drop
+                                <i class="fas fa-wand-magic-sparkles" style="color:var(--brand);"></i> New Season Drop
                             </button>
                             <button type="button" class="filter-pill" data-special="sale" onclick="toggleSpecialFilter('sale')">
                                 <i class="fas fa-fire" style="color:var(--red);"></i> Sale Deals
@@ -1027,7 +1027,7 @@
                     'crystal-zircon': 'Sparkling Crystal / Zircon',
                     'oxidised-silver': 'Oxidised Silver'
                 };
-                chipsHtml += '<span class="chip" onclick="removeChip(\'finish\')"><i class="fas fa-sparkles"></i> ' + (finishLabels[filterState.finish] || filterState.finish) + ' <i class="fas fa-times"></i></span>';
+                chipsHtml += '<span class="chip" onclick="removeChip(\'finish\')"><i class="fas fa-wand-magic-sparkles"></i> ' + (finishLabels[filterState.finish] || filterState.finish) + ' <i class="fas fa-times"></i></span>';
             }
             if (filterState.price !== 'all') {
                 activeFilterCount++;
@@ -1046,7 +1046,7 @@
             if (filterState.special) {
                 activeFilterCount++;
                 var specialLabels = { 'new': 'New Drop', 'sale': 'Sale Deals', 'instock': 'In Stock' };
-                chipsHtml += '<span class="chip" onclick="removeChip(\'special\')"><i class="fas fa-sparkles"></i> ' + (specialLabels[filterState.special] || filterState.special) + ' <i class="fas fa-times"></i></span>';
+                chipsHtml += '<span class="chip" onclick="removeChip(\'special\')"><i class="fas fa-wand-magic-sparkles"></i> ' + (specialLabels[filterState.special] || filterState.special) + ' <i class="fas fa-times"></i></span>';
             }
             if (activeFilterCount > 0) {
                 chipsHtml += '<button type="button" class="chip chip-clear-all" onclick="resetAllFilters()"><i class="fas fa-rotate-left"></i> Clear All</button>';

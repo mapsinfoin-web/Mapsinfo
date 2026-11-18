@@ -618,4 +618,13 @@
         max-width: none;
     }
 }
+
+/* Polyfill for FontAwesome fa-sparkles (Pro -> Free wand-magic-sparkles fallback) */
+.fa-sparkles::before,
+i.fa-sparkles::before {
+    content: "\e2ca" !important;
+    font-family: "Font Awesome 6 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    display: inline-block;
+}
 </style>
