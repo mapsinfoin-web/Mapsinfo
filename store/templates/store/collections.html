@@ -552,14 +552,17 @@
         <span class="eyebrow" style="color:var(--navy); font-weight:700; letter-spacing:2px; font-size:12px; text-transform:uppercase; margin-bottom:6px; display:inline-block;">{{ occasion_data.eyebrow }}</span>
         <h1 style="margin:4px 0 8px;">{{ occasion_data.title }}</h1>
         <p>{{ occasion_data.desc }}</p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-            <a href="{% url 'store:collections' %}?occasion=haldi" class="main-cat-tab {% if active_occasion == 'haldi' %}active{% endif %}"><i class="fas fa-sun" style="color:#D97706;"></i> Haldi</a>
-            <a href="{% url 'store:collections' %}?occasion=mehendi" class="main-cat-tab {% if active_occasion == 'mehendi' %}active{% endif %}"><i class="fas fa-leaf" style="color:#059669;"></i> Mehendi</a>
-            <a href="{% url 'store:collections' %}?occasion=sangeet" class="main-cat-tab {% if active_occasion == 'sangeet' %}active{% endif %}"><i class="fas fa-glass-cheers" style="color:#2563EB;"></i> Sangeet</a>
-            <a href="{% url 'store:collections' %}?occasion=bridal" class="main-cat-tab {% if active_occasion == 'bridal' %}active{% endif %}"><i class="fas fa-crown" style="color:#DC2626;"></i> Bridal</a>
-            <a href="{% url 'store:collections' %}?occasion=reception" class="main-cat-tab {% if active_occasion == 'reception' %}active{% endif %}"><i class="fas fa-gem" style="color:#7C3AED;"></i> Reception</a>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px;">
+            <a href="{% url 'store:collections' %}?occasion=wedding-bridal" class="main-cat-tab {% if active_occasion == 'wedding-bridal' %}active{% endif %}"><i class="fas fa-crown" style="color:#DC2626;"></i> Wedding &amp; Bridal</a>
+            <a href="{% url 'store:collections' %}?occasion=daily-office" class="main-cat-tab {% if active_occasion == 'daily-office' %}active{% endif %}"><i class="fas fa-briefcase" style="color:#2563EB;"></i> Daily Office Wear</a>
+            <a href="{% url 'store:collections' %}?occasion=cocktail-party" class="main-cat-tab {% if active_occasion == 'cocktail-party' %}active{% endif %}"><i class="fas fa-glass-cheers" style="color:#7C3AED;"></i> Cocktail &amp; Party</a>
+            <a href="{% url 'store:collections' %}?occasion=haldi-mehendi" class="main-cat-tab {% if active_occasion == 'haldi-mehendi' %}active{% endif %}"><i class="fas fa-sun" style="color:#D97706;"></i> Haldi &amp; Mehendi</a>
             <a href="{% url 'store:collections' %}" class="main-cat-tab"><i class="fas fa-th-large"></i> All Jewellery</a>
         </div>
+        {% elif finish_data %}
+        <span class="eyebrow" style="color:var(--navy); font-weight:700; letter-spacing:2px; font-size:12px; text-transform:uppercase; margin-bottom:6px; display:inline-block;">Shop By Metal &amp; Finish</span>
+        <h1 style="margin:4px 0 8px;">{{ finish_data.title }}</h1>
+        <p>{{ finish_data.desc }}</p>
         {% elif active_main_cat %}
         <h1>{{ active_main_cat.name }} Collection</h1>
         <p>Handcrafted {{ active_main_cat.name }} designed for modern luxury</p>
@@ -568,7 +571,7 @@
         <p>Explore fine handcrafted jewellery by style</p>
         {% else %}
         <h1>Curated Collections</h1>
-        <p>Explore fine handcrafted jewellery by category and style</p>
+        <p>Explore fine handcrafted jewellery by category, occasion, finish, and price</p>
         {% endif %}
     </div>
 
@@ -672,26 +675,66 @@
             {% endif %}
 
             <div class="filter-row">
-                <!-- Price Range -->
+                <!-- By Occasion -->
                 <div class="filter-group">
                     <div class="filter-group-header">
-                        <h4 class="filter-group-title"><i class="fas fa-tag"></i> Price Range:</h4>
+                        <h4 class="filter-group-title"><i class="fas fa-crown"></i> By Occasion:</h4>
+                    </div>
+                    <div class="filter-pills" id="occasionFilterPills">
+                        <button type="button" class="filter-pill active" data-occasion="all" onclick="setOccasionFilter('all')">
+                            All Occasions
+                        </button>
+                        {% for occ in occasion_filters %}
+                        <button type="button" class="filter-pill" data-occasion="{{ occ.slug }}" onclick="setOccasionFilter('{{ occ.slug }}')">
+                            <i class="fas {{ occ.icon }}" style="color: {{ occ.color }};"></i>
+                            <span>{{ occ.name }}</span>
+                            <span class="pill-count">({{ occ.count }})</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- By Metal / Finish -->
+                <div class="filter-group">
+                    <div class="filter-group-header">
+                        <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> By Metal / Finish:</h4>
+                    </div>
+                    <div class="filter-pills" id="finishFilterPills">
+                        <button type="button" class="filter-pill active" data-finish="all" onclick="setFinishFilter('all')">
+                            All Finishes
+                        </button>
+                        {% for fin in finish_filters %}
+                        <button type="button" class="filter-pill" data-finish="{{ fin.slug }}" onclick="setFinishFilter('{{ fin.slug }}')">
+                            <span class="pill-dot" style="background: {{ fin.swatch }};"></span>
+                            <span>{{ fin.name }}</span>
+                            <span class="pill-count">({{ fin.count }})</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <!-- By Price -->
+                <div class="filter-group">
+                    <div class="filter-group-header">
+                        <h4 class="filter-group-title"><i class="fas fa-tag"></i> By Price:</h4>
                     </div>
                     <div class="filter-pills" id="priceFilterPills">
                         <button type="button" class="filter-pill active" data-price="all" onclick="setPriceFilter('all')">
                             All Prices
                         </button>
-                        <button type="button" class="filter-pill" data-price="under-250" onclick="setPriceFilter('under-250')">
-                            Under ₹250
+                        <button type="button" class="filter-pill" data-price="under-999" onclick="setPriceFilter('under-999')">
+                            <span>Under ₹999</span>
+                            <span class="pill-count">({{ price_summary.under_999|default:"0" }})</span>
                         </button>
-                        <button type="button" class="filter-pill" data-price="250-499" onclick="setPriceFilter('250-499')">
-                            ₹250 – ₹499
+                        <button type="button" class="filter-pill" data-price="999-1999" onclick="setPriceFilter('999-1999')">
+                            <span>₹999 – ₹1,999</span>
+                            <span class="pill-count">({{ price_summary.mid_999_1999|default:"0" }})</span>
                         </button>
-                        <button type="button" class="filter-pill" data-price="500-999" onclick="setPriceFilter('500-999')">
-                            ₹500 – ₹999
-                        </button>
-                        <button type="button" class="filter-pill" data-price="1000-plus" onclick="setPriceFilter('1000-plus')">
-                            ₹1,000 &amp; Above
+                        <button type="button" class="filter-pill" data-price="above-2000" onclick="setPriceFilter('above-2000')">
+                            <span>Luxury Above ₹2,000</span>
+                            <span class="pill-count">({{ price_summary.above_2000|default:"0" }})</span>
                         </button>
                     </div>
                 </div>
@@ -699,7 +742,7 @@
                 <!-- Availability & Special -->
                 <div class="filter-group">
                     <div class="filter-group-header">
-                        <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> Availability &amp; Special:</h4>
+                        <h4 class="filter-group-title"><i class="fas fa-sliders"></i> Availability &amp; Special:</h4>
                     </div>
                     <div class="filter-pills" id="specialFilterPills">
                         <button type="button" class="filter-pill" data-special="instock" onclick="toggleSpecialFilter('instock')">
@@ -810,11 +853,25 @@
     <script>
         var filterState = {
             subcat: '{{ active_sub_slug|default:"all" }}',
+            occasion: '{{ active_occasion|default:"all" }}',
+            finish: '{{ active_finish|default:"all" }}',
             color: 'all',
-            price: 'all',
+            price: '{{ active_price|default:"all" }}',
             special: null,
             sort: 'featured'
         };
+
+        function syncQueryParam(param, val) {
+            try {
+                var url = new URL(window.location.href);
+                if (val && val !== 'all') {
+                    url.searchParams.set(param, val);
+                } else {
+                    url.searchParams.delete(param);
+                }
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
+        }
 
         function toggleFilterDrawer(forceOpen) {
             var drawer = document.getElementById('filterDrawer');
@@ -835,15 +892,21 @@
         function setSubcatFilter(subSlug) {
             filterState.subcat = (subSlug || 'all').toLowerCase();
             updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', filterState.subcat);
-            try {
-                var url = new URL(window.location.href);
-                if (filterState.subcat && filterState.subcat !== 'all') {
-                    url.searchParams.set('sub', filterState.subcat);
-                } else {
-                    url.searchParams.delete('sub');
-                }
-                window.history.replaceState({}, '', url.toString());
-            } catch (e) {}
+            syncQueryParam('sub', filterState.subcat);
+            applyAllFilters();
+        }
+
+        function setOccasionFilter(occasionSlug) {
+            filterState.occasion = (occasionSlug || 'all').toLowerCase();
+            updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', filterState.occasion);
+            syncQueryParam('occasion', filterState.occasion);
+            applyAllFilters();
+        }
+
+        function setFinishFilter(finishSlug) {
+            filterState.finish = (finishSlug || 'all').toLowerCase();
+            updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', filterState.finish);
+            syncQueryParam('finish', filterState.finish);
             applyAllFilters();
         }
 
@@ -856,6 +919,7 @@
         function setPriceFilter(priceKey) {
             filterState.price = (priceKey || 'all').toLowerCase();
             updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', filterState.price);
+            syncQueryParam('price', filterState.price);
             applyAllFilters();
         }
 
@@ -889,10 +953,14 @@
 
         function resetAllFilters() {
             filterState.subcat = 'all';
+            filterState.occasion = 'all';
+            filterState.finish = 'all';
             filterState.color = 'all';
             filterState.price = 'all';
             filterState.special = null;
             updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', 'all');
+            updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', 'all');
+            updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', 'all');
             updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', 'all');
             updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', 'all');
             var specialPills = document.querySelectorAll('#specialFilterPills .filter-pill');
@@ -900,6 +968,9 @@
             try {
                 var url = new URL(window.location.href);
                 url.searchParams.delete('sub');
+                url.searchParams.delete('occasion');
+                url.searchParams.delete('finish');
+                url.searchParams.delete('price');
                 window.history.replaceState({}, '', url.toString());
             } catch (e) {}
             applyAllFilters();
@@ -907,6 +978,8 @@
 
         function removeChip(type) {
             if (type === 'subcat') setSubcatFilter('all');
+            else if (type === 'occasion') setOccasionFilter('all');
+            else if (type === 'finish') setFinishFilter('all');
             else if (type === 'color') setColorFilter('all');
             else if (type === 'price') setPriceFilter('all');
             else if (type === 'special') toggleSpecialFilter(filterState.special);
@@ -937,7 +1010,6 @@
         function applyAllFilters() {
             var cards = document.querySelectorAll('.grid .card');
             var emptyMessageEl = document.getElementById('filterEmptyMessage');
-            var countBadge = document.getElementById('productsCountBadge');
             var activeFilterBadge = document.getElementById('activeFilterBadge');
             var chipsContainer = document.getElementById('activeChipsContainer');
             var visibleCount = 0;
@@ -951,17 +1023,35 @@
                 var subLabel = subSpan ? subSpan.textContent.trim() : filterState.subcat;
                 chipsHtml += '<span class="chip" onclick="removeChip(\'subcat\')"><i class="fas fa-tag"></i> ' + subLabel + ' <i class="fas fa-times"></i></span>';
             }
-            if (filterState.price !== 'all') {
+            if (filterState.occasion && filterState.occasion !== 'all') {
+                activeFilterCount++;
+                var occLabels = {
+                    'wedding-bridal': 'Wedding & Bridal',
+                    'daily-office': 'Daily Office Wear',
+                    'cocktail-party': 'Cocktail & Party',
+                    'haldi-mehendi': 'Haldi & Mehendi'
+                };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'occasion\')"><i class="fas fa-crown"></i> ' + (occLabels[filterState.occasion] || filterState.occasion) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.finish && filterState.finish !== 'all') {
+                activeFilterCount++;
+                var finishLabels = {
+                    'anti-tarnish-gold': 'Anti-Tarnish Gold',
+                    'crystal-zircon': 'Sparkling Crystal / Zircon',
+                    'oxidised-silver': 'Oxidised Silver'
+                };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'finish\')"><i class="fas fa-sparkles"></i> ' + (finishLabels[filterState.finish] || filterState.finish) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.price && filterState.price !== 'all') {
                 activeFilterCount++;
                 var priceLabels = {
-                    'under-250': 'Under ₹250',
-                    '250-499': '₹250–₹499',
-                    '500-999': '₹500–₹999',
-                    '1000-plus': '₹1,000+'
+                    'under-999': 'Under ₹999',
+                    '999-1999': '₹999 – ₹1,999',
+                    'above-2000': 'Luxury Above ₹2,000'
                 };
                 chipsHtml += '<span class="chip" onclick="removeChip(\'price\')"><i class="fas fa-tag"></i> ' + (priceLabels[filterState.price] || filterState.price) + ' <i class="fas fa-times"></i></span>';
             }
-            if (filterState.color !== 'all') {
+            if (filterState.color && filterState.color !== 'all') {
                 activeFilterCount++;
                 var capitalizedCol = filterState.color.charAt(0).toUpperCase() + filterState.color.slice(1);
                 chipsHtml += '<span class="chip" onclick="removeChip(\'color\')"><i class="fas fa-palette"></i> ' + capitalizedCol + ' <i class="fas fa-times"></i></span>';
@@ -989,6 +1079,8 @@
                 var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
                 var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
+                var cardOccasions = (card.getAttribute('data-occasions') || '').split(/\s+/).filter(Boolean);
+                var cardFinishes = (card.getAttribute('data-finishes') || '').split(/\s+/).filter(Boolean);
                 var cardCategory = (card.getAttribute('data-category') || '').toLowerCase();
                 var isSale = card.getAttribute('data-is-sale') === 'true';
                 var inStock = card.getAttribute('data-in-stock') === 'true';
@@ -1007,17 +1099,17 @@
                 }
 
                 var matchSubcat = (filterState.subcat === 'all') || (cardStyles.indexOf(filterState.subcat) !== -1) || (cardCategory === filterState.subcat);
+                var matchOccasion = (filterState.occasion === 'all') || (cardOccasions.indexOf(filterState.occasion) !== -1);
+                var matchFinish = (filterState.finish === 'all') || (cardFinishes.indexOf(filterState.finish) !== -1);
                 var matchColor = (filterState.color === 'all') || (cardColors.indexOf(filterState.color) !== -1);
 
                 var matchPrice = true;
-                if (filterState.price === 'under-250') {
-                    matchPrice = (cardPrice < 250);
-                } else if (filterState.price === '250-499') {
-                    matchPrice = (cardPrice >= 250 && cardPrice < 500);
-                } else if (filterState.price === '500-999') {
-                    matchPrice = (cardPrice >= 500 && cardPrice < 1000);
-                } else if (filterState.price === '1000-plus') {
-                    matchPrice = (cardPrice >= 1000);
+                if (filterState.price === 'under-999') {
+                    matchPrice = (cardPrice < 999);
+                } else if (filterState.price === '999-1999') {
+                    matchPrice = (cardPrice >= 999 && cardPrice < 2000);
+                } else if (filterState.price === 'above-2000') {
+                    matchPrice = (cardPrice >= 2000);
                 }
 
                 var matchSpecial = true;
@@ -1029,7 +1121,7 @@
                     matchSpecial = inStock;
                 }
 
-                if (matchSubcat && matchColor && matchPrice && matchSpecial) {
+                if (matchSubcat && matchOccasion && matchFinish && matchColor && matchPrice && matchSpecial) {
                     card.classList.remove('hide');
                     visibleCount++;
 
@@ -1056,11 +1148,29 @@
             }
         }
 
-        // Initialize subcategory filter if active_sub_slug was passed
-        if (filterState.subcat && filterState.subcat !== 'all') {
-            updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', filterState.subcat);
-            applyAllFilters();
-        }
+        // Hydrate initial facet filters from URL query parameters
+        (function initFacetFilters() {
+            var hasInitial = false;
+            if (filterState.subcat && filterState.subcat !== 'all') {
+                updatePillActiveState('#subcatFilterPills .filter-pill', 'data-sub', filterState.subcat);
+                hasInitial = true;
+            }
+            if (filterState.occasion && filterState.occasion !== 'all') {
+                updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', filterState.occasion);
+                hasInitial = true;
+            }
+            if (filterState.finish && filterState.finish !== 'all') {
+                updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', filterState.finish);
+                hasInitial = true;
+            }
+            if (filterState.price && filterState.price !== 'all') {
+                updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', filterState.price);
+                hasInitial = true;
+            }
+            if (hasInitial) {
+                applyAllFilters();
+            }
+        })();
 
         function previewCardColor(swatchEl) {
             var imgUrl = swatchEl.getAttribute('data-img');

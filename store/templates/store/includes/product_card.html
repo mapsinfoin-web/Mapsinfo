@@ -5,6 +5,8 @@
          data-price="{{ product.price }}"
          data-style="{{ product.style|default:'' }}"
          data-styles="{{ product.style_tags_str|default:'' }}"
+         data-occasions="{{ product.occasion_tags_str|default:'' }}"
+         data-finishes="{{ product.metal_finish_tags_str|default:'' }}"
          data-colors="{{ product.color_tags_str|default:'' }}"
          data-created="{{ product.created|date:'U' }}"
          data-is-sale="{% if product.mrp and product.mrp > product.price %}true{% else %}false{% endif %}"

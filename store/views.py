@@ -855,25 +855,63 @@ def _get_collection_style_filters(category, products):
     return style_filters
 
 
+def _get_occasion_filters(products):
+    """Computes occasion facet counts for Kushal's / Rubans style discovery."""
+    specs = [
+        {'slug': 'wedding-bridal', 'name': 'Wedding & Bridal', 'icon': 'fa-crown', 'color': '#DC2626'},
+        {'slug': 'daily-office', 'name': 'Daily Office Wear', 'icon': 'fa-briefcase', 'color': '#2563EB'},
+        {'slug': 'cocktail-party', 'name': 'Cocktail & Party', 'icon': 'fa-glass-cheers', 'color': '#7C3AED'},
+        {'slug': 'haldi-mehendi', 'name': 'Haldi & Mehendi', 'icon': 'fa-sun', 'color': '#D97706'},
+    ]
+    results = []
+    for item in specs:
+        count = sum(1 for p in products if item['slug'] in p.occasion_tags)
+        results.append({**item, 'count': count})
+    return results
+
+
+def _get_metal_finish_filters(products):
+    """Computes metal/finish facet counts with metallic swatch gradients."""
+    specs = [
+        {
+            'slug': 'anti-tarnish-gold',
+            'name': 'Anti-Tarnish Gold',
+            'swatch': 'linear-gradient(135deg, #FDE68A 0%, #D97706 60%, #92400E 100%)',
+        },
+        {
+            'slug': 'crystal-zircon',
+            'name': 'Sparkling Crystal / Zircon',
+            'swatch': 'linear-gradient(135deg, #FFFFFF 0%, #BAE6FD 55%, #38BDF8 100%)',
+        },
+        {
+            'slug': 'oxidised-silver',
+            'name': 'Oxidised Silver',
+            'swatch': 'linear-gradient(135deg, #E2E8F0 0%, #94A3B8 55%, #334155 100%)',
+        },
+    ]
+    results = []
+    for item in specs:
+        count = sum(1 for p in products if item['slug'] in p.metal_finish_tags)
+        results.append({**item, 'count': count})
+    return results
+
+
 def _get_price_ranges(products):
-    """Counts how many products fall into standard price brackets."""
+    """Counts how many products fall into the curated price brackets."""
     counts = {
-        'under-250': 0,
-        '250-499': 0,
-        '500-999': 0,
-        '1000-plus': 0,
+        'under_999': 0,
+        'mid_999_1999': 0,
+        'above_2000': 0,
     }
     for p in products:
         try:
             price = float(p.price)
-            if price < 250:
-                counts['under-250'] += 1
-            elif 250 <= price < 500:
-                counts['250-499'] += 1
-            elif 500 <= price < 1000:
-                counts['500-999'] += 1
+            if price < 999:
+                counts['under_999'] += 1
+            elif 999 <= price < 2000:
+                counts['mid_999_1999'] += 1
             else:
-                counts['1000-plus'] += 1
+                counts['above_2000'] += 1
         except Exception:
             pass
     return counts
@@ -885,88 +923,108 @@ def _get_price_ranges(products):
 
 def collections(request):
     main_categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('order', 'id'))
-    
+
     active_cat_slug = request.GET.get('cat', '').strip().lower()
     active_sub_slug = request.GET.get('sub', '').strip().lower()
-    active_occasion = request.GET.get('occasion', '').strip().lower()
+    raw_occasion = request.GET.get('occasion', '').strip().lower()
+    active_finish = request.GET.get('finish', '').strip().lower()
+    active_price = request.GET.get('price', '').strip().lower()
+
+    # Map legacy occasion query aliases cleanly to the 4 core occasion facets
+    OCCASION_ALIAS = {
+        'bridal': 'wedding-bridal',
+        'wedding': 'wedding-bridal',
+        'wedding-bridal': 'wedding-bridal',
+        'daily': 'daily-office',
+        'office': 'daily-office',
+        'daily-office': 'daily-office',
+        'cocktail': 'cocktail-party',
+        'party': 'cocktail-party',
+        'sangeet': 'cocktail-party',
+        'reception': 'cocktail-party',
+        'cocktail-party': 'cocktail-party',
+        'haldi': 'haldi-mehendi',
+        'mehendi': 'haldi-mehendi',
+        'haldi-mehendi': 'haldi-mehendi',
+    }
+    active_occasion = OCCASION_ALIAS.get(raw_occasion, '')
 
     # Determine active main category
     active_main_cat = None
     if active_cat_slug:
         active_main_cat = next((c for c in main_categories if c.slug.lower() == active_cat_slug), None)
-    
-    # Occasion curation mapping for wedding & festive looks
+
+    # Occasion curation mapping for header copy
     OCCASION_MAP = {
-        'haldi': {
-            'key': 'haldi',
-            'title': 'Haldi Ceremony Jewellery',
-            'eyebrow': 'Wedding Occasion Edit',
-            'desc': 'Radiant yellow stones, gold tones, and floral kundan pieces curated for auspicious Haldi celebrations.',
-            'query': Q(title__icontains='gold') | Q(title__icontains='yellow') | Q(colors__name__icontains='yellow') | Q(sub_categories__slug__in=['jhumke', 'chandbali']),
-            'badge': 'Haldi Yellow & Gold',
-        },
-        'mehendi': {
-            'key': 'mehendi',
-            'title': 'Mehendi Ceremony Jewellery',
-            'eyebrow': 'Wedding Occasion Edit',
-            'desc': 'Vibrant emerald greens, verdant crystals, and statement cuffs designed for celebratory Mehendi ceremonies.',
-            'query': Q(title__icontains='green') | Q(title__icontains='verdant') | Q(title__icontains='emerald') | Q(colors__name__icontains='green'),
-            'badge': 'Mehendi Green & Cuffs',
-        },
-        'sangeet': {
-            'key': 'sangeet',
-            'title': 'Sangeet & Cocktail Glam',
-            'eyebrow': 'Wedding Occasion Edit',
-            'desc': 'High-sparkle baguette crystals, radiant zircons, and royal sapphire blue pieces made to dazzle the dance floor.',
-            'query': Q(title__icontains='baguette') | Q(title__icontains='crystal') | Q(title__icontains='blue') | Q(title__icontains='crown') | Q(title__icontains='starlight'),
-            'badge': 'Sangeet High Glam',
-        },
-        'bridal': {
-            'key': 'bridal',
-            'title': 'Grand Wedding & Bridal Sets',
+        'wedding-bridal': {
+            'key': 'wedding-bridal',
+            'title': 'Wedding & Bridal Jewellery',
             'eyebrow': 'Royal Wedding Edit',
-            'desc': 'Heritage bridal chokers, necklace sets with matching maang tikka, and royal jhumkas for your wedding ceremony.',
-            'query': Q(category__slug='necklaces') | Q(sub_categories__slug__in=['chokers-sets', 'chokers-sets-1']) | Q(title__icontains='set') | Q(title__icontains='bridal'),
-            'badge': 'Royal Bridal Sets',
+            'desc': 'Heritage bridal chokers, statement necklace sets with maang tikka, and royal jhumkas crafted for wedding ceremonies.',
+            'badge': 'Wedding & Bridal',
         },
-        'reception': {
-            'key': 'reception',
-            'title': 'Reception Elegance Collection',
-            'eyebrow': 'Red Carpet Wedding Edit',
-            'desc': 'Contemporary solitaire studs, tiara flow crystal sets, and sleek tennis bracelets for modern red-carpet glam.',
-            'query': Q(title__icontains='tiara') | Q(title__icontains='solitaire') | Q(title__icontains='serenity') | Q(title__icontains='halo') | Q(sub_categories__slug__in=['tennis-bracelets', 'studs']),
-            'badge': 'Reception Red Carpet',
+        'daily-office': {
+            'key': 'daily-office',
+            'title': 'Daily Office Wear Jewellery',
+            'eyebrow': 'Everyday Minimal Edit',
+            'desc': 'Featherlight solitaire studs, sleek pendants, and anti-tarnish everyday accents tailored for effortless office elegance.',
+            'badge': 'Daily Office Wear',
+        },
+        'cocktail-party': {
+            'key': 'cocktail-party',
+            'title': 'Cocktail & Party Glam',
+            'eyebrow': 'Evening Statement Edit',
+            'desc': 'High-sparkle baguette crystals, radiant zircons, and tiara-flow sets made to dazzle evening receptions and cocktail nights.',
+            'badge': 'Cocktail & Party',
+        },
+        'haldi-mehendi': {
+            'key': 'haldi-mehendi',
+            'title': 'Haldi & Mehendi Festive Edit',
+            'eyebrow': 'Festive Celebration Edit',
+            'desc': 'Auspicious gold tones, emerald greens, floral drops, and traditional chandbalis curated for vibrant Haldi & Mehendi celebrations.',
+            'badge': 'Haldi & Mehendi',
+        },
+    }
+
+    FINISH_MAP = {
+        'anti-tarnish-gold': {
+            'title': 'Anti-Tarnish Gold Jewellery',
+            'desc': 'Water-resistant, skin-safe anti-tarnish gold-plated pieces engineered for lasting radiance.',
+        },
+        'crystal-zircon': {
+            'title': 'Sparkling Crystal & Zircon Jewellery',
+            'desc': 'Precision-cut American diamond, crystal, and zircon silhouettes with high-shine brilliance.',
+        },
+        'oxidised-silver': {
+            'title': 'Oxidised Silver Jewellery',
+            'desc': 'Artisanal antique silver and boho statement silhouettes for timeless ethnic and fusion styling.',
         },
     }
 
     occasion_data = OCCASION_MAP.get(active_occasion)
+    finish_data = FINISH_MAP.get(active_finish)
 
-    # Base products for category / occasion context
+    # Base products for category context (all products loaded for instant client-side faceted filtering)
     base_products_qs = Product.objects.filter(is_active=True).select_related('category').prefetch_related('colors', 'sub_categories', 'category__subcategories', 'gallery_images').distinct().order_by('-created')
-    if occasion_data:
-        base_products_qs = base_products_qs.filter(occasion_data['query'])
-    elif active_main_cat:
+    if active_main_cat:
         base_products_qs = base_products_qs.filter(Q(category=active_main_cat) | Q(category__parent=active_main_cat) | Q(sub_categories__parent=active_main_cat))
-    
+
     base_products = list(base_products_qs)
     total_count = len(base_products)
 
-    # Subcategories to display at starting of page
+    # Subcategories to display inside the filter drawer
     if active_main_cat:
         subcategories = list(active_main_cat.subcategories.all().order_by('order', 'id'))
     else:
-        # Show all subcategories across categories, ordered nicely
         subcategories = list(Category.objects.filter(parent__isnull=False).select_related('parent').order_by('parent__order', 'order', 'name'))
 
-    # Precompute counts for subcategories based on base_products
     for sub in subcategories:
         sub.product_count = sum(1 for p in base_products if sub.slug.lower() in p.style_tags or (p.category and p.category.slug.lower() == sub.slug.lower()))
 
-    # All products in current category context passed to DOM for instant filter drawer switching
-    products_list = base_products
-
-    products = attach_offers(products_list)
+    products = attach_offers(base_products)
     color_filters = _get_collection_color_filters(products)
+    occasion_filters = _get_occasion_filters(products)
+    finish_filters = _get_metal_finish_filters(products)
     price_summary = _get_price_ranges(products)
 
     return render(request, 'store/collections.html', {
@@ -975,11 +1033,16 @@ def collections(request):
         'active_cat_slug': active_cat_slug,
         'active_sub_slug': active_sub_slug,
         'active_occasion': active_occasion,
+        'active_finish': active_finish,
+        'active_price': active_price,
         'occasion_data': occasion_data,
+        'finish_data': finish_data,
         'subcategories': subcategories,
         'total_count': total_count,
         'products': products,
         'color_filters': color_filters,
+        'occasion_filters': occasion_filters,
+        'finish_filters': finish_filters,
         'price_summary': price_summary,
     })
 
@@ -993,7 +1056,7 @@ def collection_detail(request, slug):
 
     # Subcategories of this main category
     subcategories = list(main_cat.subcategories.all().order_by('order', 'id'))
-    
+
     active_sub = request.GET.get('sub', '').strip().lower()
     if is_subcollection and not active_sub:
         active_sub = category.slug
@@ -1019,8 +1082,13 @@ def collection_detail(request, slug):
 
     color_filters = _get_collection_color_filters(products)
     style_filters = _get_collection_style_filters(category, products)
+    occasion_filters = _get_occasion_filters(products)
+    finish_filters = _get_metal_finish_filters(products)
     price_summary = _get_price_ranges(products)
     selected_color = request.GET.get('color', '').strip().lower()
+    active_occasion = request.GET.get('occasion', '').strip().lower()
+    active_finish = request.GET.get('finish', '').strip().lower()
+    active_price = request.GET.get('price', '').strip().lower()
 
     return render(request, 'store/collection_detail.html', {
         'category': category,
@@ -1033,8 +1101,13 @@ def collection_detail(request, slug):
         'products': products,
         'color_filters': color_filters,
         'style_filters': style_filters,
+        'occasion_filters': occasion_filters,
+        'finish_filters': finish_filters,
         'price_summary': price_summary,
         'selected_color': selected_color,
+        'active_occasion': active_occasion,
+        'active_finish': active_finish,
+        'active_price': active_price,
     })
 
 

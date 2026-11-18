@@ -67,86 +67,112 @@
                         <div class="megamenu-featured">
                             <div class="megamenu-card">
                                 <span class="megamenu-card-tag">ATELIER SIGNATURE</span>
-                                <h5>Signature Velvet Packaging</h5>
-                                <p>Every order is pre-packed in our signature velvet box or pouch with branded unboxing elements. 100% skin-safe.</p>
+                                <h5>Signature Velvet Box Packaging</h5>
+                                <p>Every piece arrives with our MAPSKART Anti-Tarnish Purity &amp; Skin-Safe Guarantee inside signature velvet packaging.</p>
                                 <a href="{% url 'store:collections' %}" class="btn-megamenu-cta">Explore All Jewellery &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Facet Discovery Strip (By Metal / Finish & By Price) -->
+                    <div class="megamenu-facets-bar">
+                        <div class="megamenu-facets-inner">
+                            <div class="megamenu-facet-group">
+                                <span class="megamenu-facet-label"><i class="fas fa-sparkles"></i> By Metal / Finish:</span>
+                                <a href="{% url 'store:collections' %}?finish=anti-tarnish-gold" class="megamenu-facet-pill">
+                                    <span class="facet-swatch" style="background:linear-gradient(135deg,#FDE68A,#D97706,#92400E);"></span> Anti-Tarnish Gold
+                                </a>
+                                <a href="{% url 'store:collections' %}?finish=crystal-zircon" class="megamenu-facet-pill">
+                                    <span class="facet-swatch" style="background:linear-gradient(135deg,#FFFFFF,#BAE6FD,#38BDF8);"></span> Sparkling Crystal / Zircon
+                                </a>
+                                <a href="{% url 'store:collections' %}?finish=oxidised-silver" class="megamenu-facet-pill">
+                                    <span class="facet-swatch" style="background:linear-gradient(135deg,#E2E8F0,#94A3B8,#334155);"></span> Oxidised Silver
+                                </a>
+                            </div>
+                            <div class="megamenu-facet-group">
+                                <span class="megamenu-facet-label"><i class="fas fa-tag"></i> By Price:</span>
+                                <a href="{% url 'store:collections' %}?price=under-999" class="megamenu-facet-pill">Under ₹999</a>
+                                <a href="{% url 'store:collections' %}?price=999-1999" class="megamenu-facet-pill">₹999 – ₹1,999</a>
+                                <a href="{% url 'store:collections' %}?price=above-2000" class="megamenu-facet-pill">Luxury Above ₹2,000</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. WEDDING & OCCASIONS MEGA-MENU (Competitor Benchmark Feature!) -->
+            <!-- 2. WEDDING & OCCASIONS MEGA-MENU (Kushal's & Rubans Style Faceted Discovery) -->
             <div class="nav-item has-megamenu">
-                <a href="{% url 'store:collections' %}?occasion=bridal" class="nav-link nav-dropdown-trigger highlight-nav{% if active_occasion %} active{% endif %}">
+                <a href="{% url 'store:collections' %}?occasion=wedding-bridal" class="nav-link nav-dropdown-trigger highlight-nav{% if active_occasion %} active{% endif %}">
                     <span class="nav-sparkle">✨</span> Wedding &amp; Occasions <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 <div class="megamenu megamenu-occasions">
                     <div class="megamenu-occasions-grid">
-                        <!-- Haldi -->
-                        <a href="{% url 'store:collections' %}?occasion=haldi" class="occasion-tile haldi-tile">
-                            <div class="occasion-tile-icon" style="background:#FEF3C7; color:#D97706;">
-                                <i class="fas fa-sun"></i>
-                            </div>
-                            <div class="occasion-tile-info">
-                                <span class="occasion-tag" style="color:#D97706;">Auspicious Yellow</span>
-                                <h4>Haldi Ceremony</h4>
-                                <p>Warm gold tones, floral kundan &amp; pearl drop pieces.</p>
-                            </div>
-                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
-                        </a>
-
-                        <!-- Mehendi -->
-                        <a href="{% url 'store:collections' %}?occasion=mehendi" class="occasion-tile mehendi-tile">
-                            <div class="occasion-tile-icon" style="background:#D1FAE5; color:#059669;">
-                                <i class="fas fa-leaf"></i>
-                            </div>
-                            <div class="occasion-tile-info">
-                                <span class="occasion-tag" style="color:#059669;">Verdant Greens</span>
-                                <h4>Mehendi Ceremony</h4>
-                                <p>Vibrant emerald crystals, statement cuffs &amp; boho drops.</p>
-                            </div>
-                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
-                        </a>
-
-                        <!-- Sangeet & Cocktail -->
-                        <a href="{% url 'store:collections' %}?occasion=sangeet" class="occasion-tile sangeet-tile">
-                            <div class="occasion-tile-icon" style="background:#DBEAFE; color:#2563EB;">
-                                <i class="fas fa-glass-cheers"></i>
-                            </div>
-                            <div class="occasion-tile-info">
-                                <span class="occasion-tag" style="color:#2563EB;">High-Shine Glam</span>
-                                <h4>Sangeet &amp; Cocktail</h4>
-                                <p>Sparkling baguette crystals &amp; royal blue dazzle.</p>
-                            </div>
-                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
-                        </a>
-
-                        <!-- Main Wedding / Bridal -->
-                        <a href="{% url 'store:collections' %}?occasion=bridal" class="occasion-tile bridal-tile">
+                        <!-- Wedding & Bridal -->
+                        <a href="{% url 'store:collections' %}?occasion=wedding-bridal" class="occasion-tile bridal-tile">
                             <div class="occasion-tile-icon" style="background:#FEE2E2; color:#DC2626;">
                                 <i class="fas fa-crown"></i>
                             </div>
                             <div class="occasion-tile-info">
                                 <span class="occasion-tag" style="color:#DC2626;">Royal Bride</span>
-                                <h4>Main Wedding &amp; Bridal</h4>
-                                <p>Choker sets with matching maang tikka &amp; heavy jhumkas.</p>
+                                <h4>Wedding &amp; Bridal</h4>
+                                <p>Choker sets with matching maang tikka &amp; heritage bridal jewellery.</p>
                             </div>
                             <i class="fas fa-arrow-right occasion-tile-arrow"></i>
                         </a>
 
-                        <!-- Reception -->
-                        <a href="{% url 'store:collections' %}?occasion=reception" class="occasion-tile reception-tile">
-                            <div class="occasion-tile-icon" style="background:#EDE9FE; color:#7C3AED;">
-                                <i class="fas fa-gem"></i>
+                        <!-- Daily Office Wear -->
+                        <a href="{% url 'store:collections' %}?occasion=daily-office" class="occasion-tile office-tile">
+                            <div class="occasion-tile-icon" style="background:#DBEAFE; color:#2563EB;">
+                                <i class="fas fa-briefcase"></i>
                             </div>
                             <div class="occasion-tile-info">
-                                <span class="occasion-tag" style="color:#7C3AED;">Red Carpet</span>
-                                <h4>Reception Elegance</h4>
-                                <p>Tiara flow crystal sets &amp; sleek solitaire bracelets.</p>
+                                <span class="occasion-tag" style="color:#2563EB;">Everyday Minimal</span>
+                                <h4>Daily Office Wear</h4>
+                                <p>Featherlight solitaire studs, sleek pendants &amp; anti-tarnish essentials.</p>
                             </div>
                             <i class="fas fa-arrow-right occasion-tile-arrow"></i>
                         </a>
+
+                        <!-- Cocktail & Party -->
+                        <a href="{% url 'store:collections' %}?occasion=cocktail-party" class="occasion-tile cocktail-tile">
+                            <div class="occasion-tile-icon" style="background:#EDE9FE; color:#7C3AED;">
+                                <i class="fas fa-glass-cheers"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#7C3AED;">High-Shine Glam</span>
+                                <h4>Cocktail &amp; Party</h4>
+                                <p>Sparkling baguette crystals, zircon halos &amp; reception statement sets.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Haldi & Mehendi -->
+                        <a href="{% url 'store:collections' %}?occasion=haldi-mehendi" class="occasion-tile haldi-tile">
+                            <div class="occasion-tile-icon" style="background:#FEF3C7; color:#D97706;">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="occasion-tile-info">
+                                <span class="occasion-tag" style="color:#D97706;">Festive Radiance</span>
+                                <h4>Haldi &amp; Mehendi</h4>
+                                <p>Auspicious gold tones, emerald greens, floral drops &amp; chandbalis.</p>
+                            </div>
+                            <i class="fas fa-arrow-right occasion-tile-arrow"></i>
+                        </a>
+
+                        <!-- Quick Shop By Price & Finish Tile -->
+                        <div class="occasion-tile occasion-quick-facets" style="cursor:default; flex-direction:column; align-items:flex-start; gap:10px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="occasion-tag" style="color:var(--navy); margin:0;"><i class="fas fa-sliders-h"></i> Shop By Price &amp; Finish</span>
+                            </div>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                <a href="{% url 'store:collections' %}?price=under-999" class="megamenu-facet-pill">Under ₹999</a>
+                                <a href="{% url 'store:collections' %}?price=999-1999" class="megamenu-facet-pill">₹999 – ₹1,999</a>
+                                <a href="{% url 'store:collections' %}?price=above-2000" class="megamenu-facet-pill">Above ₹2,000</a>
+                                <a href="{% url 'store:collections' %}?finish=anti-tarnish-gold" class="megamenu-facet-pill">Anti-Tarnish Gold</a>
+                                <a href="{% url 'store:collections' %}?finish=crystal-zircon" class="megamenu-facet-pill">Crystal / Zircon</a>
+                                <a href="{% url 'store:collections' %}?finish=oxidised-silver" class="megamenu-facet-pill">Oxidised Silver</a>
+                            </div>
+                        </div>
 
                         <!-- Occasion Concierge Banner Card -->
                         <div class="occasion-banner-tile">

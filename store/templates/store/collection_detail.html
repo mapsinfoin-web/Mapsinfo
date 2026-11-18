@@ -678,26 +678,64 @@
                     </div>
                     {% endif %}
 
-                    <!-- Price Range -->
+                    <!-- By Occasion -->
                     <div class="filter-group">
                         <div class="filter-group-header">
-                            <h4 class="filter-group-title"><i class="fas fa-tag"></i> Price Range:</h4>
+                            <h4 class="filter-group-title"><i class="fas fa-crown"></i> By Occasion:</h4>
+                        </div>
+                        <div class="filter-pills" id="occasionFilterPills">
+                            <button type="button" class="filter-pill active" data-occasion="all" onclick="setOccasionFilter('all')">
+                                All Occasions
+                            </button>
+                            {% for occ in occasion_filters %}
+                            <button type="button" class="filter-pill" data-occasion="{{ occ.slug }}" onclick="setOccasionFilter('{{ occ.slug }}')">
+                                <i class="fas {{ occ.icon }}" style="color: {{ occ.color }};"></i>
+                                <span>{{ occ.name }}</span>
+                                <span class="pill-count">({{ occ.count }})</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- By Metal / Finish -->
+                    <div class="filter-group">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-sparkles"></i> By Metal / Finish:</h4>
+                        </div>
+                        <div class="filter-pills" id="finishFilterPills">
+                            <button type="button" class="filter-pill active" data-finish="all" onclick="setFinishFilter('all')">
+                                All Finishes
+                            </button>
+                            {% for fin in finish_filters %}
+                            <button type="button" class="filter-pill" data-finish="{{ fin.slug }}" onclick="setFinishFilter('{{ fin.slug }}')">
+                                <span class="pill-dot" style="background: {{ fin.swatch }};"></span>
+                                <span>{{ fin.name }}</span>
+                                <span class="pill-count">({{ fin.count }})</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- By Price -->
+                    <div class="filter-group" style="grid-column: 1 / -1;">
+                        <div class="filter-group-header">
+                            <h4 class="filter-group-title"><i class="fas fa-tag"></i> By Price:</h4>
                         </div>
                         <div class="filter-pills" id="priceFilterPills">
                             <button type="button" class="filter-pill active" data-price="all" onclick="setPriceFilter('all')">
                                 All Prices
                             </button>
-                            <button type="button" class="filter-pill" data-price="under-250" onclick="setPriceFilter('under-250')">
-                                Under ₹250
+                            <button type="button" class="filter-pill" data-price="under-999" onclick="setPriceFilter('under-999')">
+                                <span>Under ₹999</span>
+                                <span class="pill-count">({{ price_summary.under_999|default:"0" }})</span>
                             </button>
-                            <button type="button" class="filter-pill" data-price="250-499" onclick="setPriceFilter('250-499')">
-                                ₹250 – ₹499
+                            <button type="button" class="filter-pill" data-price="999-1999" onclick="setPriceFilter('999-1999')">
+                                <span>₹999 – ₹1,999</span>
+                                <span class="pill-count">({{ price_summary.mid_999_1999|default:"0" }})</span>
                             </button>
-                            <button type="button" class="filter-pill" data-price="500-999" onclick="setPriceFilter('500-999')">
-                                ₹500 – ₹999
-                            </button>
-                            <button type="button" class="filter-pill" data-price="1000-plus" onclick="setPriceFilter('1000-plus')">
-                                ₹1,000 &amp; Above
+                            <button type="button" class="filter-pill" data-price="above-2000" onclick="setPriceFilter('above-2000')">
+                                <span>Luxury Above ₹2,000</span>
+                                <span class="pill-count">({{ price_summary.above_2000|default:"0" }})</span>
                             </button>
                         </div>
                     </div>
@@ -826,7 +864,9 @@
         var filterState = {
             color: 'all',
             style: 'all',
-            price: 'all',
+            occasion: '{{ active_occasion|default:"all" }}',
+            finish: '{{ active_finish|default:"all" }}',
+            price: '{{ active_price|default:"all" }}',
             special: null, // 'new', 'sale', 'instock' or null
             sort: 'featured'
         };
@@ -856,6 +896,18 @@
         function setStyleFilter(styleSlug) {
             filterState.style = (styleSlug || 'all').toLowerCase();
             updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', filterState.style);
+            applyAllFilters();
+        }
+
+        function setOccasionFilter(occasionSlug) {
+            filterState.occasion = (occasionSlug || 'all').toLowerCase();
+            updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', filterState.occasion);
+            applyAllFilters();
+        }
+
+        function setFinishFilter(finishSlug) {
+            filterState.finish = (finishSlug || 'all').toLowerCase();
+            updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', filterState.finish);
             applyAllFilters();
         }
 
@@ -896,10 +948,14 @@
         function resetAllFilters() {
             filterState.color = 'all';
             filterState.style = 'all';
+            filterState.occasion = 'all';
+            filterState.finish = 'all';
             filterState.price = 'all';
             filterState.special = null;
             updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', 'all');
             updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', 'all');
+            updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', 'all');
+            updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', 'all');
             updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', 'all');
             var specialPills = document.querySelectorAll('#specialFilterPills .filter-pill');
             specialPills.forEach(function (p) { p.classList.remove('active'); });
@@ -909,6 +965,8 @@
         function removeChip(type) {
             if (type === 'color') setColorFilter('all');
             else if (type === 'style') setStyleFilter('all');
+            else if (type === 'occasion') setOccasionFilter('all');
+            else if (type === 'finish') setFinishFilter('all');
             else if (type === 'price') setPriceFilter('all');
             else if (type === 'special') toggleSpecialFilter(filterState.special);
         }
@@ -938,8 +996,6 @@
         function applyAllFilters() {
             var cards = document.querySelectorAll('.grid .card');
             var emptyMessageEl = document.getElementById('filterEmptyMessage');
-            var countBadge = document.getElementById('productsCountBadge');
-            var drawerCount = document.getElementById('drawerResultsCount');
             var activeFilterBadge = document.getElementById('activeFilterBadge');
             var chipsContainer = document.getElementById('activeChipsContainer');
             var visibleCount = 0;
@@ -950,16 +1006,35 @@
             if (filterState.style !== 'all') {
                 activeFilterCount++;
                 var stylePill = document.querySelector('#styleFilterPills .filter-pill[data-style="' + filterState.style + '"]');
-                var styleName = stylePill ? stylePill.childNodes[0].textContent.trim() : filterState.style;
+                var styleSpan = stylePill ? stylePill.querySelector('span') : null;
+                var styleName = styleSpan ? styleSpan.textContent.trim() : filterState.style;
                 chipsHtml += '<span class="chip" onclick="removeChip(\'style\')"><i class="fas fa-gem"></i> ' + styleName + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.occasion !== 'all') {
+                activeFilterCount++;
+                var occLabels = {
+                    'wedding-bridal': 'Wedding & Bridal',
+                    'daily-office': 'Daily Office Wear',
+                    'cocktail-party': 'Cocktail & Party',
+                    'haldi-mehendi': 'Haldi & Mehendi'
+                };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'occasion\')"><i class="fas fa-crown"></i> ' + (occLabels[filterState.occasion] || filterState.occasion) + ' <i class="fas fa-times"></i></span>';
+            }
+            if (filterState.finish !== 'all') {
+                activeFilterCount++;
+                var finishLabels = {
+                    'anti-tarnish-gold': 'Anti-Tarnish Gold',
+                    'crystal-zircon': 'Sparkling Crystal / Zircon',
+                    'oxidised-silver': 'Oxidised Silver'
+                };
+                chipsHtml += '<span class="chip" onclick="removeChip(\'finish\')"><i class="fas fa-sparkles"></i> ' + (finishLabels[filterState.finish] || filterState.finish) + ' <i class="fas fa-times"></i></span>';
             }
             if (filterState.price !== 'all') {
                 activeFilterCount++;
                 var priceLabels = {
-                    'under-250': 'Under ₹250',
-                    '250-499': '₹250–₹499',
-                    '500-999': '₹500–₹999',
-                    '1000-plus': '₹1,000+'
+                    'under-999': 'Under ₹999',
+                    '999-1999': '₹999 – ₹1,999',
+                    'above-2000': 'Luxury Above ₹2,000'
                 };
                 chipsHtml += '<span class="chip" onclick="removeChip(\'price\')"><i class="fas fa-tag"></i> ' + (priceLabels[filterState.price] || filterState.price) + ' <i class="fas fa-times"></i></span>';
             }
@@ -991,6 +1066,8 @@
                 var cardPrice = parseFloat(card.getAttribute('data-price') || '0');
                 var cardColors = (card.getAttribute('data-colors') || '').split(/\s+/).filter(Boolean);
                 var cardStyles = (card.getAttribute('data-styles') || '').split(/\s+/).filter(Boolean);
+                var cardOccasions = (card.getAttribute('data-occasions') || '').split(/\s+/).filter(Boolean);
+                var cardFinishes = (card.getAttribute('data-finishes') || '').split(/\s+/).filter(Boolean);
                 var isSale = card.getAttribute('data-is-sale') === 'true';
                 var inStock = card.getAttribute('data-in-stock') === 'true';
                 var colorImages = {};
@@ -1010,33 +1087,36 @@
                 // 1. Color check
                 var matchColor = (filterState.color === 'all') || (cardColors.indexOf(filterState.color) !== -1);
 
-                // 2. Style / Type of Jhumke check
+                // 2. Style / Subcategory check
                 var matchStyle = (filterState.style === 'all') || (cardStyles.indexOf(filterState.style) !== -1);
 
-                // 3. Price check
+                // 3. Occasion check
+                var matchOccasion = (filterState.occasion === 'all') || (cardOccasions.indexOf(filterState.occasion) !== -1);
+
+                // 4. Metal / Finish check
+                var matchFinish = (filterState.finish === 'all') || (cardFinishes.indexOf(filterState.finish) !== -1);
+
+                // 5. Price check
                 var matchPrice = true;
-                if (filterState.price === 'under-250') {
-                    matchPrice = (cardPrice < 250);
-                } else if (filterState.price === '250-499') {
-                    matchPrice = (cardPrice >= 250 && cardPrice < 500);
-                } else if (filterState.price === '500-999') {
-                    matchPrice = (cardPrice >= 500 && cardPrice < 1000);
-                } else if (filterState.price === '1000-plus') {
-                    matchPrice = (cardPrice >= 1000);
+                if (filterState.price === 'under-999') {
+                    matchPrice = (cardPrice < 999);
+                } else if (filterState.price === '999-1999') {
+                    matchPrice = (cardPrice >= 999 && cardPrice < 2000);
+                } else if (filterState.price === 'above-2000') {
+                    matchPrice = (cardPrice >= 2000);
                 }
 
-                // 4. Special check
+                // 6. Special check
                 var matchSpecial = true;
                 if (filterState.special === 'new') {
-                    // Check if among newest or flagged
-                    matchSpecial = true; // all active pieces in drop qualify, or sale/in_stock
+                    matchSpecial = true;
                 } else if (filterState.special === 'sale') {
                     matchSpecial = isSale;
                 } else if (filterState.special === 'instock') {
                     matchSpecial = inStock;
                 }
 
-                if (matchColor && matchStyle && matchPrice && matchSpecial) {
+                if (matchColor && matchStyle && matchOccasion && matchFinish && matchPrice && matchSpecial) {
                     card.classList.remove('hide');
                     visibleCount++;
 
@@ -1071,6 +1151,10 @@
                 else url.searchParams.delete('color');
                 if (filterState.style !== 'all') url.searchParams.set('style', filterState.style);
                 else url.searchParams.delete('style');
+                if (filterState.occasion !== 'all') url.searchParams.set('occasion', filterState.occasion);
+                else url.searchParams.delete('occasion');
+                if (filterState.finish !== 'all') url.searchParams.set('finish', filterState.finish);
+                else url.searchParams.delete('finish');
                 if (filterState.price !== 'all') url.searchParams.set('price', filterState.price);
                 else url.searchParams.delete('price');
                 window.history.replaceState({}, '', url);
@@ -1084,18 +1168,29 @@
             var params = new URLSearchParams(window.location.search);
             var colorParam = params.get('color');
             var styleParam = params.get('style');
+            var occasionParam = params.get('occasion');
+            var finishParam = params.get('finish');
             var priceParam = params.get('price');
 
             if (colorParam) filterState.color = colorParam.toLowerCase();
             if (styleParam) filterState.style = styleParam.toLowerCase();
+            if (occasionParam) filterState.occasion = occasionParam.toLowerCase();
+            if (finishParam) filterState.finish = finishParam.toLowerCase();
             if (priceParam) filterState.price = priceParam.toLowerCase();
 
-            if (filterState.color !== 'all' || filterState.style !== 'all' || filterState.price !== 'all') {
+            if (
+                filterState.color !== 'all' ||
+                filterState.style !== 'all' ||
+                filterState.occasion !== 'all' ||
+                filterState.finish !== 'all' ||
+                filterState.price !== 'all'
+            ) {
                 updatePillActiveState('#colorFilterPills .filter-pill', 'data-color', filterState.color);
                 updatePillActiveState('#styleFilterPills .filter-pill', 'data-style', filterState.style);
+                updatePillActiveState('#occasionFilterPills .filter-pill', 'data-occasion', filterState.occasion);
+                updatePillActiveState('#finishFilterPills .filter-pill', 'data-finish', filterState.finish);
                 updatePillActiveState('#priceFilterPills .filter-pill', 'data-price', filterState.price);
                 applyAllFilters();
-                // If filters are specified in URL, open drawer for user
                 toggleFilterDrawer(true);
             }
         });

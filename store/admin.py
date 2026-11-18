@@ -303,16 +303,76 @@ class StockStatusFilter(admin.SimpleListFilter):
         return queryset
 
 
+class ProductAdminForm(forms.ModelForm):
+    occasions_list = forms.MultipleChoiceField(
+        choices=Product.OCCASION_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Occasions (Faceted Filter)',
+        help_text='Select one or more occasions. Leave blank for smart auto-matching.'
+    )
+    metal_finish_list = forms.MultipleChoiceField(
+        choices=Product.METAL_FINISH_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Metal / Finish (Faceted Filter)',
+        help_text='Select one or more metal/finish types. Leave blank for smart auto-matching.'
+    )
+
+    class Meta:
+        model = Product
+        fields = [
+            'category', 'sub_categories', 'title', 'sku', 'description',
+            'mrp', 'price', 'stock', 'image', 'is_active',
+            'weight_grams', 'dimensions', 'closure_type', 'pair_with',
+            'occasions_list', 'metal_finish_list',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            if self.instance.occasions:
+                self.fields['occasions_list'].initial = [
+                    x.strip() for x in self.instance.occasions.split(',') if x.strip()
+                ]
+            if self.instance.metal_finish:
+                self.fields['metal_finish_list'].initial = [
+                    x.strip() for x in self.instance.metal_finish.split(',') if x.strip()
+                ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.occasions = ','.join(self.cleaned_data.get('occasions_list') or [])
+        instance.metal_finish = ','.join(self.cleaned_data.get('metal_finish_list') or [])
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
     list_display = ['title', 'sku', 'category', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
     list_filter = [StockStatusFilter, 'category', 'is_active']
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku']
-    filter_horizontal = ['sub_categories']
+    filter_horizontal = ['sub_categories', 'pair_with']
     inlines = [ProductGalleryInline, ProductColorInline]
-    fields = ['category', 'sub_categories', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active']
+    fieldsets = (
+        ('Basic Details', {
+            'fields': ('category', 'sub_categories', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active')
+        }),
+        ('Occasion & Style Facets (Kushal\'s / Rubans Discovery)', {
+            'fields': ('occasions_list', 'metal_finish_list'),
+            'description': 'Tag products for faceted filtering by Occasion and Metal / Finish. Leave unticked to use smart auto-matching.'
+        }),
+        ('Jewellery Specifications & Cross-Sell', {
+            'fields': ('weight_grams', 'dimensions', 'closure_type', 'pair_with'),
+            'classes': ('collapse',),
+        }),
+    )
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('bogo_offers')

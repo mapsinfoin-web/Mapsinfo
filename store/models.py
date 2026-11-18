@@ -76,6 +76,32 @@ class Product(models.Model):
         help_text="Optional 1-2 curated matching pieces to feature in 'Complete The Look' on the PDP."
     )
 
+    # Faceted Discovery Attributes (Occasion & Metal/Finish)
+    OCCASION_CHOICES = [
+        ('wedding-bridal', 'Wedding & Bridal'),
+        ('daily-office', 'Daily Office Wear'),
+        ('cocktail-party', 'Cocktail & Party'),
+        ('haldi-mehendi', 'Haldi & Mehendi'),
+    ]
+    METAL_FINISH_CHOICES = [
+        ('anti-tarnish-gold', 'Anti-Tarnish Gold'),
+        ('crystal-zircon', 'Sparkling Crystal / Zircon'),
+        ('oxidised-silver', 'Oxidised Silver'),
+    ]
+    occasions = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text="Comma-separated occasions (e.g. wedding-bridal, daily-office, cocktail-party, haldi-mehendi). Leave empty for smart auto-matching."
+    )
+    metal_finish = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        verbose_name='Metal / Finish',
+        help_text="Comma-separated finishes (e.g. anti-tarnish-gold, crystal-zircon, oxidised-silver). Leave empty for smart auto-matching."
+    )
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True, help_text="Uncheck to hide this product from the store.")
@@ -296,6 +322,133 @@ class Product(models.Model):
     def style_tags_str(self):
         """Space-separated list for data-styles attribute."""
         return " ".join(self.style_tags)
+
+    @property
+    def occasion_tags(self):
+        """Returns normalized occasion slugs for faceted filtering (explicit DB field or smart auto-match)."""
+        if hasattr(self, '_cached_occasion_tags'):
+            return self._cached_occasion_tags
+        valid_keys = {k for k, _ in self.OCCASION_CHOICES}
+        tags = set()
+        if self.occasions:
+            for item in self.occasions.split(','):
+                s = item.strip().lower()
+                if s in valid_keys:
+                    tags.add(s)
+        if not tags:
+            title_l = (self.title or '').lower()
+            desc_l = (self.description or '').lower()
+            cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
+            styles = set(self.style_tags)
+            colors = set(self.color_tags)
+            price_val = float(self.price or 0)
+
+            def has_word(text, words):
+                return any(re.search(r'\b' + re.escape(w), text) for w in words)
+
+            # 1. Wedding & Bridal
+            if (
+                has_word(title_l, ['bridal', 'wedding', 'choker', 'tikka', 'set', 'kundan', 'jhumk', 'chandbali', 'maharani', 'luna', 'aurora', 'starlight', 'mehrunissa'])
+                or cat_slug in ('necklaces', 'chokers-sets', 'chokers-sets-1')
+                or bool(styles & {'chokers-sets', 'chokers-sets-1', 'jhumke', 'chandbali'})
+                or price_val >= 900
+            ):
+                tags.add('wedding-bridal')
+
+            # 2. Daily Office Wear (featherlight studs, minimal line/solitaire pieces, everyday essentials; excludes heavy bridal/sets)
+            is_heavy_bridal = has_word(title_l, ['bridal', 'choker', 'tikka', 'set']) or price_val >= 800
+            if not is_heavy_bridal and (
+                has_word(title_l, ['stud', 'solitaire', 'pearl', 'trinity', 'minimal', 'daily', 'office', 'pendant', 'line', 'pyramid', 'bracelet'])
+                or cat_slug in ('rings', 'bracelets')
+                or bool(styles & {'studs', 'pendants', 'solitaire-rings', 'adjustable-rings', 'tennis-bracelets', 'charm-bracelets', 'layered-necklaces'})
+                or price_val <= 300
+            ):
+                tags.add('daily-office')
+
+            # 3. Cocktail & Party
+            if (
+                has_word(title_l, ['crystal', 'baguette', 'halo', 'tiara', 'serenity', 'starlight', 'aurora', 'luminesc', 'pyramid', 'crown', 'elysian', 'talisman', 'statement', 'cocktail', 'party', 'drop', 'diamond', 'zircon'])
+                or bool(styles & {'halos', 'drops', 'drop-necklace', 'statement-rings', 'tennis-bracelets'})
+                or bool(colors & {'blue', 'pink', 'purple', 'black', 'ruby'})
+            ):
+                tags.add('cocktail-party')
+
+            # 4. Haldi & Mehendi
+            if (
+                has_word(title_l, ['yellow', 'gold', 'haldi', 'mehendi', 'green', 'emerald', 'verdant', 'floral', 'bloom', 'multicolour', 'jhumk', 'chandbali', 'lattice', 'mehrunissa'])
+                or bool(styles & {'jhumke', 'chandbali', 'bangles-cuffs'})
+                or bool(colors & {'yellow', 'gold', 'green', 'multicolour'})
+                or has_word(desc_l, ['haldi', 'mehendi'])
+            ):
+                tags.add('haldi-mehendi')
+
+            # Ensure every product appears in at least one occasion
+            if not tags:
+                tags.add('daily-office')
+
+        self._cached_occasion_tags = sorted(list(tags))
+        return self._cached_occasion_tags
+
+    @property
+    def occasion_tags_str(self):
+        """Space-separated list for data-occasions attribute."""
+        return " ".join(self.occasion_tags)
+
+    @property
+    def metal_finish_tags(self):
+        """Returns normalized metal/finish slugs for faceted filtering (explicit DB field or smart auto-match)."""
+        if hasattr(self, '_cached_metal_finish_tags'):
+            return self._cached_metal_finish_tags
+        valid_keys = {k for k, _ in self.METAL_FINISH_CHOICES}
+        tags = set()
+        if self.metal_finish:
+            for item in self.metal_finish.split(','):
+                s = item.strip().lower()
+                if s in valid_keys:
+                    tags.add(s)
+        if not tags:
+            title_l = (self.title or '').lower()
+            desc_l = (self.description or '').lower()
+            cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
+            styles = set(self.style_tags)
+            colors = set(self.color_tags)
+
+            def has_word(text, words):
+                return any(re.search(r'\b' + re.escape(w), text) for w in words)
+
+            # 1. Sparkling Crystal / Zircon
+            if (
+                has_word(title_l, ['crystal', 'zircon', 'solitaire', 'baguette', 'halo', 'tiara', 'radiant', 'diamond', 'sparkl', 'starlight', 'aurora', 'serenity', 'luminesc', 'crown', 'elysian', 'pyramid', 'symphony'])
+                or bool(styles & {'halos', 'solitaire-rings', 'tennis-bracelets'})
+                or 'crystal' in colors
+            ):
+                tags.add('crystal-zircon')
+
+            # 2. Oxidised Silver
+            if (
+                has_word(title_l, ['oxidised', 'oxidized', 'silver', 'boho', 'antique', 'tribal', 'black', 'mehrunissa', 'talisman', 'jhumk', 'chandbali'])
+                or has_word(desc_l, ['oxidised', 'oxidized', 'silver'])
+                or bool(styles & {'jhumke', 'chandbali', 'bangles-cuffs'})
+                or bool(colors & {'silver', 'black'})
+            ):
+                tags.add('oxidised-silver')
+
+            # 3. Anti-Tarnish Gold
+            if (
+                has_word(title_l, ['gold', 'anti-tarnish', 'kundan', 'pearl', 'bridal', 'choker', 'bloom', 'set', 'royal', 'yellow', 'lattice', 'trinity', 'drop'])
+                or cat_slug in ('necklaces', 'chokers-sets', 'chokers-sets-1', 'drop-necklace', 'bracelets', 'rings')
+                or bool(colors & {'gold', 'yellow', 'multicolour'})
+                or not tags
+            ):
+                tags.add('anti-tarnish-gold')
+
+        self._cached_metal_finish_tags = sorted(list(tags))
+        return self._cached_metal_finish_tags
+
+    @property
+    def metal_finish_tags_str(self):
+        """Space-separated list for data-finishes attribute."""
+        return " ".join(self.metal_finish_tags)
 
     @property
     def primary_subcategory(self):
