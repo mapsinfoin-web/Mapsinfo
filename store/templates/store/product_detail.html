@@ -1261,6 +1261,738 @@
                 font-size: 12.5px;
             }
         }
+
+        /* =========================================================
+           CUSTOMER REVIEWS & PHOTO UGC STYLES (Kushal's / Rubans Style)
+           ========================================================= */
+        .reviews-section-wrapper {
+            max-width: 1240px;
+            margin: 48px auto 60px;
+            padding: 0 20px;
+            font-family: inherit;
+        }
+        .reviews-head-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 18px;
+        }
+        .reviews-head-text .reviews-eyebrow {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #b45309;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .reviews-head-text h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 6px;
+            letter-spacing: -0.4px;
+        }
+        .reviews-head-text p {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+        .write-review-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #0A1E3F;
+            color: #ffffff !important;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(10, 30, 63, 0.18);
+            transition: all .2s ease;
+        }
+        .write-review-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(10, 30, 63, 0.25);
+        }
+
+        /* Overview Card */
+        .reviews-overview-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: 240px 1fr 280px;
+            gap: 32px;
+            align-items: center;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+        }
+        .overview-score-box {
+            text-align: center;
+            border-right: 1px solid #e2e8f0;
+            padding-right: 28px;
+        }
+        .overview-score-num {
+            font-size: 48px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .overview-stars {
+            color: #f59e0b;
+            font-size: 18px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+        .overview-count {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        .overview-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Breakdown bars */
+        .overview-bars-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12.5px;
+            color: #475569;
+        }
+        .bar-star-label {
+            min-width: 48px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .bar-star-label i {
+            color: #f59e0b;
+            font-size: 11px;
+        }
+        .bar-track {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+            border-radius: 999px;
+            transition: width .4s ease;
+        }
+        .bar-pct {
+            min-width: 36px;
+            text-align: right;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* Trust Perks Box */
+        .overview-perks-box {
+            border-left: 1px solid #e2e8f0;
+            padding-left: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .perk-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .perk-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .perk-text strong {
+            display: block;
+            font-size: 13px;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+        .perk-text span {
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.3;
+        }
+
+        /* Customer Photo UGC Strip */
+        .ugc-gallery-block {
+            margin-bottom: 34px;
+            background: #fdfaf3;
+            border: 1px solid #fed7aa;
+            border-radius: 18px;
+            padding: 20px 24px;
+        }
+        .ugc-gallery-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .ugc-gallery-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ugc-gallery-title i {
+            color: #b45309;
+        }
+        .ugc-gallery-count {
+            font-size: 12.5px;
+            color: #64748b;
+        }
+        .ugc-scroll-track {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ugc-scroll-track::-webkit-scrollbar {
+            height: 6px;
+        }
+        .ugc-scroll-track::-webkit-scrollbar-thumb {
+            background: #fed7aa;
+            border-radius: 999px;
+        }
+        .ugc-photo-card {
+            position: relative;
+            flex: 0 0 170px;
+            height: 220px;
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            border: 1.5px solid #ffffff;
+            transition: all .25s ease;
+        }
+        .ugc-photo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .ugc-photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .4s ease;
+        }
+        .ugc-photo-card:hover img {
+            transform: scale(1.05);
+        }
+        .ugc-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 10px 10px;
+            background: linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0) 100%);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .ugc-card-outfit {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #fef08a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ugc-card-user {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ugc-card-user i {
+            color: #10b981;
+            font-size: 9px;
+        }
+
+        /* Filter Pills */
+        .reviews-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .review-filter-pill {
+            padding: 7px 14px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all .2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .review-filter-pill:hover, .review-filter-pill.active {
+            background: #0A1E3F;
+            color: #ffffff;
+            border-color: #0A1E3F;
+        }
+
+        /* Review Cards Grid */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .review-card-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px 24px;
+            transition: box-shadow .2s ease;
+        }
+        .review-card-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+        .review-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .review-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0A1E3F 0%, #1e3a8a 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .review-meta-text strong {
+            font-size: 14px;
+            color: #0f172a;
+            display: block;
+        }
+        .review-buyer-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: #059669;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ecfdf5;
+            padding: 2px 7px;
+            border-radius: 999px;
+            border: 1px solid #a7f3d0;
+        }
+        .review-date {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .review-stars-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .review-stars {
+            color: #f59e0b;
+            font-size: 13px;
+            display: flex;
+            gap: 2px;
+        }
+        .review-headline {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+        .review-outfit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fdf2f8;
+            color: #be185d;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+            border: 1px solid #fbcfe8;
+        }
+        .review-body-text {
+            font-size: 13.5px;
+            color: #334155;
+            line-height: 1.6;
+            margin: 0 0 14px;
+        }
+        .review-photo-preview {
+            margin-bottom: 14px;
+        }
+        .review-photo-preview img {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: transform .2s ease;
+        }
+        .review-photo-preview img:hover {
+            transform: scale(1.04);
+        }
+        .review-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 12px;
+        }
+        .helpful-vote-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .2s ease;
+        }
+        .helpful-vote-btn:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #93c5fd;
+        }
+        .helpful-vote-btn.voted {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #6ee7b7;
+        }
+
+        /* Empty Reviews State */
+        .empty-reviews-box {
+            text-align: center;
+            padding: 48px 20px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 16px;
+        }
+        .empty-reviews-box i {
+            font-size: 40px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+        }
+        .empty-reviews-box h3 {
+            font-size: 18px;
+            color: #0f172a;
+            margin: 0 0 6px;
+        }
+        .empty-reviews-box p {
+            font-size: 13.5px;
+            color: #64748b;
+            margin: 0 0 16px;
+        }
+
+        /* Review Submission Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all .25s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .review-modal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+            padding: 28px 30px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform .25s ease;
+        }
+        .modal-overlay.active .review-modal-card {
+            transform: translateY(0);
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 14px;
+            transition: all .2s ease;
+        }
+        .modal-close-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px;
+        }
+        .modal-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0 0 20px;
+        }
+
+        /* Star rating picker */
+        .star-rating-picker {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 6px 0 16px;
+        }
+        .picker-stars {
+            display: flex;
+            gap: 6px;
+            font-size: 28px;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+        .picker-stars i {
+            transition: color .15s ease, transform .15s ease;
+        }
+        .picker-stars i.active, .picker-stars i.hovered {
+            color: #f59e0b;
+        }
+        .picker-stars i:hover {
+            transform: scale(1.15);
+        }
+        .rating-hint-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b45309;
+        }
+
+        /* Form fields */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13.5px;
+            color: #0f172a;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        }
+        .file-upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8fafc;
+            transition: all .2s ease;
+        }
+        .file-upload-box:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+        .preview-thumb-container {
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+        .preview-thumb-container img {
+            max-width: 140px;
+            max-height: 140px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid #cbd5e1;
+        }
+        .submit-review-btn {
+            width: 100%;
+            padding: 13px;
+            background: #0A1E3F;
+            color: #ffffff;
+            font-size: 14.5px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all .2s ease;
+            box-shadow: 0 4px 14px rgba(10,30,63,0.2);
+        }
+        .submit-review-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px);
+        }
+
+        /* UGC Lightbox Modal */
+        .ugc-modal-card {
+            background: #ffffff;
+            border-radius: 18px;
+            max-width: 760px;
+            width: 100%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .ugc-modal-img-col {
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ugc-modal-img-col img {
+            width: 100%;
+            height: 100%;
+            max-height: 520px;
+            object-fit: contain;
+        }
+        .ugc-modal-info-col {
+            padding: 24px 26px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 840px) {
+            .reviews-overview-card {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                padding: 22px;
+            }
+            .overview-score-box {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding-right: 0;
+                padding-bottom: 18px;
+            }
+            .overview-perks-box {
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                padding-left: 0;
+                padding-top: 18px;
+            }
+            .ugc-modal-card {
+                grid-template-columns: 1fr;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .ugc-modal-img-col img {
+                max-height: 320px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1363,6 +2095,24 @@
                 {% endif %}
             </div>
             <h1 class="title">{{ product.title }}</h1>
+
+            <!-- Social Proof Star Rating & UGC Quick Badge -->
+            <div class="rating-quick-summary" style="display:flex; align-items:center; gap:10px; margin: 4px 0 14px; flex-wrap:wrap;">
+                <a href="#customer-reviews" class="rating-pill-link" style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; text-decoration:none; transition:all .2s ease; border:1px solid #fde68a;">
+                    <i class="fas fa-star" style="color:#f59e0b; font-size:11px;"></i>
+                    <span>{{ rating_stats.average }}</span>
+                    <span style="color:#b45309; font-weight:500;">({{ rating_stats.total|default:"Atelier" }} Reviews)</span>
+                </a>
+                <span class="rating-verified-tag" style="font-size:12px; color:#059669; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                    <i class="fas fa-check-circle"></i> 100% Verified Buyers
+                </span>
+                {% if rating_stats.photo_count > 0 %}
+                <a href="#customer-reviews" style="font-size:12px; color:#2563eb; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                    <i class="fas fa-camera"></i> {{ rating_stats.photo_count }} Customer Looks
+                </a>
+                {% endif %}
+            </div>
+
             <p class="price" id="productPriceContainer"
                data-base-price="{{ product.price }}"
                data-base-mrp="{% if product.mrp and product.mrp > product.price %}{{ product.mrp }}{% endif %}"
@@ -1705,6 +2455,528 @@
         </div>
 
     </main>
+
+    <!-- ======================================================== -->
+    <!-- ===== SOCIAL PROOF: CUSTOMER REVIEWS & PHOTO UGC ===== -->
+    <!-- ======================================================== -->
+    <section class="reviews-section-wrapper" id="customer-reviews">
+        <div class="reviews-head-row">
+            <div class="reviews-head-text">
+                <span class="reviews-eyebrow">
+                    <i class="fas fa-sparkles"></i> Social Proof &middot; Real Customer Looks
+                </span>
+                <h2>Customer Reviews &amp; Styling Looks</h2>
+                <p>Verified buyers sharing feedback and how this jewellery pairs with sarees, lehengas, and everyday outfits.</p>
+            </div>
+            <button type="button" class="write-review-btn" onclick="openReviewModal()">
+                <i class="fas fa-pen-nib"></i> Write a Review &amp; Add Photo
+            </button>
+        </div>
+
+        <!-- Rating Overview Card (Score, Breakdown Bars & Assurance) -->
+        <div class="reviews-overview-card">
+            <!-- Overall Score Box -->
+            <div class="overview-score-box">
+                <div class="overview-score-num">{{ rating_stats.average }}</div>
+                <div class="overview-stars" aria-label="{{ rating_stats.average }} out of 5 stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="overview-count">Based on {{ rating_stats.total }} verified buyer review{{ rating_stats.total|pluralize }}</div>
+                <div class="overview-badge">
+                    <i class="fas fa-thumbs-up"></i> {{ rating_stats.recommended_pct }}% would recommend
+                </div>
+            </div>
+
+            <!-- Rating Breakdown Progress Bars -->
+            <div class="overview-bars-box">
+                <div class="bar-row">
+                    <span class="bar-star-label">5 <i class="fas fa-star"></i></span>
+                    <div class="bar-track"><div class="bar-fill" style="width: {{ rating_stats.pct_5 }}%;"></div></div>
+                    <span class="bar-pct">{{ rating_stats.pct_5 }}%</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-star-label">4 <i class="fas fa-star"></i></span>
+                    <div class="bar-track"><div class="bar-fill" style="width: {{ rating_stats.pct_4 }}%;"></div></div>
+                    <span class="bar-pct">{{ rating_stats.pct_4 }}%</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-star-label">3 <i class="fas fa-star"></i></span>
+                    <div class="bar-track"><div class="bar-fill" style="width: {{ rating_stats.pct_3 }}%;"></div></div>
+                    <span class="bar-pct">{{ rating_stats.pct_3 }}%</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-star-label">2 <i class="fas fa-star"></i></span>
+                    <div class="bar-track"><div class="bar-fill" style="width: {{ rating_stats.pct_2 }}%;"></div></div>
+                    <span class="bar-pct">{{ rating_stats.pct_2 }}%</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-star-label">1 <i class="fas fa-star"></i></span>
+                    <div class="bar-track"><div class="bar-fill" style="width: {{ rating_stats.pct_1 }}%;"></div></div>
+                    <span class="bar-pct">{{ rating_stats.pct_1 }}%</span>
+                </div>
+            </div>
+
+            <!-- MAPSKART Assurance Perks -->
+            <div class="overview-perks-box">
+                <div class="perk-item">
+                    <div class="perk-icon"><i class="fas fa-shield-check"></i></div>
+                    <div class="perk-text">
+                        <strong>Verified Atelier Reviews</strong>
+                        <span>Authentic purchases certified by MAPSKART.</span>
+                    </div>
+                </div>
+                <div class="perk-item">
+                    <div class="perk-icon"><i class="fas fa-camera"></i></div>
+                    <div class="perk-text">
+                        <strong>Real Customer Photos</strong>
+                        <span>Unedited photos wearing jewellery with outfits.</span>
+                    </div>
+                </div>
+                <div class="perk-item">
+                    <div class="perk-icon"><i class="fas fa-gem"></i></div>
+                    <div class="perk-text">
+                        <strong>Anti-Tarnish Certified</strong>
+                        <span>Hypoallergenic alloy tested for everyday wear.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if photo_reviews %}
+        <!-- Customer Photo UGC Gallery ("Styled by Real Buyers") -->
+        <div class="ugc-gallery-block">
+            <div class="ugc-gallery-head">
+                <div class="ugc-gallery-title">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>Styled With Outfits &middot; Customer Looks</span>
+                </div>
+                <span class="ugc-gallery-count">{{ photo_reviews|length }} Customer Photos &middot; Tap photo to view look</span>
+            </div>
+            <div class="ugc-scroll-track" id="ugcScrollTrack">
+                {% for rev in photo_reviews %}
+                <div class="ugc-photo-card" onclick="openUgcLightbox('{{ rev.display_image_url|escapejs }}', '{{ rev.name|escapejs }}', {{ rev.rating }}, '{{ rev.outfit_tag|escapejs }}', '{{ rev.review_text|escapejs }}')" title="View look by {{ rev.name }}">
+                    <img src="{{ rev.display_image_url }}" alt="{{ rev.name }} styling {{ product.title }}" loading="lazy" />
+                    <div class="ugc-card-overlay">
+                        {% if rev.outfit_tag %}
+                        <span class="ugc-card-outfit"><i class="fas fa-vest"></i> {{ rev.outfit_tag }}</span>
+                        {% endif %}
+                        <span class="ugc-card-user">
+                            <i class="fas fa-check-circle"></i> {{ rev.name }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filter Pills Bar -->
+        <div class="reviews-filter-bar" id="reviewsFilterBar">
+            <button type="button" class="review-filter-pill active" onclick="filterReviews('all', this)">
+                All Reviews ({{ rating_stats.total }})
+            </button>
+            {% if rating_stats.photo_count > 0 %}
+            <button type="button" class="review-filter-pill" onclick="filterReviews('photo', this)">
+                <i class="fas fa-camera"></i> With Photos ({{ rating_stats.photo_count }})
+            </button>
+            {% endif %}
+            <button type="button" class="review-filter-pill" onclick="filterReviews('5-star', this)">
+                ★ 5 Stars
+            </button>
+            <button type="button" class="review-filter-pill" onclick="filterReviews('saree', this)">
+                👗 Saree / Traditional
+            </button>
+            <button type="button" class="review-filter-pill" onclick="filterReviews('lehenga', this)">
+                ✨ Lehenga / Bridal
+            </button>
+            <button type="button" class="review-filter-pill" onclick="filterReviews('western', this)">
+                👠 Western / Cocktail
+            </button>
+            <button type="button" class="review-filter-pill" onclick="filterReviews('office', this)">
+                💼 Kurti / Office
+            </button>
+        </div>
+
+        <!-- Customer Reviews List -->
+        <div class="reviews-list" id="reviewsListContainer">
+            {% if reviews %}
+                {% for rev in reviews %}
+                <div class="review-card-item"
+                     data-rating="{{ rev.rating }}"
+                     data-has-photo="{% if rev.display_image_url %}true{% else %}false{% endif %}"
+                     data-outfit="{{ rev.outfit_tag|lower }}">
+                    <div class="review-card-head">
+                        <div class="review-user-info">
+                            <div class="review-avatar">{{ rev.name|slice:":1" }}</div>
+                            <div class="review-meta-text">
+                                <strong>{{ rev.name }}</strong>
+                                {% if rev.is_verified %}
+                                <span class="review-buyer-badge"><i class="fas fa-check-circle"></i> Verified Buyer</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="review-date">{{ rev.created_at|date:"d M Y" }}</span>
+                    </div>
+
+                    <div class="review-stars-row">
+                        <div class="review-stars">
+                            {% for i in rev.star_range %}<i class="fas fa-star"></i>{% endfor %}
+                            {% for i in rev.empty_star_range %}<i class="far fa-star"></i>{% endfor %}
+                        </div>
+                        {% if rev.headline %}
+                        <h4 class="review-headline">{{ rev.headline }}</h4>
+                        {% endif %}
+                    </div>
+
+                    {% if rev.outfit_tag %}
+                    <div>
+                        <span class="review-outfit-badge">
+                            <i class="fas fa-vest"></i> Styled With: {{ rev.outfit_tag }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <p class="review-body-text">{{ rev.review_text|linebreaksbr }}</p>
+
+                    {% if rev.display_image_url %}
+                    <div class="review-photo-preview">
+                        <img src="{{ rev.display_image_url }}" alt="Photo submitted by {{ rev.name }}" onclick="openUgcLightbox('{{ rev.display_image_url|escapejs }}', '{{ rev.name|escapejs }}', {{ rev.rating }}, '{{ rev.outfit_tag|escapejs }}', '{{ rev.review_text|escapejs }}')" title="Click to enlarge customer photo" loading="lazy" />
+                    </div>
+                    {% endif %}
+
+                    <div class="review-card-footer">
+                        <button type="button" class="helpful-vote-btn" onclick="voteHelpful({{ rev.pk }}, this)" title="Vote this review as helpful">
+                            <i class="fas fa-thumbs-up"></i> Helpful (<span class="vote-cnt">{{ rev.helpful_count }}</span>)
+                        </button>
+                        <span style="font-size:11.5px; color:#94a3b8;"><i class="fas fa-shield-alt"></i> MAPSKART Quality Verified</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-reviews-box">
+                    <i class="fas fa-stars"></i>
+                    <h3>Be the First to Review This Piece</h3>
+                    <p>Share your feedback and styling photos with our community. Your experience helps others find their perfect look.</p>
+                    <button type="button" class="write-review-btn" onclick="openReviewModal()">
+                        <i class="fas fa-pen"></i> Write the First Review
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- ===== REVIEW SUBMISSION MODAL ===== -->
+    <div class="modal-overlay" id="reviewModalOverlay" onclick="handleModalBackdropClick(event)">
+        <div class="review-modal-card" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+            <button type="button" class="modal-close-btn" onclick="closeReviewModal()" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-title" id="reviewModalTitle">Write a Customer Review</h3>
+            <p class="modal-subtitle">Share how this jewellery looks and feels with your outfits.</p>
+
+            <form action="{% url 'store:add_product_review' product.pk %}" method="POST" enctype="multipart/form-data" id="reviewForm" onsubmit="handleReviewSubmit(event)">
+                {% csrf_token %}
+                <input type="hidden" name="rating" id="reviewRatingInput" value="5">
+
+                <!-- Star Rating Picker -->
+                <div class="form-group">
+                    <label class="form-label">Overall Rating *</label>
+                    <div class="star-rating-picker">
+                        <div class="picker-stars" id="pickerStarsContainer">
+                            <i class="fas fa-star active" data-val="1" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseout="resetHoverRating()"></i>
+                            <i class="fas fa-star active" data-val="2" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseout="resetHoverRating()"></i>
+                            <i class="fas fa-star active" data-val="3" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseout="resetHoverRating()"></i>
+                            <i class="fas fa-star active" data-val="4" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="resetHoverRating()"></i>
+                            <i class="fas fa-star active" data-val="5" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="resetHoverRating()"></i>
+                        </div>
+                        <span class="rating-hint-text" id="ratingHintText">5 / 5 - Loved it! Perfect shine &amp; finish</span>
+                    </div>
+                </div>
+
+                <!-- Customer Name -->
+                <div class="form-group">
+                    <label class="form-label" for="reviewName">Your Name *</label>
+                    <input type="text" class="form-input" id="reviewName" name="name" required placeholder="e.g. Pooja Sharma" value="{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}">
+                </div>
+
+                <!-- Customer Email (Private) -->
+                <div class="form-group">
+                    <label class="form-label" for="reviewEmail">Email Address <span style="font-weight:normal; color:#94a3b8;">(Private, for purchase verification)</span></label>
+                    <input type="email" class="form-input" id="reviewEmail" name="email" placeholder="e.g. pooja@example.com" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}">
+                </div>
+
+                <!-- Outfit Styled With -->
+                <div class="form-group">
+                    <label class="form-label" for="reviewOutfitTag">Outfit Styled With <span style="font-weight:normal; color:#94a3b8;">(Helps other shoppers)</span></label>
+                    <select class="form-select" id="reviewOutfitTag" name="outfit_tag">
+                        <option value="">-- Select Outfit Type --</option>
+                        <option value="Saree / Traditional">👗 Saree / Traditional</option>
+                        <option value="Bridal / Sangeet Lehenga">✨ Bridal / Sangeet Lehenga</option>
+                        <option value="Suit & Daily Kurti">🌸 Suit &amp; Daily Kurti</option>
+                        <option value="Western & Cocktail Dress">👠 Western &amp; Cocktail Dress</option>
+                        <option value="Indo-Western Fusion">💫 Indo-Western Fusion</option>
+                        <option value="Office / Formal Wear">💼 Office / Formal Wear</option>
+                        <option value="Party & Festive Wear">🎉 Party &amp; Festive Wear</option>
+                        <option value="Other Outfit">Other Outfit</option>
+                    </select>
+                </div>
+
+                <!-- Review Headline -->
+                <div class="form-group">
+                    <label class="form-label" for="reviewHeadline">Review Headline</label>
+                    <input type="text" class="form-input" id="reviewHeadline" name="headline" placeholder="e.g. Total showstopper at my cousin's wedding!">
+                </div>
+
+                <!-- Review Content -->
+                <div class="form-group">
+                    <label class="form-label" for="reviewText">Your Detailed Feedback *</label>
+                    <textarea class="form-textarea" id="reviewText" name="review_text" required rows="4" placeholder="How did the jewellery look with your outfit? Mention the shine, weight, skin comfort, and compliments you received..."></textarea>
+                </div>
+
+                <!-- Customer UGC Photo Upload -->
+                <div class="form-group">
+                    <label class="form-label">Upload Outfit Styling Photo <span style="font-weight:normal; color:#94a3b8;">(Optional)</span></label>
+                    <div class="file-upload-box" onclick="document.getElementById('reviewPhotoInput').click()">
+                        <i class="fas fa-cloud-arrow-up" style="font-size:26px; color:#2563eb; margin-bottom:6px;"></i>
+                        <p style="margin:0 0 4px; font-weight:600; font-size:13px; color:#1e293b;">Click to upload or drag &amp; drop photo</p>
+                        <span style="font-size:11.5px; color:#64748b;">PNG, JPG, WEBP up to 10MB</span>
+                        <input type="file" id="reviewPhotoInput" name="image" accept="image/*" style="display:none;" onchange="previewReviewImage(this)">
+                    </div>
+                    <div class="preview-thumb-container" id="previewThumbContainer">
+                        <img id="previewThumbImg" src="#" alt="Selected photo preview">
+                        <p style="font-size:11.5px; color:#059669; margin:4px 0 0;"><i class="fas fa-check-circle"></i> Photo ready to upload</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-review-btn" id="submitReviewBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Customer Review
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== CUSTOMER PHOTO UGC LIGHTBOX MODAL ===== -->
+    <div class="modal-overlay" id="ugcLightboxModal" onclick="handleUgcModalBackdropClick(event)">
+        <div class="ugc-modal-card" role="dialog" aria-modal="true" aria-label="Customer Look Viewer">
+            <button type="button" class="modal-close-btn" onclick="closeUgcLightbox()" aria-label="Close look viewer" style="z-index:10; background:rgba(255,255,255,0.9);">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="ugc-modal-img-col">
+                <img id="ugcModalImage" src="#" alt="Customer outfit styling" />
+            </div>
+            <div class="ugc-modal-info-col">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                    <div class="review-avatar" id="ugcModalAvatar">C</div>
+                    <div>
+                        <strong id="ugcModalName" style="font-size:15px; color:#0f172a; display:block;">Customer</strong>
+                        <span class="review-buyer-badge"><i class="fas fa-check-circle"></i> Verified Buyer</span>
+                    </div>
+                </div>
+                <div id="ugcModalStars" class="review-stars" style="margin-bottom:10px; font-size:15px;"></div>
+                <div id="ugcModalOutfit" style="margin-bottom:12px;"></div>
+                <p id="ugcModalReview" style="font-size:13.5px; color:#334155; line-height:1.6; margin:0 0 16px; flex:1;"></p>
+                <div style="border-top:1px solid #f1f5f9; padding-top:12px; font-size:11.5px; color:#94a3b8;">
+                    <i class="fas fa-gem"></i> Authentic MAPSKART Customer Look
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- REVIEWS & UGC JAVASCRIPT ---
+        var currentRatingVal = 5;
+        var ratingDescriptions = {
+            1: '1 / 5 - Needs improvement',
+            2: '2 / 5 - Fair quality',
+            3: '3 / 5 - Good, as expected',
+            4: '4 / 5 - Very good! Loved the shine',
+            5: '5 / 5 - Loved it! Perfect shine & finish'
+        };
+
+        function openReviewModal() {
+            var modal = document.getElementById('reviewModalOverlay');
+            if (modal) modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReviewModal() {
+            var modal = document.getElementById('reviewModalOverlay');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function handleModalBackdropClick(e) {
+            if (e.target && e.target.id === 'reviewModalOverlay') {
+                closeReviewModal();
+            }
+        }
+
+        function setRating(val) {
+            currentRatingVal = val;
+            var hiddenInput = document.getElementById('reviewRatingInput');
+            if (hiddenInput) hiddenInput.value = val;
+            updateStarIcons(val);
+            var hint = document.getElementById('ratingHintText');
+            if (hint) hint.textContent = ratingDescriptions[val] || (val + ' / 5');
+        }
+
+        function hoverRating(val) {
+            updateStarIcons(val);
+            var hint = document.getElementById('ratingHintText');
+            if (hint) hint.textContent = ratingDescriptions[val] || (val + ' / 5');
+        }
+
+        function resetHoverRating() {
+            updateStarIcons(currentRatingVal);
+            var hint = document.getElementById('ratingHintText');
+            if (hint) hint.textContent = ratingDescriptions[currentRatingVal] || (currentRatingVal + ' / 5');
+        }
+
+        function updateStarIcons(val) {
+            var stars = document.querySelectorAll('#pickerStarsContainer i');
+            stars.forEach(function(star, idx) {
+                if (idx < val) {
+                    star.className = 'fas fa-star active';
+                } else {
+                    star.className = 'far fa-star';
+                }
+            });
+        }
+
+        function previewReviewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var container = document.getElementById('previewThumbContainer');
+                    var img = document.getElementById('previewThumbImg');
+                    if (img && container) {
+                        img.src = e.target.result;
+                        container.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function handleReviewSubmit(e) {
+            var btn = document.getElementById('submitReviewBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Review...';
+            }
+        }
+
+        // Helpful Vote AJAX
+        function voteHelpful(reviewId, btnEl) {
+            if (btnEl.classList.contains('voted')) return;
+            var url = '/review/' + reviewId + '/helpful/';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.status === 'success' || data.status === 'already_voted') {
+                    btnEl.classList.add('voted');
+                    var cntSpan = btnEl.querySelector('.vote-cnt');
+                    if (cntSpan) cntSpan.textContent = data.helpful_count;
+                }
+            })
+            .catch(function(err) {
+                console.error('Error voting helpful:', err);
+            });
+        }
+
+        // Filter Reviews list
+        function filterReviews(filterType, btnEl) {
+            var buttons = document.querySelectorAll('#reviewsFilterBar .review-filter-pill');
+            buttons.forEach(function(b) { b.classList.remove('active'); });
+            if (btnEl) btnEl.classList.add('active');
+
+            var cards = document.querySelectorAll('#reviewsListContainer .review-card-item');
+            cards.forEach(function(card) {
+                var rating = card.getAttribute('data-rating');
+                var hasPhoto = card.getAttribute('data-has-photo') === 'true';
+                var outfit = (card.getAttribute('data-outfit') || '').toLowerCase();
+
+                var show = true;
+                if (filterType === 'all') {
+                    show = true;
+                } else if (filterType === 'photo') {
+                    show = hasPhoto;
+                } else if (filterType === '5-star') {
+                    show = (rating === '5');
+                } else if (filterType === 'saree') {
+                    show = outfit.indexOf('saree') !== -1 || outfit.indexOf('traditional') !== -1;
+                } else if (filterType === 'lehenga') {
+                    show = outfit.indexOf('lehenga') !== -1 || outfit.indexOf('bridal') !== -1;
+                } else if (filterType === 'western') {
+                    show = outfit.indexOf('western') !== -1 || outfit.indexOf('cocktail') !== -1 || outfit.indexOf('gown') !== -1;
+                } else if (filterType === 'office') {
+                    show = outfit.indexOf('office') !== -1 || outfit.indexOf('kurti') !== -1 || outfit.indexOf('suit') !== -1;
+                }
+                card.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        // UGC Lightbox Modal
+        function openUgcLightbox(imgUrl, name, rating, outfit, reviewText) {
+            var modal = document.getElementById('ugcLightboxModal');
+            var img = document.getElementById('ugcModalImage');
+            var nameEl = document.getElementById('ugcModalName');
+            var avatarEl = document.getElementById('ugcModalAvatar');
+            var starsEl = document.getElementById('ugcModalStars');
+            var outfitEl = document.getElementById('ugcModalOutfit');
+            var reviewEl = document.getElementById('ugcModalReview');
+
+            if (img) img.src = imgUrl;
+            if (nameEl) nameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = (name || 'C').charAt(0).toUpperCase();
+
+            if (starsEl) {
+                var starsHtml = '';
+                for (var i = 0; i < 5; i++) {
+                    starsHtml += (i < rating) ? '<i class="fas fa-star" style="color:#f59e0b;"></i> ' : '<i class="far fa-star" style="color:#cbd5e1;"></i> ';
+                }
+                starsEl.innerHTML = starsHtml;
+            }
+
+            if (outfitEl) {
+                outfitEl.innerHTML = outfit ? '<span class="review-outfit-badge"><i class="fas fa-vest"></i> Styled With: ' + outfit + '</span>' : '';
+            }
+
+            if (reviewEl) reviewEl.textContent = reviewText;
+
+            if (modal) modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUgcLightbox() {
+            var modal = document.getElementById('ugcLightboxModal');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function handleUgcModalBackdropClick(e) {
+            if (e.target && e.target.id === 'ugcLightboxModal') {
+                closeUgcLightbox();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeReviewModal();
+                closeUgcLightbox();
+            }
+        });
+    </script>
 
     <!-- ===== FOOTER ===== -->
     <footer class="footer" id="footer">

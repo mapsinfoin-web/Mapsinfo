@@ -3,7 +3,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import F
 from django.utils import timezone
@@ -467,6 +467,23 @@ class Product(models.Model):
         if self.category and self.category.parent:
             return self.category
         return None
+
+    @property
+    def approved_reviews(self):
+        return self.reviews.filter(is_approved=True)
+
+    @property
+    def average_rating(self):
+        reviews = self.approved_reviews
+        if not reviews.exists():
+            return 4.9
+        from django.db.models import Avg
+        avg = reviews.aggregate(Avg('rating'))['rating__avg']
+        return round(float(avg), 1) if avg else 4.9
+
+    @property
+    def review_count(self):
+        return self.approved_reviews.count()
 
     def save(self, *args, **kwargs):
         if not self.sku:
@@ -1090,4 +1107,70 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.phone_number})"
+
+
+class ProductReview(models.Model):
+    OUTFIT_TAG_CHOICES = [
+        ('Saree / Traditional', 'Saree / Traditional'),
+        ('Bridal / Sangeet Lehenga', 'Bridal / Sangeet Lehenga'),
+        ('Suit & Daily Kurti', 'Suit & Daily Kurti'),
+        ('Western & Cocktail Dress', 'Western & Cocktail Dress'),
+        ('Indo-Western Fusion', 'Indo-Western Fusion'),
+        ('Office / Formal Wear', 'Office / Formal Wear'),
+        ('Party & Festive Wear', 'Party & Festive Wear'),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviews')
+    name = models.CharField(max_length=120, verbose_name='Customer Name')
+    email = models.EmailField(blank=True, verbose_name='Email (Private)')
+    rating = models.PositiveSmallIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Rating from 1 to 5 stars"
+    )
+    headline = models.CharField(max_length=200, blank=True, verbose_name='Review Title / Headline')
+    review_text = models.TextField(verbose_name='Review Content')
+    outfit_tag = models.CharField(
+        max_length=120,
+        blank=True,
+        default='',
+        verbose_name='Outfit Styled With',
+        help_text="e.g. Silk Saree, Bridal Lehenga, Kurti, Western Dress"
+    )
+    image = models.ImageField(upload_to='reviews/', blank=True, null=True, verbose_name='Customer UGC Photo')
+    image_url = models.URLField(max_length=500, blank=True, default='', verbose_name='Direct Photo URL (Optional)')
+    is_verified = models.BooleanField(default=True, verbose_name='Verified Buyer')
+    is_approved = models.BooleanField(default=True, verbose_name='Approved for Display')
+    helpful_count = models.PositiveIntegerField(default=0, verbose_name='Helpful Votes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Customer Review & UGC'
+        verbose_name_plural = 'Customer Reviews & UGC'
+
+    def __str__(self):
+        return f"{self.rating}★ by {self.name} for {self.product.title}"
+
+    @property
+    def display_image_url(self):
+        if self.image:
+            try:
+                return self.image.url
+            except Exception:
+                pass
+        if self.image_url:
+            return self.image_url
+        return ""
+
+    @property
+    def star_range(self):
+        return range(self.rating)
+
+    @property
+    def empty_star_range(self):
+        return range(max(0, 5 - self.rating))
+
 

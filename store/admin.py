@@ -13,7 +13,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import (
     BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Notification, Order, OrderItem, PaymentSettings,
-    Product, ProductColor, ProductGallery, Profile,
+    Product, ProductColor, ProductGallery, ProductReview, Profile,
 )
 
 
@@ -1069,5 +1069,105 @@ class UserAdmin(BaseUserAdmin):
     def get_phone(self, obj):
         profile = getattr(obj, 'profile', None)
         return profile.phone_number if profile and profile.phone_number else '-'
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 'product', 'customer_info', 'rating_stars', 'headline_short',
+        'outfit_styled', 'photo_thumbnail', 'is_verified', 'is_approved', 'created_at'
+    ]
+    list_filter = ['rating', 'is_approved', 'is_verified', 'outfit_tag', 'created_at']
+    search_fields = ['name', 'email', 'headline', 'review_text', 'product__title', 'product__sku']
+    list_editable = ['is_approved', 'is_verified']
+    readonly_fields = ['created_at', 'updated_at', 'photo_large_preview']
+    list_per_page = 25
+    actions = ['approve_reviews', 'reject_reviews', 'mark_verified']
+
+    fieldsets = (
+        ('Review Summary', {
+            'fields': ('product', 'user', 'name', 'email', 'rating', 'headline', 'review_text')
+        }),
+        ('Outfit Styling & UGC Photo', {
+            'fields': ('outfit_tag', 'image', 'image_url', 'photo_large_preview')
+        }),
+        ('Verification & Moderation', {
+            'fields': ('is_verified', 'is_approved', 'helpful_count', 'created_at', 'updated_at')
+        }),
+    )
+
+    @admin.display(description='Customer')
+    def customer_info(self, obj):
+        return format_html(
+            '<strong>{}</strong><br><span style="color:#64748b; font-size:11px;">{}</span>',
+            obj.name, obj.email or 'No email'
+        )
+
+    @admin.display(description='Rating')
+    def rating_stars(self, obj):
+        stars = '★' * obj.rating + '☆' * (5 - obj.rating)
+        color = '#f59e0b' if obj.rating >= 4 else ('#eab308' if obj.rating == 3 else '#ef4444')
+        return format_html('<span style="color:{}; font-size:14px; font-weight:700;">{} ({})</span>', color, stars, obj.rating)
+
+    @admin.display(description='Headline')
+    def headline_short(self, obj):
+        return obj.headline[:40] + ('...' if len(obj.headline) > 40 else '') if obj.headline else '-'
+
+    @admin.display(description='Outfit Styled')
+    def outfit_styled(self, obj):
+        if not obj.outfit_tag:
+            return mark_safe('<span style="color:#94a3b8; font-size:11px;">Not specified</span>')
+        return format_html(
+            '<span style="background:#f1f5f9; color:#334155; font-size:11px; padding:3px 8px; border-radius:12px; font-weight:600;">👗 {}</span>',
+            obj.outfit_tag
+        )
+
+    @admin.display(description='Photo UGC')
+    def photo_thumbnail(self, obj):
+        url = obj.display_image_url
+        if url:
+            return format_html(
+                '<a href="{}" target="_blank"><img src="{}" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;" /></a>',
+                url, url
+            )
+        return mark_safe('<span style="color:#94a3b8; font-size:11px;">No photo</span>')
+
+    @admin.display(description='Photo Preview')
+    def photo_large_preview(self, obj):
+        url = obj.display_image_url
+        if url:
+            return format_html(
+                '<a href="{}" target="_blank"><img src="{}" style="max-width:240px; max-height:240px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.08);" /></a>',
+                url, url
+            )
+        return 'No image uploaded.'
+
+    @admin.display(description='Verified')
+    def verified_badge(self, obj):
+        if obj.is_verified:
+            return mark_safe('<span style="color:#059669; font-weight:700; font-size:12px;"><i class="fas fa-check-circle"></i> Verified</span>')
+        return mark_safe('<span style="color:#94a3b8; font-size:12px;">Unverified</span>')
+
+    @admin.display(description='Approved')
+    def approved_badge(self, obj):
+        if obj.is_approved:
+            return mark_safe('<span style="color:#059669; font-weight:700; font-size:12px;">✓ Visible</span>')
+        return mark_safe('<span style="color:#dc2626; font-weight:700; font-size:12px;">✕ Hidden</span>')
+
+    def approve_reviews(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f"{updated} review(s) successfully approved and visible on PDP.")
+    approve_reviews.short_description = "Approve selected reviews for PDP"
+
+    def reject_reviews(self, request, queryset):
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f"{updated} review(s) marked hidden.")
+    reject_reviews.short_description = "Hide selected reviews from PDP"
+
+    def mark_verified(self, request, queryset):
+        updated = queryset.update(is_verified=True)
+        self.message_user(request, f"{updated} review(s) marked as Verified Buyer.")
+    mark_verified.short_description = "Mark selected reviews as Verified Buyer"
+
 
 

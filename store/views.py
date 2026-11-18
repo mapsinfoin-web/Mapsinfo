@@ -25,7 +25,7 @@ from django.http import JsonResponse
 
 from .forms import CustomRegistrationForm
 from .models import (
-    Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product, Wishlist
+    Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product, ProductReview, Wishlist
 )
 from .offers import (
     add_gift, attach_offers, auto_fill_single_gift, calculate as calculate_offers, eligible_gifts,
@@ -179,6 +179,45 @@ def product_detail(request, pk):
         combo_discounted = round(combo_total * Decimal('0.90'))
         combo_savings = combo_total - combo_discounted
 
+    # Customer Reviews & Photo UGC
+    reviews_qs = product.reviews.filter(is_approved=True).select_related('user').order_by('-created_at')
+    total_reviews = reviews_qs.count()
+    if total_reviews > 0:
+        avg_rating = round(sum(r.rating for r in reviews_qs) / total_reviews, 1)
+        stars_5 = reviews_qs.filter(rating=5).count()
+        stars_4 = reviews_qs.filter(rating=4).count()
+        stars_3 = reviews_qs.filter(rating=3).count()
+        stars_2 = reviews_qs.filter(rating=2).count()
+        stars_1 = reviews_qs.filter(rating=1).count()
+        pct_5 = round((stars_5 / total_reviews) * 100)
+        pct_4 = round((stars_4 / total_reviews) * 100)
+        pct_3 = round((stars_3 / total_reviews) * 100)
+        pct_2 = round((stars_2 / total_reviews) * 100)
+        pct_1 = round((stars_1 / total_reviews) * 100)
+        photo_reviews = [r for r in reviews_qs if r.display_image_url]
+    else:
+        avg_rating = 4.9
+        stars_5, stars_4, stars_3, stars_2, stars_1 = 0, 0, 0, 0, 0
+        pct_5, pct_4, pct_3, pct_2, pct_1 = 92, 6, 2, 0, 0
+        photo_reviews = []
+
+    rating_stats = {
+        'average': avg_rating,
+        'total': total_reviews,
+        'stars_5': stars_5,
+        'stars_4': stars_4,
+        'stars_3': stars_3,
+        'stars_2': stars_2,
+        'stars_1': stars_1,
+        'pct_5': pct_5,
+        'pct_4': pct_4,
+        'pct_3': pct_3,
+        'pct_2': pct_2,
+        'pct_1': pct_1,
+        'photo_count': len(photo_reviews),
+        'recommended_pct': 98 if total_reviews == 0 else min(100, round(((stars_5 + stars_4) / max(total_reviews, 1)) * 100)),
+    }
+
     return render(request, 'store/product_detail.html', {
         'product': product,
         'offer': product.offer,
@@ -189,7 +228,95 @@ def product_detail(request, pk):
         'combo_total': combo_total,
         'combo_discounted': combo_discounted,
         'combo_savings': combo_savings,
+        'reviews': reviews_qs[:30],
+        'photo_reviews': photo_reviews[:16],
+        'rating_stats': rating_stats,
+        'outfit_choices': ProductReview.OUTFIT_TAG_CHOICES,
     })
+
+
+@require_POST
+def add_product_review(request, pk):
+    """
+    Submits a customer rating, feedback, outfit styling tag, and optional photo UGC.
+    """
+    product = get_object_or_404(Product, pk=pk, is_active=True)
+
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    rating_raw = request.POST.get('rating', '5').strip()
+    headline = request.POST.get('headline', '').strip()
+    review_text = request.POST.get('review_text', '').strip()
+    outfit_tag = request.POST.get('outfit_tag', '').strip()
+    uploaded_image = request.FILES.get('image')
+
+    is_ajax = (
+        request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+        'application/json' in request.headers.get('Accept', '')
+    )
+
+    if not name or not review_text:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': 'Please provide your name and review message.'}, status=400)
+        messages.error(request, 'Please provide your name and review message.')
+        return redirect('store:product_detail', pk=product.pk)
+
+    try:
+        rating = int(rating_raw)
+        rating = max(1, min(5, rating))
+    except (ValueError, TypeError):
+        rating = 5
+
+    review = ProductReview(
+        product=product,
+        user=request.user if request.user.is_authenticated else None,
+        name=name,
+        email=email,
+        rating=rating,
+        headline=headline,
+        review_text=review_text,
+        outfit_tag=outfit_tag,
+        is_verified=True,
+        is_approved=True,
+    )
+    if uploaded_image:
+        review.image = uploaded_image
+    review.save()
+
+    if is_ajax:
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Thank you! Your review and outfit styling photo have been shared.',
+            'review_id': review.pk,
+        })
+
+    messages.success(request, 'Thank you! Your review and outfit styling photo have been shared.')
+    return redirect(f"{reverse('store:product_detail', args=[product.pk])}#customer-reviews")
+
+
+@require_POST
+def vote_review_helpful(request, review_id):
+    """
+    Helpful vote counter for social proof.
+    """
+    review = get_object_or_404(ProductReview, pk=review_id, is_approved=True)
+    voted_key = f'voted_review_{review_id}'
+    if request.session.get(voted_key):
+        return JsonResponse({
+            'status': 'already_voted',
+            'helpful_count': review.helpful_count,
+            'message': 'You have already marked this review as helpful.'
+        })
+
+    ProductReview.objects.filter(pk=review_id).update(helpful_count=F('helpful_count') + 1)
+    review.refresh_from_db(fields=['helpful_count'])
+    request.session[voted_key] = True
+    return JsonResponse({
+        'status': 'success',
+        'helpful_count': review.helpful_count,
+        'message': 'Thank you for your feedback!'
+    })
+
 # ---------------------------------------------------------------------------
 # CART HELPERS
 # ---------------------------------------------------------------------------
