@@ -2095,6 +2095,149 @@
                 max-height: 320px;
             }
         }
+        /* ===== PDP FAQ SECTION ===== */
+        .pdp-faq-section {
+            max-width: 1240px;
+            margin: 50px auto 30px;
+            padding: 0 20px;
+        }
+        .pdp-faq-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 36px 32px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+        }
+        .pdp-faq-head {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 16px;
+        }
+        .pdp-faq-eyebrow {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #2563eb;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .pdp-faq-head h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px;
+            letter-spacing: -0.3px;
+        }
+        .pdp-faq-head p {
+            font-size: 13.5px;
+            color: #64748b;
+            margin: 0;
+        }
+        .pdp-faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .pdp-faq-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all .25s ease;
+        }
+        .pdp-faq-item:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .pdp-faq-item.active {
+            border-color: #0A1E3F;
+            background: #ffffff;
+            box-shadow: 0 4px 16px rgba(10, 30, 63, 0.08);
+        }
+        .pdp-faq-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .pdp-faq-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+        }
+        .pdp-faq-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #0f172a;
+            display: grid;
+            place-items: center;
+            font-size: 10.5px;
+            flex-shrink: 0;
+            transition: transform .25s ease, background .25s ease, color .25s ease;
+        }
+        .pdp-faq-item.active .pdp-faq-icon {
+            transform: rotate(180deg);
+            background: #0A1E3F;
+            color: #ffffff;
+        }
+        .pdp-faq-ans {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 18px;
+        }
+        .pdp-faq-ans-inner {
+            padding: 0 0 16px;
+            font-size: 13.5px;
+            color: #475569;
+            line-height: 1.55;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 10px;
+        }
+        .pdp-faq-footer {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .pdp-faq-more-link {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0A1E3F;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pdp-faq-more-link:hover {
+            color: #2563eb;
+        }
+        @media (max-width: 768px) {
+            .pdp-faq-grid {
+                grid-template-columns: 1fr;
+            }
+            .pdp-faq-card {
+                padding: 24px 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2749,6 +2892,104 @@
         </div>
     </section>
 
+    <!-- ===== PDP FAQ SECTION (QUESTIONS & ANSWERS) ===== -->
+    <section class="pdp-faq-section" id="pdp-faqs">
+        <div class="pdp-faq-card">
+            <div class="pdp-faq-head">
+                <span class="pdp-faq-eyebrow"><i class="fas fa-circle-question"></i> Product Questions &amp; Guarantees</span>
+                <h3>Frequently Asked Questions</h3>
+                <p>Essential answers regarding anti-tarnish durability, skin-safe materials, Delhi NCR dispatch, and signature packaging for {{ product.title }}.</p>
+            </div>
+            <div class="pdp-faq-grid">
+                <!-- FAQ 1 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">Is this piece genuinely 100% Anti-Tarnish?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            Yes. Handcrafted with our signature anti-tarnish plating and invisible nano-seal barrier, this piece will not turn green, fade, or oxidise under normal humidity and everyday wear.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">Will it arrive in the signature velvet jewellery box?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            Yes, 100%! Every order arrives in our deep-blue luxury velvet box with cushioned lining, accompanied by our branded Anti-Tarnish Guarantee certificate seal and an airtight protective pouch.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">Is it safe for sensitive skin and nickel allergies?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            Absolutely. This piece is completely lead-free, nickel-free, and cadmium-free. It is laboratory tested for hypoallergenic skin compatibility and 24/7 comfort fit.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">How fast is delivery to Delhi NCR and across India?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            Orders for Delhi NCR are dispatched within 24 hours and arrive in 1 to 2 business days. Across the rest of India, insured express air shipping takes 3 to 5 business days.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">Can I pay using Cash on Delivery (COD) or UPI?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            Yes, we support Google Pay, PhonePe, Paytm, BHIM, Cards, Net Banking, and Cash on Delivery (COD) across 18,000+ pin codes in India.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="pdp-faq-item">
+                    <button class="pdp-faq-btn" type="button" aria-expanded="false">
+                        <span class="pdp-faq-title">What is your 7-day transit replacement policy?</span>
+                        <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="pdp-faq-ans">
+                        <div class="pdp-faq-ans-inner">
+                            If your piece arrives damaged or defective, send a photo or video to our WhatsApp (+91 99535 95557) within 7 days, and we will send a brand-new replacement immediately at no extra cost.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pdp-faq-footer">
+                <a href="{% url 'store:faq' %}" class="pdp-faq-more-link">
+                    <i class="fas fa-circle-info"></i> View Full Help Center &amp; FAQs &rarr;
+                </a>
+                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20have%20a%20question%20about%20{{ product.title|urlencode }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; color:#15803d; font-size:13px; font-weight:700; text-decoration:none;">
+                    <i class="fab fa-whatsapp" style="font-size:15px;"></i> Ask styling concierge on WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== REVIEW SUBMISSION MODAL ===== -->
     <div class="modal-overlay" id="reviewModalOverlay" onclick="handleModalBackdropClick(event)">
         <div class="review-modal-card" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
@@ -3056,6 +3297,33 @@
                 closeUgcLightbox();
             }
         });
+
+        // PDP FAQ Accordion Toggles
+        document.querySelectorAll('.pdp-faq-item').forEach(function(item) {
+            var btn = item.querySelector('.pdp-faq-btn');
+            var ans = item.querySelector('.pdp-faq-ans');
+            if (btn && ans) {
+                btn.addEventListener('click', function() {
+                    var isActive = item.classList.contains('active');
+                    document.querySelectorAll('.pdp-faq-item').forEach(function(other) {
+                        if (other !== item && other.classList.contains('active')) {
+                            other.classList.remove('active');
+                            other.querySelector('.pdp-faq-btn').setAttribute('aria-expanded', 'false');
+                            other.querySelector('.pdp-faq-ans').style.maxHeight = null;
+                        }
+                    });
+                    if (isActive) {
+                        item.classList.remove('active');
+                        btn.setAttribute('aria-expanded', 'false');
+                        ans.style.maxHeight = null;
+                    } else {
+                        item.classList.add('active');
+                        btn.setAttribute('aria-expanded', 'true');
+                        ans.style.maxHeight = ans.scrollHeight + 'px';
+                    }
+                });
+            }
+        });
     </script>
 
     <!-- ===== FOOTER ===== -->
@@ -3083,17 +3351,17 @@
                 </div>
                 <div class="fcol">
                     <h4>Help</h4>
-                    <a href="#">Track Order</a>
-                    <a href="#">Size Guide</a>
-                    <a href="#">FAQs</a>
+                    <a href="{% url 'store:my_orders' %}">Track Order</a>
+                    <a href="{% url 'store:faq' %}">FAQs</a>
                     <a href="{% url 'store:contact' %}">Contact Support</a>
+                    <a href="https://wa.me/919953595557" target="_blank" rel="noopener">WhatsApp Concierge</a>
                 </div>
                 <div class="fcol">
                     <h4>Company</h4>
                     <a href="{% url 'store:about' %}">Our Story</a>
-                    <a href="#">Sustainability</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Press</a>
+                    <a href="{% url 'store:collections' %}">Full Directory</a>
+                    <a href="{% url 'store:sale' %}">Curated Sale</a>
+                    <a href="{% url 'store:contact' %}">Store Support</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -3101,7 +3369,7 @@
                 <div class="pay" aria-label="Payment methods">
                     <i class="fas fa-qrcode"></i><i class="fab fa-google-pay"></i> <span style="font-size:12px;letter-spacing:.5px;">Pay securely by Paytm QR / UPI</span>
                 </div>
-                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="{% url 'store:faq' %}">FAQ</a></div>
             </div>
         </div>
     </footer>

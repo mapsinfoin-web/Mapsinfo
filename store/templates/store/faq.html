@@ -1,0 +1,1014 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frequently Asked Questions (FAQ) | MAPSKART Anti-Tarnish Jewellery</title>
+    <meta name="description" content="Find answers to all your questions about MAPSKART Anti-Tarnish Jewellery, 18K gold plating, Delhi NCR express dispatch, signature velvet box packaging, care, and 7-day replacements." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MAPSKART" />
+    <meta property="og:title" content="Frequently Asked Questions (FAQ) | MAPSKART Handcrafted Jewellery" />
+    <meta property="og:description" content="Answers regarding our Anti-Tarnish Purity Guarantee, Delhi NCR dispatch, velvet box packaging, skin-safe materials, and easy 7-day replacements." />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FAQ | MAPSKART Handcrafted Jewellery" />
+    <meta name="twitter:description" content="All your questions answered: Anti-Tarnish Guarantee, express shipping, and jewellery care." />
+
+    <link rel="icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Schema.org FAQPage JSON-LD for Search Engine Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the MAPSKART Anti-Tarnish Purity & Skin-Safe Guarantee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every piece in our Anti-Tarnish collection is engineered with hypoallergenic brass or surgical-grade stainless steel, coated with thick 18K gold or rhodium plating, and sealed with a nano-protective barrier. This prevents tarnishing, oxidisation, and skin discolouration even during daily wear."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is MAPSKART jewellery waterproof and sweat-resistant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, our Anti-Tarnish jewellery is water-resistant and sweat-proof, making it perfect for office, workout, and daily routines. For maximum shine longevity over years, we advise avoiding direct exposure to heavy pool chlorine and concentrated chemical perfumes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is my order packaged? Is the signature velvet box included?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every piece arrives in our signature MAPSKART deep-blue luxury velvet jewellery box, accompanied by a branded certificate guarantee seal and an airtight protective zip pouch. It is 100% gift-ready."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does delivery take across Delhi NCR and India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Orders in Delhi NCR enjoy express priority dispatch and typically arrive in 1 to 2 business days. For the rest of India and metro cities, insured air delivery takes 3 to 5 business days via trusted couriers (Bluedart, Delhivery, DTDC)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is your replacement and return policy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We provide a 7-day transit replacement guarantee. In the rare event your jewellery arrives defective or damaged, simply message our WhatsApp concierge at +91 99535 95557 with an unboxing video or photo, and we will send a brand-new replacement immediately."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you accept Cash on Delivery (COD) and UPI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, we accept all major UPI apps (Google Pay, PhonePe, Paytm, BHIM), Credit/Debit cards, Net Banking, and Cash on Delivery (COD) across serviceable pin codes in India."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        :root {
+            --navy: #1F3A66; --navy-2: #132639; --blue: #295CA3; --accent: #B3E0FF; --secondary: #C2D6E8;
+            --ink: #132639; --text: #2B3F57; --muted: #52637A; --bg: #F5F8FC; --soft: #E1E9F0;
+            --line: #D1DEE8; --radius: 18px;
+            --shadow: 0 10px 30px rgba(19, 38, 57, .08); --shadow-lg: 0 20px 50px rgba(19, 38, 57, .16);
+            --container: 1280px;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6 { text-transform: capitalize; }
+
+        .announce { background: var(--navy); color: #fff; font-size: 12.5px; letter-spacing: .4px; overflow: hidden; white-space: nowrap; }
+        .announce-track { display: inline-flex; gap: 60px; padding: 10px 0; animation: marquee 28s linear infinite; }
+        .announce:hover .announce-track { animation-play-state: paused; }
+        .announce span i { color: var(--accent); margin-right: 8px; }
+        @keyframes marquee { to { transform: translateX(-50%); } }
+
+        /* Page Hero Header */
+        .faq-hero {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F5F8FC 100%);
+            border-bottom: 1px solid var(--line);
+            padding: 56px 20px 48px;
+            text-align: center;
+        }
+        .faq-hero-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(41, 92, 163, 0.08);
+            border: 1px solid rgba(41, 92, 163, 0.2);
+            color: var(--navy);
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .faq-hero h1 {
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0 0 14px;
+            letter-spacing: -.8px;
+            line-height: 1.2;
+        }
+        .faq-hero p {
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin: 0 auto 32px;
+            max-width: 640px;
+        }
+
+        /* FAQ Live Search Input */
+        .faq-search-box {
+            position: relative;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+        .faq-search-box input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            border-radius: 999px;
+            border: 1.5px solid var(--line);
+            background: #ffffff;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--ink);
+            box-shadow: 0 4px 20px rgba(19, 38, 57, 0.06);
+            transition: all .25s ease;
+        }
+        .faq-search-box input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 4px rgba(31, 58, 102, 0.12);
+        }
+        .faq-search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy);
+            font-size: 17px;
+        }
+
+        /* Category Filter Pills */
+        .faq-filters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 36px auto 0;
+            max-width: 960px;
+        }
+        .faq-filter-btn {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all .2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .faq-filter-btn:hover {
+            border-color: var(--navy);
+            color: var(--navy);
+            background: #F8FAFD;
+        }
+        .faq-filter-btn.active {
+            background: var(--navy);
+            color: #ffffff;
+            border-color: var(--navy);
+            box-shadow: 0 4px 12px rgba(31, 58, 102, 0.2);
+        }
+
+        /* FAQ Content Container */
+        .faq-section {
+            padding: 50px 20px 80px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .faq-category-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 40px 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--soft);
+        }
+        .faq-category-title:first-child {
+            margin-top: 0;
+        }
+        .faq-category-title i {
+            color: var(--blue);
+            font-size: 18px;
+        }
+
+        /* Accordion Component */
+        .faq-item {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: border-color .2s ease, box-shadow .2s ease;
+            overflow: hidden;
+        }
+        .faq-item:hover {
+            border-color: #B3CEE8;
+            box-shadow: 0 4px 16px rgba(19, 38, 57, 0.05);
+        }
+        .faq-item.active {
+            border-color: var(--navy);
+            box-shadow: 0 6px 20px rgba(19, 38, 57, 0.08);
+        }
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .faq-question-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .faq-q-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(41, 92, 163, 0.1);
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+        .faq-toggle-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--soft);
+            color: var(--navy);
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: transform .28s ease, background .2s ease, color .2s ease;
+        }
+        .faq-item.active .faq-toggle-icon {
+            transform: rotate(180deg);
+            background: var(--navy);
+            color: #ffffff;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 24px;
+        }
+        .faq-answer-inner {
+            padding: 0 0 22px 36px;
+            font-size: 14.5px;
+            line-height: 1.65;
+            color: var(--text);
+            border-top: 1px dashed rgba(209, 222, 232, 0.7);
+            padding-top: 14px;
+        }
+        .faq-answer-inner p {
+            margin: 0 0 10px;
+        }
+        .faq-answer-inner p:last-child {
+            margin-bottom: 0;
+        }
+        .faq-answer-inner ul {
+            margin: 8px 0 12px 18px;
+            padding: 0;
+        }
+        .faq-answer-inner li {
+            margin-bottom: 6px;
+        }
+        .faq-highlight-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #FEF3C7;
+            color: #92400E;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-top: 8px;
+        }
+
+        /* Concierge Support CTA Card */
+        .faq-cta-card {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+            border-radius: 20px;
+            padding: 36px 40px;
+            color: #ffffff;
+            margin: 50px 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        .faq-cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(179, 224, 255, 0.2) 0%, transparent 70%);
+        }
+        .faq-cta-info {
+            position: relative;
+            z-index: 2;
+        }
+        .faq-cta-pill {
+            display: inline-block;
+            background: rgba(179, 224, 255, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(179, 224, 255, 0.35);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+        }
+        .faq-cta-info h3 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .faq-cta-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #E1E9F0;
+            max-width: 480px;
+            line-height: 1.5;
+        }
+        .faq-cta-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .btn-wa-faq {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 13px 24px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+            transition: transform .2s ease, box-shadow .2s ease;
+            white-space: nowrap;
+        }
+        .btn-wa-faq:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(37, 211, 102, 0.45);
+        }
+        .btn-contact-alt {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: background .2s ease;
+        }
+        .btn-contact-alt:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* Empty search state */
+        .faq-no-results {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px dashed var(--line);
+            margin-top: 20px;
+        }
+        .faq-no-results i {
+            font-size: 36px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .faq-no-results h4 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            color: var(--ink);
+        }
+        .faq-no-results p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer { background: #132639; color: #fff; padding: 60px 0 24px; font-size: 14px; }
+        .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+        .brand-logo img { height: 46px; }
+        .footer-brand p { color: #A8B8C8; font-size: 13.5px; line-height: 1.6; margin: 14px 0 20px; max-width: 320px; }
+        .socials { display: flex; gap: 10px; }
+        .socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; color: #fff; transition: background .2s; text-decoration: none; }
+        .socials a:hover { background: var(--blue); }
+        .fcol h4 { margin: 0 0 16px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+        .fcol a { display: block; color: #A8B8C8; text-decoration: none; margin-bottom: 10px; font-size: 13.5px; transition: color .2s; }
+        .fcol a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 12.5px; color: #7E93A8; }
+        .footer-bottom .pay { display: flex; align-items: center; gap: 8px; font-size: 18px; }
+        .legal a { color: #7E93A8; text-decoration: none; margin-left: 16px; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+        @media (max-width: 860px) {
+            .faq-hero { padding: 40px 16px 36px; }
+            .faq-cta-card { flex-direction: column; text-align: center; padding: 28px 20px; gap: 20px; }
+            .faq-cta-actions { width: 100%; }
+            .btn-wa-faq { width: 100%; }
+            .footer-top { grid-template-columns: 1fr; gap: 30px; }
+            .faq-question { padding: 16px 18px; }
+            .faq-question-text { font-size: 15px; }
+            .faq-answer { padding: 0 18px; }
+            .faq-answer-inner { padding: 0 0 18px 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <aside class="announce" aria-label="Announcement">
+        <div class="announce-track">
+            <span><i class="fas fa-certificate"></i> MAPSKART Anti-Tarnish Guarantee · 100% Skin Safe</span>
+            <span><i class="fas fa-truck-fast"></i> Express Dispatch from Delhi NCR Atelier</span>
+            <span><i class="fas fa-box-open"></i> Signature Luxury Velvet Box Included with Every Order</span>
+            <span><i class="fas fa-rotate-left"></i> 7-Day Hassle-Free Transit Replacement</span>
+            <span><i class="fas fa-shield-halved"></i> 100% Lead &amp; Nickel-Free Hypoallergenic Jewellery</span>
+        </div>
+    </aside>
+
+    <!-- Header Navigation -->
+    {% include 'store/includes/header.html' %}
+
+    <main id="mainContent">
+        <!-- Page Hero Banner -->
+        <section class="faq-hero">
+            <div class="faq-hero-inner">
+                <span class="faq-eyebrow"><i class="fas fa-circle-question"></i> Help &amp; Atelier Guidelines</span>
+                <h1>Frequently Asked Questions</h1>
+                <p>Everything you need to know about our Anti-Tarnish Guarantee, materials, Delhi NCR express dispatch, velvet box packaging, and care instructions.</p>
+
+                <!-- Search Input -->
+                <div class="faq-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="faqSearch" placeholder="Search questions (e.g., anti-tarnish, delivery time, COD, care)…" aria-label="Search FAQs" autocomplete="off" />
+                </div>
+
+                <!-- Filter Category Pills -->
+                <div class="faq-filters" role="tablist">
+                    <button type="button" class="faq-filter-btn active" data-category="all"><i class="fas fa-border-all"></i> All Questions</button>
+                    <button type="button" class="faq-filter-btn" data-category="quality"><i class="fas fa-shield-halved"></i> Anti-Tarnish &amp; Purity</button>
+                    <button type="button" class="faq-filter-btn" data-category="shipping"><i class="fas fa-truck-fast"></i> Shipping &amp; Delivery</button>
+                    <button type="button" class="faq-filter-btn" data-category="packaging"><i class="fas fa-gift"></i> Velvet Box Packaging</button>
+                    <button type="button" class="faq-filter-btn" data-category="payments"><i class="fas fa-credit-card"></i> Payments &amp; COD</button>
+                    <button type="button" class="faq-filter-btn" data-category="returns"><i class="fas fa-rotate-left"></i> Replacements &amp; Returns</button>
+                    <button type="button" class="faq-filter-btn" data-category="care"><i class="fas fa-wand-magic-sparkles"></i> Jewellery Care</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Main Accordions -->
+        <section class="faq-section">
+            <div id="faqList">
+                <!-- CATEGORY 1: ANTI-TARNISH & QUALITY -->
+                <div class="faq-category-block" data-category="quality">
+                    <h2 class="faq-category-title"><i class="fas fa-shield-halved"></i> Anti-Tarnish &amp; Quality Guarantee</h2>
+
+                    <!-- Q1 -->
+                    <div class="faq-item" data-keywords="anti-tarnish purity guarantee gold plating durable green skin turn fade">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q1</span>
+                                What is the MAPSKART Anti-Tarnish Purity &amp; Skin-Safe Guarantee?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Every piece in our collection is precision-crafted with high-density brass or surgical-grade stainless steel, coated with thick <strong>18K gold or rhodium plating</strong>, and sealed with a proprietary nano-protective ceramic barrier.</p>
+                                <p>This invisible shield safeguards the jewellery against sweat, daily humidity, and oxidation, ensuring it retains its lustrous golden tone and <strong>never turns your skin green or black</strong>.</p>
+                                <span class="faq-highlight-pill"><i class="fas fa-check-circle"></i> 100% Skin-Safe &amp; Hypoallergenic Guarantee</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="faq-item" data-keywords="waterproof water shower sweat gym workout swim">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q2</span>
+                                Can I wear MAPSKART jewellery in water or during workouts?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Yes! Our Anti-Tarnish collection is <strong>water-resistant and sweat-proof</strong>. You can comfortably wear your studs, chains, and rings during daily office wear, light rain, and workouts.</p>
+                                <p><em>Pro-Tip for Maximum Longevity:</em> While hand washing and plain water won't harm the finish, we recommend avoiding chlorinated swimming pools, harsh chemical detergents, and direct sprays of perfumes or hair products.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="faq-item" data-keywords="hypoallergenic sensitive skin rash nickel lead cadmium allergy">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q3</span>
+                                Is your jewellery hypoallergenic and safe for sensitive ears and skin?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Yes, all MAPSKART pieces are <strong>100% lead-free, nickel-free, and cadmium-free</strong>. Our earring posts and necklace clasps undergo rigorous metallurgical testing to ensure they do not trigger allergies, rashes, or itchiness even after full-day wear.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORY 2: SHIPPING & DELIVERY -->
+                <div class="faq-category-block" data-category="shipping">
+                    <h2 class="faq-category-title"><i class="fas fa-truck-fast"></i> Shipping, Dispatch &amp; Tracking</h2>
+
+                    <!-- Q4 -->
+                    <div class="faq-item" data-keywords="delivery time shipping days delhi ncr express fast courier bluedart">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q4</span>
+                                How fast is delivery to Delhi NCR and across India?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>We dispatch all orders directly from our central Delhi NCR atelier:</p>
+                                <ul>
+                                    <li><strong>Delhi NCR (Delhi, Noida, Gurgaon, Ghaziabad, Faridabad):</strong> Dispatched within 24 hours. Delivery typically takes <strong>1 to 2 business days</strong>.</li>
+                                    <li><strong>Metro Cities (Mumbai, Bengaluru, Hyderabad, Kolkata, Chennai):</strong> Delivered in <strong>2 to 4 business days</strong> via insured express air couriers.</li>
+                                    <li><strong>Rest of India:</strong> <strong>3 to 5 business days</strong> depending on your pin code.</li>
+                                </ul>
+                                <p>You will receive automated tracking updates via SMS, email, and WhatsApp the moment your package leaves our atelier.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="faq-item" data-keywords="track order tracking number status courier airway bill awb">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q5</span>
+                                How do I track my order once it has been shipped?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Once dispatched, you will receive an AWB tracking link via WhatsApp and email. You can also log into your account and view live shipping updates under <a href="{% url 'store:my_orders' %}" style="color:var(--navy);font-weight:700;">My Orders</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q6 -->
+                    <div class="faq-item" data-keywords="shipping charges free delivery cost minimum order">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q6</span>
+                                Are there any shipping charges?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>We offer <strong>FREE insured delivery</strong> across India on all prepaid orders above ₹499. For smaller orders or select COD destinations, a nominal standard handling fee is displayed transparently at checkout.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORY 3: VELVET BOX PACKAGING & GIFTING -->
+                <div class="faq-category-block" data-category="packaging">
+                    <h2 class="faq-category-title"><i class="fas fa-gift"></i> Packaging &amp; Gifting</h2>
+
+                    <!-- Q7 -->
+                    <div class="faq-item" data-keywords="velvet box packaging gift box present unboxing card certificate">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q7</span>
+                                Does every order arrive in the signature velvet jewellery box?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p><strong>Yes, 100%!</strong> We believe the unboxing experience should feel luxurious. Every single order includes:</p>
+                                <ul>
+                                    <li>Our signature <strong>deep-blue luxury velvet jewellery box</strong> lined with plush cushioned interior.</li>
+                                    <li>A certified <strong>MAPSKART Anti-Tarnish Purity Seal card</strong>.</li>
+                                    <li>An airtight <strong>zip-lock care pouch</strong> to store your jewellery when travelling.</li>
+                                    <li>Safe tamper-evident outer bubble protection.</li>
+                                </ul>
+                                <p>It arrives completely gift-ready for birthdays, anniversaries, weddings, and festive gifting.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="faq-item" data-keywords="gift message gift note invoice price hide send to friend">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q8</span>
+                                Can I send jewellery directly as a gift without the price tag?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Yes! During checkout, simply add a note or message our WhatsApp concierge at +91 99535 95557 with your order ID. We will conceal item pricing on the physical packaging and can include a handwritten personalised gift note free of charge.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORY 4: PAYMENTS & COD -->
+                <div class="faq-category-block" data-category="payments">
+                    <h2 class="faq-category-title"><i class="fas fa-credit-card"></i> Payments &amp; Cash on Delivery (COD)</h2>
+
+                    <!-- Q9 -->
+                    <div class="faq-item" data-keywords="payment cod cash on delivery upi gpay phonepe paytm cards">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q9</span>
+                                What payment methods do you accept? Is COD available?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>We offer 100% secure, encrypted payment options:</p>
+                                <ul>
+                                    <li><strong>Instant UPI:</strong> Google Pay, PhonePe, Paytm, BHIM, and QR code scan.</li>
+                                    <li><strong>Credit &amp; Debit Cards:</strong> Visa, MasterCard, RuPay, Maestro.</li>
+                                    <li><strong>Net Banking:</strong> All major Indian banks.</li>
+                                    <li><strong>Cash on Delivery (COD):</strong> Available across 18,000+ serviceable pin codes in India.</li>
+                                </ul>
+                                <span class="faq-highlight-pill"><i class="fas fa-bolt"></i> Tip: Prepaid UPI orders get priority queue dispatch from our atelier.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="faq-item" data-keywords="payment failed debited money account refund upi">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q10</span>
+                                What if my payment was deducted but the order did not confirm?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Rest assured, your money is completely safe. Banking gateways occasionally face network latency. If money was debited without order confirmation, it automatically reverses back to your bank within 24 to 48 hours.</p>
+                                <p>You can also share your payment reference screenshot with our support team on WhatsApp (+91 99535 95557), and we will manually confirm your order immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORY 5: REPLACEMENTS & RETURNS -->
+                <div class="faq-category-block" data-category="returns">
+                    <h2 class="faq-category-title"><i class="fas fa-rotate-left"></i> Returns &amp; Transit Replacements</h2>
+
+                    <!-- Q11 -->
+                    <div class="faq-item" data-keywords="return replacement damaged broken transit wrong item exchange">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q11</span>
+                                What if my jewellery arrives damaged or with a missing stone?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>We maintain strict 3-tier atelier quality checks before dispatch. However, in the rare event of transit mishandling, we offer an unconditional <strong>7-Day Free Replacement Guarantee</strong>.</p>
+                                <p>Simply share a short unboxing video or photo showing the issue with our WhatsApp support at <strong>+91 99535 95557</strong> within 7 days of delivery. Our Delhi atelier will dispatch a fresh replacement piece right away.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q12 -->
+                    <div class="faq-item" data-keywords="size issue ring size bangles exchange fit adjust">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q12</span>
+                                Are your rings and bangles adjustable? What if there's a size issue?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>Most of our statement and solitaire rings feature an ergonomic <strong>comfort-flex adjustable band</strong> that fits Indian ring sizes 10 to 18 effortlessly without pinching. Exact millimeter measurements are listed on each product page.</p>
+                                <p>If you need exchange guidance, our styling team is ready to help via WhatsApp.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORY 6: CARE & MAINTENANCE -->
+                <div class="faq-category-block" data-category="care">
+                    <h2 class="faq-category-title"><i class="fas fa-wand-magic-sparkles"></i> Jewellery Care &amp; Longevity Tips</h2>
+
+                    <!-- Q13 -->
+                    <div class="faq-item" data-keywords="care instructions clean store perfume lotion tips polish">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span class="faq-question-text">
+                                <span class="faq-q-badge">Q13</span>
+                                How should I care for my jewellery to keep it looking brand new?
+                            </span>
+                            <span class="faq-toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-inner">
+                                <p>To preserve the brilliant 18K gold gleam for years, follow these simple golden rules:</p>
+                                <ul>
+                                    <li><strong>The "Last On, First Off" Rule:</strong> Put on your jewellery *after* applying makeup, body lotions, and perfumes.</li>
+                                    <li><strong>Wipe Clean:</strong> Gently wipe with a soft dry cotton or microfiber cloth after a long day to remove skin oils.</li>
+                                    <li><strong>Store Dry:</strong> Store each piece separately in your provided MAPSKART velvet box or airtight pouch away from direct sun and humidity.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Results Found State -->
+                <div class="faq-no-results" id="faqNoResults">
+                    <i class="fas fa-search-minus"></i>
+                    <h4>No Matching Questions Found</h4>
+                    <p>We couldn't find an answer matching your search. Don't worry, our styling concierge is available right now to assist you directly!</p>
+                    <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20have%20a%20question%20about%20my%20order" target="_blank" rel="noopener noreferrer" class="btn-wa-faq" style="margin-top:16px;display:inline-flex;">
+                        <i class="fab fa-whatsapp"></i> Ask Concierge on WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Atelier Concierge Support CTA Card -->
+            <div class="faq-cta-card">
+                <div class="faq-cta-info">
+                    <span class="faq-cta-pill"><i class="fas fa-sparkles"></i> Live Atelier Concierge</span>
+                    <h3>Still Have a Question?</h3>
+                    <p>Our dedicated bridal and jewellery stylists in Delhi NCR are here to help with size assistance, lehenga matching, order updates, or custom gifting.</p>
+                </div>
+                <div class="faq-cta-actions">
+                    <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20have%20a%20question%20about%20your%20jewellery" target="_blank" rel="noopener noreferrer" class="btn-wa-faq">
+                        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                    <a href="{% url 'store:contact' %}" class="btn-contact-alt">
+                        <i class="fas fa-envelope"></i> Contact Support Form
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
+                    </div>
+                    <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
+                    <div class="socials">
+                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="fcol">
+                    <h4>Shop</h4>
+                    <a href="{% url 'store:collection_detail' 'earrings' %}">Earrings</a>
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}">Necklaces</a>
+                    <a href="{% url 'store:collection_detail' 'rings' %}">Rings</a>
+                    <a href="{% url 'store:collection_detail' 'bracelets' %}">Bracelets</a>
+                </div>
+                <div class="fcol">
+                    <h4>Help</h4>
+                    <a href="{% url 'store:my_orders' %}">Track Order</a>
+                    <a href="{% url 'store:faq' %}">FAQs</a>
+                    <a href="{% url 'store:contact' %}">Contact Support</a>
+                    <a href="https://wa.me/919953595557" target="_blank" rel="noopener">WhatsApp Concierge</a>
+                </div>
+                <div class="fcol">
+                    <h4>Company</h4>
+                    <a href="{% url 'store:about' %}">Our Story</a>
+                    <a href="{% url 'store:collections' %}">Full Directory</a>
+                    <a href="{% url 'store:sale' %}">Curated Sale</a>
+                    <a href="{% url 'store:contact' %}">Store Support</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
+                <div class="pay" aria-label="Payment methods">
+                    <i class="fas fa-qrcode"></i><i class="fab fa-google-pay"></i> <span style="font-size:12px;letter-spacing:.5px;">Pay securely by Paytm QR / UPI</span>
+                </div>
+                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="{% url 'store:faq' %}">FAQ</a></div>
+            </div>
+        </div>
+    </footer>
+
+    {% include 'store/includes/floating_whatsapp.html' %}
+
+    <!-- Interactive FAQ Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var faqItems = document.querySelectorAll('.faq-item');
+        var filterBtns = document.querySelectorAll('.faq-filter-btn');
+        var categoryBlocks = document.querySelectorAll('.faq-category-block');
+        var searchInput = document.getElementById('faqSearch');
+        var noResults = document.getElementById('faqNoResults');
+
+        // Accordion Toggle
+        faqItems.forEach(function(item) {
+            var btn = item.querySelector('.faq-question');
+            var answer = item.querySelector('.faq-answer');
+
+            btn.addEventListener('click', function() {
+                var isActive = item.classList.contains('active');
+
+                // Close other accordions in the same block if desired, or allow multiple
+                faqItems.forEach(function(other) {
+                    if (other !== item && other.classList.contains('active')) {
+                        other.classList.remove('active');
+                        other.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+                        other.querySelector('.faq-answer').style.maxHeight = null;
+                    }
+                });
+
+                if (isActive) {
+                    item.classList.remove('active');
+                    btn.setAttribute('aria-expanded', 'false');
+                    answer.style.maxHeight = null;
+                } else {
+                    item.classList.add('active');
+                    btn.setAttribute('aria-expanded', 'true');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+
+        // Category Filter Pills
+        filterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                var selectedCat = btn.getAttribute('data-category');
+                var query = searchInput.value.toLowerCase().trim();
+
+                applyFilters(selectedCat, query);
+            });
+        });
+
+        // Live Search Filter
+        searchInput.addEventListener('input', function() {
+            var query = this.value.toLowerCase().trim();
+            var activeFilterBtn = document.querySelector('.faq-filter-btn.active');
+            var selectedCat = activeFilterBtn ? activeFilterBtn.getAttribute('data-category') : 'all';
+
+            applyFilters(selectedCat, query);
+        });
+
+        function applyFilters(category, query) {
+            var visibleCount = 0;
+
+            categoryBlocks.forEach(function(block) {
+                var blockCat = block.getAttribute('data-category');
+                var items = block.querySelectorAll('.faq-item');
+                var blockHasVisibleItem = false;
+
+                // Check category match
+                var categoryMatches = (category === 'all' || category === blockCat);
+
+                items.forEach(function(item) {
+                    var questionText = item.querySelector('.faq-question-text').textContent.toLowerCase();
+                    var answerText = item.querySelector('.faq-answer-inner').textContent.toLowerCase();
+                    var keywords = (item.getAttribute('data-keywords') || '').toLowerCase();
+
+                    var matchesQuery = !query || questionText.indexOf(query) !== -1 || answerText.indexOf(query) !== -1 || keywords.indexOf(query) !== -1;
+
+                    if (categoryMatches && matchesQuery) {
+                        item.style.display = 'block';
+                        blockHasVisibleItem = true;
+                        visibleCount++;
+
+                        // Auto-expand when query is typed
+                        if (query.length >= 3) {
+                            item.classList.add('active');
+                            item.querySelector('.faq-question').setAttribute('aria-expanded', 'true');
+                            var answer = item.querySelector('.faq-answer');
+                            answer.style.maxHeight = answer.scrollHeight + 'px';
+                        }
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                if (blockHasVisibleItem) {
+                    block.style.display = 'block';
+                } else {
+                    block.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1342,6 +1342,19 @@
         .news-form input { flex: 1; min-width: 0; border: none; padding: 0 20px; font-size: 15px; font-family: inherit; background: transparent; }
         .news-form input:focus { outline: none; }
 
+        /* ===== HOMEPAGE FAQ SECTION ===== */
+        .home-faq-accordion { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .home-faq-item { background: #ffffff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: all .25s ease; }
+        .home-faq-item:hover { border-color: var(--navy); box-shadow: 0 4px 16px rgba(19, 38, 57, 0.06); }
+        .home-faq-item.active { border-color: var(--navy); box-shadow: 0 6px 20px rgba(19, 38, 57, 0.08); }
+        .home-faq-trigger { width: 100%; background: none; border: none; text-align: left; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; font-family: inherit; }
+        .home-faq-q { font-size: 15.5px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 12px; }
+        .home-faq-badge { width: 22px; height: 22px; border-radius: 50%; background: rgba(41, 92, 163, 0.1); color: var(--blue); font-size: 11px; font-weight: 800; display: grid; place-items: center; flex-shrink: 0; }
+        .home-faq-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--soft); color: var(--navy); display: grid; place-items: center; font-size: 11px; flex-shrink: 0; transition: transform .25s ease, background .25s ease, color .25s ease; }
+        .home-faq-item.active .home-faq-icon { transform: rotate(180deg); background: var(--navy); color: #ffffff; }
+        .home-faq-body { max-height: 0; overflow: hidden; transition: max-height .32s cubic-bezier(0.4, 0, 0.2, 1); padding: 0 22px; }
+        .home-faq-body-inner { padding: 0 0 18px 34px; font-size: 14px; line-height: 1.65; color: var(--text); border-top: 1px dashed rgba(209, 222, 232, 0.7); padding-top: 12px; }
+
         /* ===== FOOTER ===== */
         .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
         .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
@@ -2204,6 +2217,123 @@
             </div>
         </section>
 
+        <!-- ===== FREQUENTLY ASKED QUESTIONS ===== -->
+        <section class="section home-faq-section" id="faq" style="background:#F9FBFE; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:64px 0 72px;">
+            <div class="container" style="max-width:960px;">
+                <div class="sec-head reveal" style="text-align:center; flex-direction:column; align-items:center; margin-bottom:36px;">
+                    <span class="eyebrow"><i class="fas fa-circle-question"></i> Clear &amp; Transparent</span>
+                    <h2 style="font-size:clamp(26px, 4vw, 36px); margin:0 0 10px;">Frequently Asked Questions</h2>
+                    <p style="color:var(--muted); max-width:580px; margin:0 auto; font-size:15px; line-height:1.5;">Quick answers to your questions on our Anti-Tarnish Guarantee, Delhi NCR express dispatch, signature velvet box packaging, and skin safety.</p>
+                </div>
+                <div class="home-faq-accordion reveal">
+                    <!-- Q1: Anti-tarnish -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">1</span>
+                                What is the MAPSKART Anti-Tarnish Guarantee?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                Every piece is precision-crafted with skin-safe brass or surgical stainless steel, coated with thick 18K gold/rhodium plating and an invisible nano-protective ceramic barrier. This shields against sweat, daily humidity, and oxidation so your jewellery stays gleaming and <strong>never turns your skin green or black</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q2: Water & gym -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">2</span>
+                                Is MAPSKART jewellery waterproof and sweat-resistant?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                Yes! Our Anti-Tarnish pieces are sweat-proof and water-resistant, making them ideal for everyday office routines and workouts. For decades of high-shine brilliance, avoid harsh chlorinated pool water and direct chemical perfume sprays.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q3: Velvet box packaging -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">3</span>
+                                How is my order packaged? Is the signature velvet box included?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                <strong>Every single order</strong> arrives inside our signature deep-blue cushioned velvet jewellery box, accompanied by a certificate purity seal card and airtight protective pouch—100% gift-ready for yourself or someone special.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q4: Delhi NCR & shipping -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">4</span>
+                                How long does delivery take across Delhi NCR and India?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                <strong>Delhi NCR</strong> orders enjoy express 24-hour dispatch and arrive in 1 to 2 business days. For the rest of India, insured express air shipping takes 3 to 5 business days with live WhatsApp and SMS tracking.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q5: Cash on Delivery & UPI -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">5</span>
+                                Do you accept Cash on Delivery (COD) and UPI?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                Yes! We accept all UPI apps (Google Pay, PhonePe, Paytm, BHIM), Credit/Debit cards, Net Banking, and Cash on Delivery (COD) across 18,000+ pin codes across India.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q6: Replacements -->
+                    <div class="home-faq-item">
+                        <button class="home-faq-trigger" type="button" aria-expanded="false">
+                            <span class="home-faq-q">
+                                <span class="home-faq-badge">6</span>
+                                What is your 7-day replacement guarantee?
+                            </span>
+                            <span class="home-faq-icon"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="home-faq-body">
+                            <div class="home-faq-body-inner">
+                                In the rare event your piece arrives damaged or defective in transit, message our WhatsApp support (+91 99535 95557) with an unboxing photo/video within 7 days, and our atelier will dispatch a fresh replacement immediately.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-faq-footer reveal" style="text-align:center; margin-top:32px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px;">
+                    <a href="{% url 'store:faq' %}" class="btn btn-outline" style="border-radius:999px; padding:12px 24px; font-weight:700; font-size:14px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                        <i class="fas fa-list-check"></i> View All Questions in Help Center &rarr;
+                    </a>
+                    <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20have%20a%20question%20about%20your%20jewellery" target="_blank" rel="noopener noreferrer" style="background:#25D366; color:#ffffff; border-radius:999px; padding:12px 24px; font-weight:700; font-size:14px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(37,211,102,0.25);">
+                        <i class="fab fa-whatsapp"></i> Chat with Delhi Atelier Concierge
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- ===== NEWSLETTER ===== -->
         <section class="news">
             <div class="container">
@@ -2246,17 +2376,17 @@
                 </div>
                 <div class="fcol">
                     <h4>Help</h4>
-                    <a href="#">Track Order</a>
-                    <a href="#">Size Guide</a>
-                    <a href="#">FAQs</a>
+                    <a href="{% url 'store:my_orders' %}">Track Order</a>
+                    <a href="{% url 'store:faq' %}">FAQs</a>
                     <a href="{% url 'store:contact' %}">Contact Support</a>
+                    <a href="https://wa.me/919953595557" target="_blank" rel="noopener">WhatsApp Concierge</a>
                 </div>
                 <div class="fcol">
                     <h4>Company</h4>
                     <a href="{% url 'store:about' %}">Our Story</a>
-                    <a href="#">Sustainability</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Press</a>
+                    <a href="{% url 'store:collections' %}">Full Directory</a>
+                    <a href="{% url 'store:sale' %}">Curated Sale</a>
+                    <a href="{% url 'store:contact' %}">Store Support</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -2264,7 +2394,7 @@
                 <div class="pay" aria-label="Payment methods">
                     <i class="fas fa-qrcode"></i><i class="fab fa-google-pay"></i> <span style="font-size:12px;letter-spacing:.5px;">Pay securely by Paytm QR / UPI</span>
                 </div>
-                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+                <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="{% url 'store:faq' %}">FAQ</a></div>
             </div>
         </div>
     </footer>
@@ -2798,6 +2928,33 @@
 
             startTimer();
         })();
+
+        /* Homepage FAQ Accordion Toggles */
+        document.querySelectorAll('.home-faq-item').forEach(function(item) {
+            var trigger = item.querySelector('.home-faq-trigger');
+            var body = item.querySelector('.home-faq-body');
+            if (trigger && body) {
+                trigger.addEventListener('click', function() {
+                    var isOpen = item.classList.contains('active');
+                    document.querySelectorAll('.home-faq-item').forEach(function(other) {
+                        if (other !== item && other.classList.contains('active')) {
+                            other.classList.remove('active');
+                            other.querySelector('.home-faq-trigger').setAttribute('aria-expanded', 'false');
+                            other.querySelector('.home-faq-body').style.maxHeight = null;
+                        }
+                    });
+                    if (isOpen) {
+                        item.classList.remove('active');
+                        trigger.setAttribute('aria-expanded', 'false');
+                        body.style.maxHeight = null;
+                    } else {
+                        item.classList.add('active');
+                        trigger.setAttribute('aria-expanded', 'true');
+                        body.style.maxHeight = body.scrollHeight + 'px';
+                    }
+                });
+            }
+        });
 
         });
      </script>

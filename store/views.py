@@ -1259,6 +1259,10 @@ def about(request):
     return render(request, 'store/about.html')
 
 
+def faq(request):
+    return render(request, 'store/faq.html')
+
+
 def _validate_contact_inquiry(name, email, phone, subject, message):
     """
     Rigorously validates contact form inputs against junk data, fake domains,

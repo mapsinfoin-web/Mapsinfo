@@ -27,6 +27,7 @@ urlpatterns = [
     # Pages
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
+    path('faq/', views.faq, name='faq'),
     path('buy/<int:pk>/', views.buy_now, name='buy_now'),
     path('search/', views.search_products, name='search'),
     path('sale/', views.sale_products, name='sale'),
