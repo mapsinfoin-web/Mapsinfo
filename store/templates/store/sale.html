@@ -435,16 +435,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile Nav Toggle
-            var navToggle = document.getElementById('navToggle');
-            var nav = document.getElementById('nav');
-            if (navToggle && nav) {
-                navToggle.addEventListener('click', function() {
-                    var o = nav.classList.toggle('open');
-                    navToggle.setAttribute('aria-expanded', o);
-                    navToggle.innerHTML = o ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-                });
-            }
+            // Mobile Nav Toggle handled centrally by header.html
 
             // Header scroll shadow
             var headerEl = document.getElementById('header');

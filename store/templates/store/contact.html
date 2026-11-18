@@ -576,15 +576,8 @@
     </script>
     <script>
         (function () {
-            var t = document.getElementById('navToggle'), n = document.getElementById('nav'), h = document.getElementById('header');
-            if (t && n) {
-                t.addEventListener('click', function () {
-                    var o = n.classList.toggle('open');
-                    t.setAttribute('aria-expanded', o);
-                    t.innerHTML = o ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-                });
-            }
-            if (h) {
+            /* Mobile menu handled by header.html */
+if (h) {
                 window.addEventListener('scroll', function () { h.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
             }
         })();

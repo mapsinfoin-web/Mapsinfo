@@ -697,13 +697,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var toggle = document.getElementById('navToggle'), nav = document.getElementById('nav');
-            toggle.addEventListener('click', function () {
-                var open = nav.classList.toggle('open');
-                toggle.setAttribute('aria-expanded', open);
-                toggle.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-            });
-            var header = document.getElementById('header');
+            /* Mobile menu handled by header.html */
+var header = document.getElementById('header');
             window.addEventListener('scroll', function () {
                 header.classList.toggle('scrolled', window.scrollY > 10);
             }, { passive: true });

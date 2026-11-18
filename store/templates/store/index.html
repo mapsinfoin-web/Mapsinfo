@@ -1370,7 +1370,7 @@
             .grid { grid-template-columns: repeat(3, 1fr); }
             .hero-copy h1 { font-size: 54px; }
             .nav { display: none; }
-            .nav.open { display: flex; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: #fff; padding: 12px 24px 20px; border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+            /* .nav.open handled by header_css.html */
             .nav-toggle { display: grid; }
             .search { max-width: none; }
         }
@@ -2273,13 +2273,7 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        /* Mobile menu */
-        var toggle = document.getElementById('navToggle'), nav = document.getElementById('nav');
-        toggle.addEventListener('click', function () {
-            var open = nav.classList.toggle('open');
-            toggle.setAttribute('aria-expanded', open);
-            toggle.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
+        /* Mobile menu handled by header.html */
 
         /* Header shadow on scroll */
         var header = document.getElementById('header');

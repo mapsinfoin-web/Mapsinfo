@@ -555,23 +555,24 @@
         gap: 14px;
     }
     .nav {
-        display: none;
-        position: fixed;
+        display: none !important;
+        position: fixed !important;
         top: 68px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: #ffffff;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 20px 24px 60px;
-        overflow-y: auto;
-        box-shadow: 0 16px 40px rgba(19, 38, 57, 0.15);
-        gap: 8px;
-        z-index: 999;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: #ffffff !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 20px 24px 80px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: 0 20px 40px rgba(19, 38, 57, 0.22) !important;
+        gap: 8px !important;
+        z-index: 99999 !important;
     }
     .nav.open {
-        display: flex;
+        display: flex !important;
     }
     .nav-toggle {
         display: grid;
