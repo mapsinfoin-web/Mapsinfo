@@ -834,6 +834,15 @@
             visibility: visible;
             z-index: 2;
         }
+        .hero-slide-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            pointer-events: none;
+        }
         .hero-slide-overlay {
             position: absolute;
             inset: 0;
@@ -1628,7 +1637,7 @@
         <section class="hero-carousel-section">
             <div class="hero-slider-wrap">
                 <!-- Slide 1: Royal Wedding & Bridal Edit -->
-                <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=1600&auto=format&fit=crop');">
+                <div class="hero-slide active" style="background-image:url('{% static 'bridal.png' %}');">
                     <div class="hero-slide-overlay"></div>
                     <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
                         <div class="hero-slide-content">
@@ -1644,7 +1653,7 @@
                 </div>
 
                 <!-- Slide 2: Minimalist Daily Luxe & Anti-Tarnish -->
-                <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=1600&auto=format&fit=crop');">
+                <div class="hero-slide" style="background-image:url('{% static 'model.png' %}');">
                     <div class="hero-slide-overlay"></div>
                     <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
                         <div class="hero-slide-content">
@@ -1659,8 +1668,11 @@
                     </div>
                 </div>
 
-                <!-- Slide 3: High-Shine Crystal & Cocktail Glam -->
-                <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1600&auto=format&fit=crop');">
+                <!-- Slide 3: High-Shine Crystal & Cocktail Glam (Video Showcase) -->
+                <div class="hero-slide has-video">
+                    <video class="hero-slide-video" autoplay muted loop playsinline preload="auto">
+                        <source src="{% static 'giff.mp4' %}" type="video/mp4">
+                    </video>
                     <div class="hero-slide-overlay"></div>
                     <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center;">
                         <div class="hero-slide-content">
@@ -2877,11 +2889,23 @@
             var intervalTime = 6000;
 
             function goToSlide(index) {
+                var prevVideo = slides[currentIndex].querySelector('video');
+                if (prevVideo) {
+                    try { prevVideo.pause(); } catch(e) {}
+                }
                 slides[currentIndex].classList.remove('active');
                 if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
                 currentIndex = (index + totalSlides) % totalSlides;
-                slides[currentIndex].classList.add('active');
+                var currentSlide = slides[currentIndex];
+                currentSlide.classList.add('active');
                 if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+                var currentVideo = currentSlide.querySelector('video');
+                if (currentVideo) {
+                    try {
+                        currentVideo.currentTime = 0;
+                        currentVideo.play().catch(function() {});
+                    } catch(e) {}
+                }
             }
 
             function nextSlide() {
