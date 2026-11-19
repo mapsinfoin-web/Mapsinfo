@@ -155,7 +155,17 @@
         .toast i { color: var(--accent); }
 
         /* ===== FOOTER ===== */
-        .footer { background: var(--navy-2); color: #fff; padding: 60px 0 30px; margin-top: 60px; }
+        .footer {
+            background:
+                radial-gradient(120% 80% at 85% 0%, rgba(127, 163, 187, 0.28) 0%, rgba(65, 117, 158, 0.12) 45%, transparent 75%),
+                radial-gradient(100% 70% at 15% 100%, rgba(65, 117, 158, 0.22) 0%, transparent 60%),
+                linear-gradient(135deg, #080F22 0%, #0F233E 22%, #193F64 48%, #2A5F8C 68%, #15385C 85%, #080F22 100%);
+            color: #C2D6E8;
+            padding: 60px 0 30px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(162, 204, 232, 0.22);
+            position: relative;
+        }
         .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
         
         .footer-brand p { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.6; max-width: 320px; }

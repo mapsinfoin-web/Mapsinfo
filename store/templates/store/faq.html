@@ -478,7 +478,17 @@
         }
 
         /* Footer */
-        .footer { background: #132639; color: #fff; padding: 60px 0 24px; font-size: 14px; }
+        .footer {
+            background:
+                radial-gradient(120% 80% at 85% 0%, rgba(127, 163, 187, 0.28) 0%, rgba(65, 117, 158, 0.12) 45%, transparent 75%),
+                radial-gradient(100% 70% at 15% 100%, rgba(65, 117, 158, 0.22) 0%, transparent 60%),
+                linear-gradient(135deg, #080F22 0%, #0F233E 22%, #193F64 48%, #2A5F8C 68%, #15385C 85%, #080F22 100%);
+            color: #C2D6E8;
+            padding: 60px 0 24px;
+            font-size: 14px;
+            border-top: 1px solid rgba(162, 204, 232, 0.22);
+            position: relative;
+        }
         .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
         .brand-logo img { height: 46px; }
         .footer-brand p { color: #A8B8C8; font-size: 13.5px; line-height: 1.6; margin: 14px 0 20px; max-width: 320px; }

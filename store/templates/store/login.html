@@ -99,7 +99,16 @@
         .icon-btn:hover { background: var(--soft); color: var(--brand); }
         .header .badge { position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; letter-spacing: 0; text-transform: none; }
         .nav-toggle { display: none; }
-        .footer { margin-top: 80px; background: var(--ink); color: #C2D6E8; }
+        .footer {
+            margin-top: 80px;
+            background:
+                radial-gradient(120% 80% at 85% 0%, rgba(127, 163, 187, 0.28) 0%, rgba(65, 117, 158, 0.12) 45%, transparent 75%),
+                radial-gradient(100% 70% at 15% 100%, rgba(65, 117, 158, 0.22) 0%, transparent 60%),
+                linear-gradient(135deg, #080F22 0%, #0F233E 22%, #193F64 48%, #2A5F8C 68%, #15385C 85%, #080F22 100%);
+            color: #C2D6E8;
+            border-top: 1px solid rgba(162, 204, 232, 0.22);
+            position: relative;
+        }
         .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
         .footer-brand .brand-logo { margin-bottom: 18px; }
         .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
