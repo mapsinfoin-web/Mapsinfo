@@ -81,12 +81,20 @@ def all_products(request):
     style_filters = _get_collection_style_filters(None, all_active)
     price_summary = _get_price_ranges(all_active)
 
+    # 6 diverse/random active products with images for "Styled By You"
+    prods_with_img = [p for p in all_active if p.image]
+    if len(prods_with_img) >= 6:
+        styled_products = random.sample(prods_with_img, 6)
+    else:
+        styled_products = prods_with_img
+
     return render(request, 'store/index.html', {
         'page_obj': page_obj,
         'categories': categories,
         'recent_products': recent_products,
         'trending_products': trending_products,
         'ugc_reviews': ugc_reviews,
+        'styled_products': styled_products,
         'color_filters': color_filters,
         'style_filters': style_filters,
         'price_summary': price_summary,
