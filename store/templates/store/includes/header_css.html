@@ -1,4 +1,10 @@
 <style>
+/* Viewport horizontal overflow prevention */
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
 /* ===== MAPSKART SIGNATURE MEGA-MENU & NAVIGATION STYLING ===== */
 .header {
     position: sticky;
@@ -584,8 +590,8 @@
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
+        width: 100% !important;
+        max-width: 100% !important;
         min-height: calc(100vh - 68px) !important;
         height: auto !important;
         background: #ffffff !important;
@@ -807,10 +813,103 @@
     }
 }
 
+/* ===== MOBILE HEADER TWO-ROW RESPONSIVE ARCHITECTURE ===== */
+@media (max-width: 768px) {
+    .header-main {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 0 !important;
+        gap: 6px 10px !important;
+    }
+    .logo {
+        order: 1 !important;
+        flex: 0 0 auto !important;
+        max-width: 140px !important;
+        justify-content: flex-start !important;
+        margin: 0 !important;
+    }
+    .logo img {
+        height: 38px !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+    .actions {
+        order: 2 !important;
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    /* Hide account/logout direct links in header on mobile because they're inside drawer */
+    .actions .icon-btn[title^="My Account"],
+    .actions .icon-btn[title="Logout"],
+    .actions .icon-btn[title="Log In"] {
+        display: none !important;
+    }
+    .icon-btn {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 15px !important;
+    }
+    .icon-btn .badge {
+        font-size: 10px !important;
+        min-width: 17px !important;
+        height: 17px !important;
+        padding: 0 4px !important;
+        top: -3px !important;
+        right: -3px !important;
+    }
+    .search {
+        order: 3 !important;
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin: 4px 0 0 !important;
+    }
+    .search input {
+        width: 100% !important;
+        height: 40px !important;
+        padding: 8px 14px 8px 38px !important;
+        font-size: 13px !important;
+        border-radius: 999px !important;
+        box-sizing: border-box !important;
+    }
+    .search i {
+        left: 14px !important;
+        font-size: 13px !important;
+    }
+}
+@media (max-width: 380px) {
+    .logo img {
+        height: 34px !important;
+    }
+    .icon-btn {
+        width: 33px !important;
+        height: 33px !important;
+        font-size: 14px !important;
+    }
+    .actions {
+        gap: 4px !important;
+    }
+    .search input {
+        font-size: 12px !important;
+    }
+}
+
 /* Polyfill for FontAwesome fa-sparkles (Pro -> Free wand-magic-sparkles fallback) */
 .fa-sparkles::before,
 i.fa-sparkles::before {
     content: "\e2ca" !important;
+    font-family: "Font Awesome 6 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    display: inline-block;
+}
+.fa-circle-check::before,
+i.fa-circle-check::before {
+    content: "\f058" !important; /* fa-check-circle */
     font-family: "Font Awesome 6 Free", "FontAwesome" !important;
     font-weight: 900 !important;
     display: inline-block;

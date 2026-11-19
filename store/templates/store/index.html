@@ -1024,7 +1024,23 @@
         }
         @media (max-width: 580px) {
             .budget-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .budget-card {
+                padding: 16px 12px;
+                border-radius: 16px;
+            }
+            .budget-price {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+            .budget-desc {
+                font-size: 11.5px;
+                margin-bottom: 12px;
+            }
+            .budget-cta {
+                font-size: 11.5px;
             }
         }
         .budget-card {
@@ -1404,18 +1420,16 @@
         }
         @media (max-width: 640px) {
             .container { padding: 0 16px; }
-            .header-main { gap: 8px; flex-wrap: wrap; padding: 10px 0; }
-            .logo { flex-basis: 100%; justify-content: center; }
-            .logo img { height: 40px; }
-            .search { order: 2; flex: 1 1 0; min-width: 0; max-width: none; margin-left: 0; }
-            .actions { order: 3; margin-left: 0; gap: 0; }
-            .icon-btn { width: 38px; height: 38px; font-size: 17px; }
             .hero-copy { padding: 28px 22px; }
             .hero-copy h1 { font-size: 40px; }
             .hero-main { min-height: 480px; border-radius: 22px; }
             .hero-side { grid-template-columns: 1fr; }
             .promo { min-height: 210px; border-radius: 22px; }
-            .trust-grid { grid-template-columns: 1fr; }
+            .trust-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+            .trust-item { padding: 12px 10px !important; gap: 10px !important; }
+            .trust-icon { width: 36px !important; height: 36px !important; font-size: 14px !important; }
+            .trust-item h4 { font-size: 12px !important; }
+            .trust-item p { font-size: 10.5px !important; }
             .sec-head h2 { font-size: 30px; }
             .section { padding-top: 54px; }
             .cat-section { padding: 20px 0 8px; }
@@ -1426,7 +1440,11 @@
             .cat-info p { display: none; }
             .cat-arrow { width: 24px; height: 24px; font-size: 9px; }
             .deal-copy h2 { font-size: 34px; }
-            .timer div { width: 64px; }
+            .timer { gap: 8px !important; justify-content: center !important; }
+            .timer div { width: 52px !important; padding: 6px 0 !important; border-radius: 12px !important; }
+            .timer span { font-size: 18px !important; }
+            .timer small { font-size: 9px !important; }
+            .unboxing-wrap { padding: 20px 16px !important; border-radius: 20px !important; gap: 20px !important; }
             .story h2 { font-size: 32px; }
             .stats { gap: 26px; }
             .reviews { padding: 50px 0; border-radius: 26px; }
