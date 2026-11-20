@@ -62,8 +62,9 @@
         .qr-badge-secure { background: #e0f2fe; color: #075985; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .3px; }
         .qr-box { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 14px; margin: 0 auto 12px; max-width: 280px; box-shadow: 0 4px 16px rgba(19, 38, 57, .06); }
         .qr-box img { width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto; }
-        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; margin: 0 auto; }
-        .dynamic-qr-canvas canvas, .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; }
+        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; margin: 0 auto; overflow: hidden; }
+        .dynamic-qr-canvas canvas { display: none !important; }
+        .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; width: 220px !important; height: 220px !important; }
         .qr-missing { padding: 40px 10px; color: var(--muted); font-size: 14px; }
         .amount { font-size: 34px; font-weight: 800; color: var(--ink); margin: 6px 0 2px; }
         .upi-app-strip { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
@@ -390,6 +391,8 @@
             var qrContainer = document.getElementById('dynamicUpiQr');
             var upiUrl = "{{ upi_intent_url|escapejs }}";
             if (qrContainer && upiUrl && typeof QRCode !== 'undefined') {
+                if (qrContainer.dataset.rendered === 'true') return;
+                qrContainer.innerHTML = '';
                 try {
                     new QRCode(qrContainer, {
                         text: upiUrl,
@@ -399,6 +402,7 @@
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.M
                     });
+                    qrContainer.dataset.rendered = 'true';
                 } catch (e) {
                     console.error("Dynamic UPI QR generation error:", e);
                 }
