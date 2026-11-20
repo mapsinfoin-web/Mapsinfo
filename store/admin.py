@@ -94,6 +94,10 @@ class ProductColorAdmin(admin.ModelAdmin):
             instance.save()
         formset.save_m2m()
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
+
 
 # --- CATEGORY ---
 @admin.register(Category)
@@ -446,6 +450,11 @@ class ProductAdmin(admin.ModelAdmin):
         except Exception:
             pass
         return super().change_view(request, object_id, form_url, extra_context)
+
+    def delete_queryset(self, request, queryset):
+        """Ensure each product's delete method and signals run so all Cloudinary images are purged."""
+        for obj in queryset:
+            obj.delete()
 
 
 # --- BOGO OFFERS ---
