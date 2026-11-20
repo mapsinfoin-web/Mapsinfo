@@ -165,7 +165,6 @@
 
                 {% if user.is_authenticated %}
                 <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
-                <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
                 {% else %}
                 <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
                 {% endif %}

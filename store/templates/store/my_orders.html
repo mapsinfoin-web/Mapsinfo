@@ -156,8 +156,13 @@
     {% include 'store/includes/header.html' %}
 
     <main class="container">
-        <h1>My Orders</h1>
-        <p class="sub">Everything you bought from us, newest first.</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <div>
+                <h1 style="margin: 0 0 4px;">My Orders</h1>
+                <p class="sub" style="margin: 0;">Everything you bought from us, newest first.</p>
+            </div>
+            <a href="{% url 'store:logout_user' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 999px; background: #ffffff; border: 1.5px solid #FCA5A5; color: #DC2626; font-size: 13.5px; font-weight: 600; text-decoration: none; transition: all .2s; box-shadow: 0 2px 6px rgba(220,38,38,0.06);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
 
         {% for order in orders %}
         <section class="order">

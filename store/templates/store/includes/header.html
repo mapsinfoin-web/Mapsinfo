@@ -236,8 +236,37 @@
             </a>
 
             {% if user.is_authenticated %}
-            <a href="{% url 'store:my_orders' %}" class="icon-btn" title="My Account ({{ user.username }})" aria-label="My account"><i class="far fa-user-circle"></i></a>
-            <a href="{% url 'store:logout_user' %}" class="icon-btn" title="Logout" aria-label="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            <div class="account-wrapper" id="accountWrapper">
+                <button type="button" class="icon-btn account-btn" id="accountBtn" aria-label="My account" title="Account ({{ user.username }})" aria-expanded="false" aria-haspopup="true">
+                    <i class="far fa-user-circle"></i>
+                </button>
+                <div class="account-dropdown" id="accountDropdown" role="menu" aria-label="Account Menu" hidden>
+                    <div class="account-dropdown-header">
+                        <div class="account-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="account-info">
+                            <div class="account-name">{{ user.first_name|default:user.username }}</div>
+                            <div class="account-meta">{{ user.email|default:"MAPSKART Member" }}</div>
+                        </div>
+                    </div>
+                    <div class="account-dropdown-body">
+                        <a href="{% url 'store:my_orders' %}" class="account-dropdown-item" role="menuitem">
+                            <i class="fas fa-box"></i>
+                            <span>My Orders</span>
+                        </a>
+                        <a href="{% url 'store:wishlist' %}" class="account-dropdown-item" role="menuitem">
+                            <i class="far fa-heart"></i>
+                            <span>Wishlist</span>
+                        </a>
+                        <div class="account-dropdown-divider"></div>
+                        <a href="{% url 'store:logout_user' %}" class="account-dropdown-item account-logout-item" role="menuitem">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
             {% else %}
             <a href="{% url 'store:login_user' %}" class="icon-btn" title="Log In" aria-label="Log in"><i class="far fa-user"></i></a>
             {% endif %}
@@ -446,6 +475,35 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && searchForm.classList.contains('search-active')) {
                 closeFullSearch();
+            }
+        });
+    }
+
+    // Account dropdown toggle
+    var accountWrapper = document.getElementById('accountWrapper');
+    var accountBtn = document.getElementById('accountBtn');
+    var accountDropdown = document.getElementById('accountDropdown');
+
+    if (accountBtn && accountDropdown) {
+        accountBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var isOpen = !accountDropdown.hidden;
+            accountDropdown.hidden = isOpen;
+            accountBtn.setAttribute('aria-expanded', String(!isOpen));
+        });
+
+        document.addEventListener('click', function(e) {
+            if (accountWrapper && !accountWrapper.contains(e.target)) {
+                accountDropdown.hidden = true;
+                accountBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !accountDropdown.hidden) {
+                accountDropdown.hidden = true;
+                accountBtn.setAttribute('aria-expanded', 'false');
             }
         });
     }
