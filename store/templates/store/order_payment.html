@@ -57,10 +57,20 @@
         .steps li b { color: var(--ink); }
 
         .qr-card { text-align: center; position: sticky; top: 90px; }
-        .qr-box { background: #fff; border: 2px dashed var(--accent); border-radius: 18px; padding: 14px; margin: 0 auto 14px; max-width: 300px; }
-        .qr-box img { width: 100%; height: auto; border-radius: 10px; }
+        .qr-badge-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .qr-badge-live { background: #dcfce7; color: #166534; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .3px; }
+        .qr-badge-secure { background: #e0f2fe; color: #075985; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .3px; }
+        .qr-box { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 14px; margin: 0 auto 12px; max-width: 280px; box-shadow: 0 4px 16px rgba(19, 38, 57, .06); }
+        .qr-box img { width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto; }
+        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; margin: 0 auto; }
+        .dynamic-qr-canvas canvas, .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; }
         .qr-missing { padding: 40px 10px; color: var(--muted); font-size: 14px; }
         .amount { font-size: 34px; font-weight: 800; color: var(--ink); margin: 6px 0 2px; }
+        .upi-app-strip { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+        .upi-chip { background: #f1f5f9; color: #334155; font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 6px; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 5px; }
+        .standee-toggle-wrap { margin: 8px 0 10px; }
+        .standee-toggle-btn { background: transparent; border: 1px dashed var(--line); color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .standee-toggle-btn:hover { color: var(--ink); border-color: var(--navy); background: #f8fafc; }
         .upi { display: inline-flex; align-items: center; gap: 10px; background: var(--soft); border-radius: 999px; padding: 8px 8px 8px 16px; font-size: 14px; font-weight: 600; color: var(--ink); margin-top: 8px; }
         .upi button { border: none; background: var(--navy); color: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
         .scan-note { font-size: 13px; color: var(--muted); margin-top: 12px; }
@@ -202,25 +212,51 @@
             {% if not order.is_paid and order.status != 'CANCELLED' %}
             <aside class="card qr-card">
                 <h2>Scan &amp; Pay</h2>
+                <div class="qr-badge-bar">
+                    <span class="qr-badge-live"><i class="fas fa-bolt"></i> Amount Auto-Filled</span>
+                    <span class="qr-badge-secure"><i class="fas fa-shield-halved"></i> NPCI UPI Standard</span>
+                </div>
+
+                <div class="qr-box" id="dynamicQrWrapper">
+                    <div id="dynamicUpiQr" class="dynamic-qr-canvas"></div>
+                    <noscript>
+                        {% if shop and shop.paytm_qr %}
+                        <img src="{{ shop.paytm_qr.url }}" alt="Paytm QR code" />
+                        {% else %}
+                        <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png" alt="Paytm QR code" />
+                        {% endif %}
+                    </noscript>
+                </div>
+
                 {% if shop and shop.paytm_qr %}
-                <div class="qr-box"><img src="{{ shop.paytm_qr.url }}" alt="Paytm QR code" /></div>
-                {% else %}
-                <!-- No QR saved in Admin > Payment settings: use the file store/static/paytm.png.
-                     If that file is missing too, the picture is replaced by a short message. -->
-                <div class="qr-box">
-                     <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png" alt="Paytm QR code"
-                         onerror="this.parentNode.innerHTML='<div class=&quot;qr-missing&quot;><i class=&quot;fas fa-qrcode&quot; style=&quot;font-size:40px;&quot;></i><br><br>The shop has not added its Paytm QR code yet. Please contact us to pay.</div>';" />
+                <div class="standee-toggle-wrap">
+                    <button type="button" id="toggleStandeeBtn" class="standee-toggle-btn" onclick="toggleStandee()">
+                        <i class="fas fa-store"></i> View Shop Standee QR
+                    </button>
+                    <div id="standeeBox" style="display:none; margin-top: 10px;" class="qr-box">
+                        <img src="{{ shop.paytm_qr.url }}" alt="Shop Standee QR" />
+                        <span style="font-size: 11.5px; color: var(--muted); display: block; margin-top: 6px;">Physical Shop Standee QR (requires manual amount entry)</span>
+                    </div>
                 </div>
                 {% endif %}
+
                 <div class="amount">₹{{ order.amount_paid }}</div>
                 <div style="font-size: 13.5px; color: var(--muted); margin-bottom: 8px;">Pay to <b>{{ shop.payee_name|default:"MAPSKART" }}</b></div>
 
-                <a href="{{ upi_intent_url }}" class="btn" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; margin: 10px 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 999px; padding: 12px 14px; font-size: 14px; text-decoration: none; box-shadow: 0 4px 12px rgba(16,185,129,.25);">
-                    <i class="fas fa-bolt"></i> Pay with UPI App
+                <!-- UPI Apps Supported Strip -->
+                <div class="upi-app-strip">
+                    <span class="upi-chip"><i class="fab fa-google-pay" style="color:#4285F4;font-size:14px;"></i> GPay</span>
+                    <span class="upi-chip"><i class="fas fa-mobile-screen" style="color:#5f259f;"></i> PhonePe</span>
+                    <span class="upi-chip"><i class="fas fa-wallet" style="color:#00b9f5;"></i> Paytm</span>
+                    <span class="upi-chip"><i class="fas fa-building-columns" style="color:#f26922;"></i> BHIM / Cred</span>
+                </div>
+
+                <a href="{{ upi_intent_url }}" class="btn" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; margin: 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-radius: 999px; padding: 13px 16px; font-size: 14.5px; text-decoration: none; box-shadow: 0 4px 14px rgba(16,185,129,.28);">
+                    <i class="fas fa-bolt"></i> Tap to Pay with UPI App
                 </a>
 
                 <div class="upi"><span id="upi">{{ upi_id|default:"maps536969@sbi" }}</span><button type="button" id="copy">Copy</button></div>
-                <p class="scan-note"><i class="fas fa-circle-info"></i> Type the exact amount if your app asks for it.</p>
+                <p class="scan-note"><i class="fas fa-circle-check" style="color:var(--green);"></i> Scan with Google Pay, PhonePe, Paytm, or BHIM. Amount ₹{{ order.amount_paid }} is pre-filled.</p>
             </aside>
             {% endif %}
         </div>
@@ -331,6 +367,43 @@
                 setTimeout(function () { copy.textContent = 'Copy'; }, 1500);
             });
         }
+
+        // Toggle Shop Standee QR visibility
+        function toggleStandee() {
+            var box = document.getElementById('standeeBox');
+            var btn = document.getElementById('toggleStandeeBtn');
+            if (box) {
+                if (box.style.display === 'none' || !box.style.display) {
+                    box.style.display = 'block';
+                    if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Standee QR';
+                } else {
+                    box.style.display = 'none';
+                    if (btn) btn.innerHTML = '<i class="fas fa-store"></i> View Shop Standee QR';
+                }
+            }
+        }
+    </script>
+    <script src="{% static 'store/js/qrcode.min.js' %}"></script>
+    <script>
+        // Initialize Dynamic UPI Payment QR Code
+        document.addEventListener('DOMContentLoaded', function() {
+            var qrContainer = document.getElementById('dynamicUpiQr');
+            var upiUrl = "{{ upi_intent_url|escapejs }}";
+            if (qrContainer && upiUrl && typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(qrContainer, {
+                        text: upiUrl,
+                        width: 220,
+                        height: 220,
+                        colorDark: "#132639",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } catch (e) {
+                    console.error("Dynamic UPI QR generation error:", e);
+                }
+            }
+        });
     </script>
     {% include 'store/includes/floating_whatsapp.html' %}
 </body>

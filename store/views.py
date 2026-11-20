@@ -948,7 +948,8 @@ def order_payment(request, order_id):
 
     upi_id = shop.get_upi_id() if shop else 'maps536969@sbi'
     payee_name = (shop.payee_name if shop and shop.payee_name else 'MAPSKART').strip()
-    upi_intent_url = f"upi://pay?pa={upi_id}&pn={quote(payee_name)}&am={order.amount_paid}&cu=INR&tn={quote(f'Order_{order.pk}')}"
+    amount_str = f"{float(order.amount_paid):.2f}"
+    upi_intent_url = f"upi://pay?pa={upi_id}&pn={quote(payee_name)}&am={amount_str}&cu=INR&tn={quote(f'Order_{order.pk}')}"
 
     return render(request, 'store/order_payment.html', {
         'order': order,
