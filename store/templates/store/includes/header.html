@@ -372,5 +372,17 @@
             }
         }, { passive: true });
     }
+
+    // Dynamic search bar size expansion on touch / focus
+    var searchForm = document.querySelector('.search');
+    var searchInput = searchForm ? searchForm.querySelector('input[type="search"], input[name="q"]') : null;
+    if (searchForm && searchInput) {
+        searchInput.addEventListener('focus', function() {
+            searchForm.classList.add('search-active');
+        });
+        searchInput.addEventListener('blur', function() {
+            searchForm.classList.remove('search-active');
+        });
+    }
 })();
 </script>
