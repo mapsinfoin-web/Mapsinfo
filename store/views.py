@@ -407,6 +407,13 @@ def _stock_problems(cart_items):
             problems.append(f"{product.title} is out of stock. Please remove it from your cart.")
         elif item.quantity > product.stock:
             problems.append(f"Only {product.stock} of {product.title} left. Please reduce the quantity.")
+        elif getattr(item, 'selected_color', None):
+            color_obj = product.colors.filter(name__iexact=item.selected_color).first()
+            if color_obj:
+                if not color_obj.in_stock or color_obj.stock <= 0:
+                    problems.append(f"{product.title} in {color_obj.name} is out of stock. Please choose another colour.")
+                elif item.quantity > color_obj.stock:
+                    problems.append(f"Only {color_obj.stock} of {product.title} in {color_obj.name} left. Please reduce the quantity.")
     return problems
 
 
@@ -464,6 +471,16 @@ def add_cart(request, product_id):
         messages.error(request, f"Sorry, {product.title} is out of stock.")
         return redirect('store:product_detail', pk=product.pk)
 
+    # Check variant stock if color is selected
+    if selected_color:
+        color_obj = product.colors.filter(name__iexact=selected_color).first()
+        if color_obj:
+            if not color_obj.in_stock or color_obj.stock <= 0:
+                if is_ajax:
+                    return JsonResponse({'status': 'error', 'error': f"Sorry, {product.title} ({color_obj.name}) is out of stock."}, status=400)
+                messages.error(request, f"Sorry, {product.title} ({color_obj.name}) is out of stock.")
+                return redirect('store:product_detail', pk=product.pk)
+
     cart = _get_cart(request, create=True)
     cart_item = CartItem.objects.filter(product=product, cart=cart).first()
     current_qty = cart_item.quantity if cart_item else 0
@@ -474,6 +491,14 @@ def add_cart(request, product_id):
         messages.error(request, f"Only {product.stock} of {product.title} available. "
                                 f"You already have {current_qty} in your cart.")
         return redirect('store:product_detail', pk=product.pk)
+
+    if selected_color:
+        color_obj = product.colors.filter(name__iexact=selected_color).first()
+        if color_obj and current_qty + 1 > color_obj.stock:
+            if is_ajax:
+                return JsonResponse({'status': 'error', 'error': f"Only {color_obj.stock} of {product.title} ({color_obj.name}) available."}, status=400)
+            messages.error(request, f"Only {color_obj.stock} of {product.title} ({color_obj.name}) available. You already have {current_qty} in your cart.")
+            return redirect('store:product_detail', pk=product.pk)
 
     if cart_item:
         cart_item.quantity += 1
@@ -640,6 +665,12 @@ def buy_now(request, pk):
         messages.error(request, f"Sorry, {product.title} is out of stock.")
         return redirect('store:product_detail', pk=product.pk)
 
+    if selected_color:
+        color_obj = product.colors.filter(name__iexact=selected_color).first()
+        if color_obj and (not color_obj.in_stock or color_obj.stock <= 0):
+            messages.error(request, f"Sorry, {product.title} ({color_obj.name}) is out of stock.")
+            return redirect('store:product_detail', pk=product.pk)
+
     cart = _get_cart(request, create=True)
     if not CartItem.objects.filter(product=product, cart=cart).exists():
         CartItem.objects.create(product=product, cart=cart, quantity=1)
@@ -795,8 +826,15 @@ def checkout(request):
                     ).update(stock=F('stock') - item.quantity)
                     if not updated:
                         raise OutOfStock(item.product.title)
+                    item_color = getattr(item, 'selected_color', '') or ''
+                    if item_color:
+                        ProductColor.objects.filter(
+                            product_id=item.product_id,
+                            name__iexact=item_color,
+                            stock__gte=item.quantity
+                        ).update(stock=F('stock') - item.quantity)
                     OrderItem.objects.create(order=order, product=item.product,
-                                             color=getattr(item, 'selected_color', '') or '',
+                                             color=item_color,
                                              price=getattr(item, 'unit_price', item.product.price),
                                              quantity=item.quantity)
 

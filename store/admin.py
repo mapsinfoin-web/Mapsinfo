@@ -39,7 +39,7 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductColorInline(admin.TabularInline):
     model = ProductColor
     extra = 1
-    fields = ['order', 'name', 'sku', 'price', 'mrp', 'hex_code', 'image', 'is_available']
+    fields = ['order', 'name', 'sku', 'price', 'mrp', 'stock', 'hex_code', 'image', 'is_available']
     ordering = ['order', 'id']
 
 
@@ -53,12 +53,15 @@ class ColorGalleryInline(admin.TabularInline):
 
 @admin.register(ProductColor)
 class ProductColorAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'name', 'color_preview', 'sku', 'price', 'mrp', 'is_available']
-    list_editable = ['order', 'sku', 'price', 'mrp', 'is_available']
+    list_display = ['product', 'order', 'name', 'color_preview', 'sku', 'price', 'mrp', 'stock', 'stock_status', 'is_available']
+    list_editable = ['order', 'sku', 'price', 'mrp', 'stock', 'is_available']
     list_filter = ['is_available', 'product__category']
     search_fields = ['name', 'sku', 'product__title', 'product__sku']
     ordering = ['product', 'order', 'id']
     inlines = [ColorGalleryInline]
+
+    class Media:
+        js = ('store/js/admin_prevent_double_submit.js',)
 
     @admin.display(description='Colour')
     def color_preview(self, obj):
@@ -68,12 +71,26 @@ class ProductColorAdmin(admin.ModelAdmin):
             hex_val, hex_val
         )
 
+    @admin.display(description='Stock Status', ordering='stock')
+    def stock_status(self, obj):
+        if not obj.is_available or obj.stock <= 0:
+            return format_html('<b style="color:{};">{}</b>', '#c0392b', 'Out of stock')
+        if obj.is_low_stock:
+            return format_html('<b style="color:{};">Low ({})</b>', '#d68910', obj.stock)
+        return format_html('<span style="color:{};">{} ({})</span>', '#1e8449', 'In stock', obj.stock)
+
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
         for instance in instances:
             if isinstance(instance, ProductGallery):
                 instance.product = form.instance.product
                 instance.color = form.instance
+                if not instance.pk and ProductGallery.objects.filter(
+                    product=instance.product, color=instance.color, image=instance.image
+                ).exists():
+                    continue
             instance.save()
         formset.save_m2m()
 
@@ -360,6 +377,10 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['title', 'sku']
     filter_horizontal = ['sub_categories', 'pair_with']
     inlines = [ProductGalleryInline, ProductColorInline]
+
+    class Media:
+        js = ('store/js/admin_prevent_double_submit.js',)
+
     fieldsets = (
         ('Basic Details', {
             'fields': ('category', 'sub_categories', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active')

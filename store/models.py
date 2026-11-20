@@ -764,6 +764,10 @@ class ProductColor(models.Model):
         blank=True,
         help_text="Original retail price (crossed out) for this colour (optional)"
     )
+    stock = models.PositiveIntegerField(
+        default=10,
+        help_text="Units available for this colour variant. 0 = Out of Stock"
+    )
     hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
     image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Main / cover photo for this color variant (switches main image when selected)")
     is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
@@ -772,6 +776,22 @@ class ProductColor(models.Model):
         ordering = ['order', 'id']
         verbose_name = 'Product Color Option'
         verbose_name_plural = 'Product Color Options'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product', 'name'],
+                name='unique_product_color_name'
+            )
+        ]
+
+    @property
+    def in_stock(self):
+        """Returns True if marked available and stock is greater than 0."""
+        return bool(self.is_available and self.stock > 0)
+
+    @property
+    def is_low_stock(self):
+        """Returns True if stock is at or below low stock threshold."""
+        return bool(self.is_available and 0 < self.stock <= Product.LOW_STOCK_THRESHOLD)
 
     @property
     def display_hex(self):
@@ -803,22 +823,57 @@ class ProductColor(models.Model):
 
     @property
     def all_images(self):
-        """Returns all image URLs for this colour: main image + all assigned gallery images."""
+        """Returns all image URLs for this colour: main image + all assigned gallery images, deduplicated."""
         urls = []
+        seen_keys = set()
+
+        def _key(u):
+            if not u:
+                return ""
+            clean = u.split('?')[0].split('#')[0].rstrip('/')
+            return clean.split('/')[-1].lower()
+
         if self.image:
             try:
-                urls.append(self.image.url)
+                u = self.image.url
+                k = _key(u)
+                if k:
+                    seen_keys.add(k)
+                urls.append(u)
             except Exception:
                 pass
         for g in self.gallery_images.all():
             try:
-                if g.image and g.image.url not in urls:
-                    urls.append(g.image.url)
+                if g.image:
+                    gu = g.image.url
+                    gk = _key(gu)
+                    if gk and gk in seen_keys:
+                        continue
+                    if gu not in urls:
+                        if gk:
+                            seen_keys.add(gk)
+                        urls.append(gu)
             except Exception:
                 pass
         return urls
 
+    def clean(self):
+        super().clean()
+        if self.name:
+            self.name = self.name.strip()
+        if self.product_id and self.name:
+            dups = ProductColor.objects.filter(
+                product_id=self.product_id,
+                name__iexact=self.name
+            ).exclude(pk=self.pk)
+            if dups.exists():
+                raise ValidationError({
+                    'name': f"A colour variant named '{self.name}' already exists for this product. Please edit the existing variant instead of adding a duplicate."
+                })
+
     def save(self, *args, **kwargs):
+        if self.name:
+            self.name = self.name.strip()
         # Auto-assign real hex code if hex_code is empty or left as default gold on non-gold colors
         if not self.hex_code or (self.hex_code.strip().upper() in ('#D4AF37', 'D4AF37') and 'gold' not in (self.name or '').lower()):
             self.hex_code = resolve_color_hex(self.name, self.hex_code)
@@ -899,6 +954,11 @@ class Order(models.Model):
         """Put every item in this order back into stock (used when an order is cancelled)."""
         for item in self.items.all():
             Product.objects.filter(pk=item.product_id).update(stock=F('stock') + item.quantity)
+            if item.color:
+                ProductColor.objects.filter(
+                    product_id=item.product_id,
+                    name__iexact=item.color
+                ).update(stock=F('stock') + item.quantity)
 
     def __str__(self):
         return f'Order #{self.id} - {self.full_name}'
