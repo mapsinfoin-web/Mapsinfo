@@ -146,7 +146,13 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dddvvn0s',
     'API_KEY': '272412746889333',
     'API_SECRET': '38TzwinefOoLBMRsVx8R-oC1tTc',
+}
 
+# Cloudinary Credentials for Video Clips (Add your second Cloudinary account details here)
+CLOUDINARY_VIDEO_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_VIDEO_CLOUD_NAME', 'your_video_cloud_name'),
+    'API_KEY': os.environ.get('CLOUDINARY_VIDEO_API_KEY', 'your_video_api_key'),
+    'API_SECRET': os.environ.get('CLOUDINARY_VIDEO_API_SECRET', 'your_video_api_secret'),
 }
 
 # Override default file saving to use Cloudinary instead of the local hard drive
@@ -156,6 +162,9 @@ STORAGES = {
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "videos": {
+        "BACKEND": "store.storages.VideoCloudinaryStorage",
     },
 }
 
