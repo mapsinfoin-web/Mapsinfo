@@ -148,11 +148,11 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': '38TzwinefOoLBMRsVx8R-oC1tTc',
 }
 
-# Cloudinary Credentials for Video Clips (Add your second Cloudinary account details here)
+# Cloudinary Credentials for Video Clips
 CLOUDINARY_VIDEO_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_VIDEO_CLOUD_NAME', 'your_video_cloud_name'),
-    'API_KEY': os.environ.get('CLOUDINARY_VIDEO_API_KEY', 'your_video_api_key'),
-    'API_SECRET': os.environ.get('CLOUDINARY_VIDEO_API_SECRET', 'your_video_api_secret'),
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_VIDEO_CLOUD_NAME', 'xcqh7rih'),
+    'API_KEY': os.environ.get('CLOUDINARY_VIDEO_API_KEY', '735359677992464'),
+    'API_SECRET': os.environ.get('CLOUDINARY_VIDEO_API_SECRET', 'JFZceWkdhH0pqVpJixQ2rBzE9YU'),
 }
 
 # Override default file saving to use Cloudinary instead of the local hard drive
