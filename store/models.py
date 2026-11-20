@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import F
 from django.utils import timezone
+from store.storages import video_storage
 
 
 class Category(models.Model):
@@ -54,6 +55,14 @@ class Product(models.Model):
                               help_text="Original Retail Price (crossed out)")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Current Sale Price")
     image = models.ImageField(upload_to='images/', blank=True, null=True)
+    video = models.FileField(
+        storage=video_storage,
+        upload_to='videos/',
+        blank=True,
+        null=True,
+        verbose_name="Product Video Clip",
+        help_text="Optional short video clip (stored in 2nd Cloudinary storage: xcqh7rih)."
+    )
 
     # Single source of truth for availability. "In stock" is computed from this number.
     stock = models.PositiveIntegerField(default=10, help_text="Units available. 0 = Out of Stock")

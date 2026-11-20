@@ -185,6 +185,47 @@
         }
         .thumbs .thumb:hover { transform: translateY(-2px); }
         .thumbs .thumb.active { border-color: var(--navy); }
+        .video-thumb-btn {
+            width: 74px;
+            height: 74px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, #0b192c 0%, #1e3e62 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all .2s ease;
+            box-sizing: border-box;
+            padding: 4px;
+        }
+        .video-thumb-btn i {
+            font-size: 18px;
+            color: #fbbf24;
+            transition: transform .2s ease;
+        }
+        .video-thumb-btn span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .video-thumb-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1e3e62 0%, #0b192c 100%);
+        }
+        .video-thumb-btn:hover i {
+            transform: scale(1.2);
+        }
+        .video-thumb-btn.active {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.4);
+        }
 
         /* Info card */
         .info {
@@ -2314,6 +2355,11 @@
         <!-- Left: gallery -->
         <div class="gallery animate-up">
             <div class="main-image" id="main-wrap" {% if selected_color_obj.image %}style="--bg: url('{{ selected_color_obj.image.url }}')"{% elif product.image %}style="--bg: url('{{ product.image.url }}')"{% endif %} role="button" tabindex="0" aria-label="Click to zoom the photo">
+                {% if product.video %}
+                <div id="main-video-wrap" style="display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: #0b192c; border-radius: inherit; overflow: hidden; z-index: 3;">
+                    <video id="product-video-player" src="{{ product.video.url }}" controls loop playsinline preload="metadata" style="width: 100%; height: 100%; object-fit: contain;"></video>
+                </div>
+                {% endif %}
                 {% if selected_color_obj.image %}
                 <img src="{{ selected_color_obj.image.url }}" alt="{{ product.title }} - {{ selected_color_obj.name }}" id="main-image" />
                 <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to zoom</span>
@@ -2324,7 +2370,7 @@
                 <div class="no-image">No image available</div>
                 {% endif %}
             </div>
-            {% if product.image or product.gallery_images.all or product.available_colors %}
+            {% if product.image or product.gallery_images.all or product.available_colors or product.video %}
             <div class="thumbs" id="productThumbsContainer">
                 {% if selected_color_obj and selected_color_obj.all_images %}
                     {% for img_url in selected_color_obj.all_images %}
@@ -2346,6 +2392,12 @@
                     <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                     {% endfor %}
                 {% endif %}
+                {% if product.video %}
+                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
+                    <i class="fas fa-play"></i>
+                    <span>Video</span>
+                </button>
+                {% endif %}
             </div>
             <template id="baseGalleryTemplate">
                 {% if product.image %}
@@ -2354,6 +2406,12 @@
                 {% for gallery_img in product.gallery_images.all %}
                 <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                 {% endfor %}
+                {% if product.video %}
+                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
+                    <i class="fas fa-play"></i>
+                    <span>Video</span>
+                </button>
+                {% endif %}
             </template>
             {% endif %}
         </div>
@@ -3784,6 +3842,21 @@
         // Swapping thumbnail in base product gallery
         function swapImage(thumbnail) {
             if (!thumbnail) return;
+
+            // Hide and pause product video if active
+            var videoWrap = document.getElementById('main-video-wrap');
+            var videoPlayer = document.getElementById('product-video-player');
+            if (videoWrap) {
+                videoWrap.style.display = 'none';
+            }
+            if (videoPlayer) {
+                videoPlayer.pause();
+            }
+            var vBtn = document.getElementById('videoThumbBtn');
+            if (vBtn) {
+                vBtn.classList.remove('active');
+            }
+
             var main = document.getElementById('main-image');
             if (main) {
                 main.src = thumbnail.src;
@@ -3797,6 +3870,27 @@
                 img.classList.remove('active');
             });
             thumbnail.classList.add('active');
+        }
+
+        // Toggle video player in main view
+        function toggleProductVideo(playNow) {
+            var videoWrap = document.getElementById('main-video-wrap');
+            var videoPlayer = document.getElementById('product-video-player');
+            if (!videoWrap || !videoPlayer) return;
+
+            videoWrap.style.display = 'block';
+            if (playNow) {
+                videoPlayer.play().catch(function() {});
+            }
+
+            // Deactivate photo thumbnails
+            document.querySelectorAll('#productThumbsContainer .thumb').forEach(function(img) {
+                img.classList.remove('active');
+            });
+            var vBtn = document.getElementById('videoThumbBtn');
+            if (vBtn) {
+                vBtn.classList.add('active');
+            }
         }
 
         // ===== Photo viewer with zoom =====

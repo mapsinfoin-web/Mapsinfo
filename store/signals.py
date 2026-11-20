@@ -20,6 +20,7 @@ def safe_delete_file(file_field, exclude_instance=None):
     from store.models import Product, ProductColor, ProductGallery, ProductReview
 
     prod_qs = Product.objects.filter(image=name)
+    prod_video_qs = Product.objects.filter(video=name)
     color_qs = ProductColor.objects.filter(image=name)
     gallery_qs = ProductGallery.objects.filter(image=name)
     review_qs = ProductReview.objects.filter(image=name)
@@ -27,6 +28,7 @@ def safe_delete_file(file_field, exclude_instance=None):
     if exclude_instance and getattr(exclude_instance, 'pk', None):
         if isinstance(exclude_instance, Product):
             prod_qs = prod_qs.exclude(pk=exclude_instance.pk)
+            prod_video_qs = prod_video_qs.exclude(pk=exclude_instance.pk)
             color_qs = color_qs.exclude(product_id=exclude_instance.pk)
             gallery_qs = gallery_qs.exclude(product_id=exclude_instance.pk)
         elif isinstance(exclude_instance, ProductColor):
@@ -38,7 +40,7 @@ def safe_delete_file(file_field, exclude_instance=None):
             review_qs = review_qs.exclude(pk=exclude_instance.pk)
 
     # If any other record still uses this file name, do not destroy it
-    if prod_qs.exists() or color_qs.exists() or gallery_qs.exists() or review_qs.exists():
+    if prod_qs.exists() or color_qs.exists() or gallery_qs.exists() or review_qs.exists() or prod_video_qs.exists():
         logger.info("File %s is still in use by another database record; keeping in storage.", name)
         return
 
@@ -85,20 +87,32 @@ def cleanup_product_images_before_delete(sender, instance, **kwargs):
     except Exception as exc:
         logger.warning("Error cleaning color images for product %s: %s", instance.pk, exc)
 
+    # 4. Product video clip (stored in 2nd Cloudinary storage)
+    if getattr(instance, 'video', None):
+        safe_delete_file(instance.video, exclude_instance=instance)
+
 
 @receiver(pre_save, sender='store.Product')
 def cleanup_old_product_image_on_update(sender, instance, **kwargs):
-    """When a product's main image is replaced with a new one, delete the old file from Cloudinary."""
+    """When a product's main image or video is replaced with a new one, delete the old file from Cloudinary."""
     if not instance.pk:
         return
     try:
         old_obj = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
         return
+
+    # Image replacement
     old_file = old_obj.image
     new_file = instance.image
     if old_file and old_file.name and (not new_file or old_file.name != getattr(new_file, 'name', None)):
         safe_delete_file(old_file, exclude_instance=instance)
+
+    # Video replacement
+    old_video = getattr(old_obj, 'video', None)
+    new_video = getattr(instance, 'video', None)
+    if old_video and old_video.name and (not new_video or old_video.name != getattr(new_video, 'name', None)):
+        safe_delete_file(old_video, exclude_instance=instance)
 
 
 # ---------------------------------------------------------------------------

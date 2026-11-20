@@ -32,6 +32,7 @@ class Command(BaseCommand):
 
         for m, field in [
             (Product, 'image'),
+            (Product, 'video'),
             (ProductColor, 'image'),
             (ProductGallery, 'image'),
             (ProductReview, 'image'),

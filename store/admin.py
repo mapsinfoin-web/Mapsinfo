@@ -344,7 +344,7 @@ class ProductAdminForm(forms.ModelForm):
         model = Product
         fields = [
             'category', 'sub_categories', 'title', 'sku', 'description',
-            'mrp', 'price', 'stock', 'image', 'is_active',
+            'mrp', 'price', 'stock', 'image', 'video', 'is_active',
             'weight_grams', 'dimensions', 'closure_type', 'pair_with',
             'occasions_list', 'metal_finish_list',
         ]
@@ -387,7 +387,10 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Details', {
-            'fields': ('category', 'sub_categories', 'title', 'sku', 'description', 'mrp', 'price', 'stock', 'image', 'is_active')
+            'fields': (
+                'category', 'sub_categories', 'title', 'sku', 'description',
+                'mrp', 'price', 'stock', 'image', 'video', 'video_player_preview', 'is_active'
+            )
         }),
         ('Occasion & Style Facets (Kushal\'s / Rubans Discovery)', {
             'fields': ('occasions_list', 'metal_finish_list'),
@@ -398,6 +401,16 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+    readonly_fields = ['video_player_preview']
+
+    @admin.display(description='Video Preview (2nd Cloudinary)')
+    def video_player_preview(self, obj):
+        if obj and obj.video:
+            return format_html(
+                '<video src="{}" style="max-height: 220px; max-width: 320px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" controls playsinline></video>',
+                obj.video.url
+            )
+        return "No video uploaded yet."
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('bogo_offers')
