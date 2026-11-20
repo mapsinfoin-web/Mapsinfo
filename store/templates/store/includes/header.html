@@ -380,14 +380,27 @@
     var searchCloseBtn = document.getElementById('searchCloseBtn');
 
     if (searchForm && searchInput) {
+        var isClosing = false;
+
         function openFullSearch() {
+            if (isClosing) return;
             searchForm.classList.add('search-active');
             if (header) header.classList.add('header-search-active');
         }
 
         function closeFullSearch() {
+            isClosing = true;
             searchForm.classList.remove('search-active');
             if (header) header.classList.remove('header-search-active');
+            searchInput.value = '';
+            searchInput.blur();
+            if (searchCloseBtn) searchCloseBtn.blur();
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+            setTimeout(function() {
+                isClosing = false;
+            }, 250);
         }
 
         searchInput.addEventListener('focus', openFullSearch);
@@ -396,6 +409,7 @@
         searchInput.addEventListener('touchstart', openFullSearch, { passive: true });
 
         searchForm.addEventListener('click', function(e) {
+            if (isClosing) return;
             if (!searchCloseBtn || (e.target !== searchCloseBtn && !searchCloseBtn.contains(e.target))) {
                 if (document.activeElement !== searchInput) {
                     searchInput.focus();
@@ -405,27 +419,32 @@
         });
 
         if (searchCloseBtn) {
-            function handleClose(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                searchInput.value = '';
-                searchInput.blur();
+            function handleCloseClick(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+                }
                 closeFullSearch();
             }
-            searchCloseBtn.addEventListener('click', handleClose);
-            searchCloseBtn.addEventListener('touchend', handleClose);
+
+            searchCloseBtn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            searchCloseBtn.addEventListener('click', handleCloseClick);
+            searchCloseBtn.addEventListener('touchend', handleCloseClick);
         }
 
         document.addEventListener('click', function(e) {
+            if (isClosing) return;
             if (searchForm.classList.contains('search-active') && !searchForm.contains(e.target)) {
-                searchInput.blur();
                 closeFullSearch();
             }
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && searchForm.classList.contains('search-active')) {
-                searchInput.blur();
                 closeFullSearch();
             }
         });
