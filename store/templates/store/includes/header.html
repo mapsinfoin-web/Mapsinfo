@@ -221,9 +221,10 @@
             </div>
         </nav>
 
-        <form class="search" role="search" action="{% url 'store:search' %}" method="GET">
-            <i class="fas fa-search"></i>
-            <input type="search" name="q" placeholder="Search jewellery, haldi, bridal…" aria-label="Search products" required />
+        <form class="search" id="headerSearchForm" role="search" action="{% url 'store:search' %}" method="GET">
+            <i class="fas fa-search search-icon"></i>
+            <input type="search" name="q" id="headerSearchInput" placeholder="Search jewellery, haldi, bridal…" aria-label="Search products" autocomplete="off" required />
+            <button type="button" class="search-close-btn" id="searchCloseBtn" aria-label="Close search" title="Close"><i class="fas fa-times"></i></button>
         </form>
 
         <div class="actions">
@@ -373,15 +374,60 @@
         }, { passive: true });
     }
 
-    // Dynamic search bar size expansion on touch / focus
-    var searchForm = document.querySelector('.search');
-    var searchInput = searchForm ? searchForm.querySelector('input[type="search"], input[name="q"]') : null;
+    // Dynamic search bar full-size expansion on touch & type
+    var searchForm = document.getElementById('headerSearchForm') || document.querySelector('.search');
+    var searchInput = document.getElementById('headerSearchInput') || (searchForm ? searchForm.querySelector('input[type="search"], input[name="q"]') : null);
+    var searchCloseBtn = document.getElementById('searchCloseBtn');
+
     if (searchForm && searchInput) {
-        searchInput.addEventListener('focus', function() {
+        function openFullSearch() {
             searchForm.classList.add('search-active');
-        });
-        searchInput.addEventListener('blur', function() {
+            if (header) header.classList.add('header-search-active');
+        }
+
+        function closeFullSearch() {
             searchForm.classList.remove('search-active');
+            if (header) header.classList.remove('header-search-active');
+        }
+
+        searchInput.addEventListener('focus', openFullSearch);
+        searchInput.addEventListener('click', openFullSearch);
+        searchInput.addEventListener('input', openFullSearch);
+        searchInput.addEventListener('touchstart', openFullSearch, { passive: true });
+
+        searchForm.addEventListener('click', function(e) {
+            if (!searchCloseBtn || (e.target !== searchCloseBtn && !searchCloseBtn.contains(e.target))) {
+                if (document.activeElement !== searchInput) {
+                    searchInput.focus();
+                }
+                openFullSearch();
+            }
+        });
+
+        if (searchCloseBtn) {
+            function handleClose(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                searchInput.value = '';
+                searchInput.blur();
+                closeFullSearch();
+            }
+            searchCloseBtn.addEventListener('click', handleClose);
+            searchCloseBtn.addEventListener('touchend', handleClose);
+        }
+
+        document.addEventListener('click', function(e) {
+            if (searchForm.classList.contains('search-active') && !searchForm.contains(e.target)) {
+                searchInput.blur();
+                closeFullSearch();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && searchForm.classList.contains('search-active')) {
+                searchInput.blur();
+                closeFullSearch();
+            }
         });
     }
 })();
