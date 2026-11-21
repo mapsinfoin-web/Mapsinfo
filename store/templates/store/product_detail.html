@@ -354,17 +354,46 @@
             font-weight: 700;
             box-sizing: border-box;
         }
+        .btn-out-of-stock-single {
+            grid-column: 1 / -1;
+            width: 100% !important;
+            height: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            background: #f1f5f9 !important;
+            border: 2px dashed #cbd5e1 !important;
+            color: #64748b !important;
+            cursor: not-allowed !important;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            box-sizing: border-box;
+            user-select: none;
+            box-shadow: none !important;
+        }
+        .btn-out-of-stock-single i {
+            color: #dc2626;
+            font-size: 16px;
+        }
+        .sticky-soldout-single {
+            width: 100% !important;
+            justify-content: center !important;
+        }
         @media (max-width: 480px) {
             .gallery-actions-btns {
                 gap: 8px;
             }
-            .gallery-actions-btns .btn {
+            .gallery-actions-btns .btn,
+            .btn-out-of-stock-single {
                 height: 48px;
                 padding: 0 8px;
                 font-size: 14px;
                 gap: 6px;
             }
-            .gallery-actions-btns .btn i {
+            .gallery-actions-btns .btn i,
+            .btn-out-of-stock-single i {
                 font-size: 14px;
             }
         }
@@ -719,6 +748,25 @@
                 padding: 1px 4px !important;
                 border-radius: 3px !important;
                 margin-left: 2px !important;
+            }
+            .trust {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+                margin: 0 0 16px !important;
+            }
+            .trust li {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                padding: 5px 10px !important;
+                font-size: 11.5px !important;
+                font-weight: 600 !important;
+                border-radius: 999px !important;
+                white-space: nowrap !important;
+            }
+            .trust li i {
+                font-size: 11.5px !important;
             }
         }
 
@@ -2608,29 +2656,31 @@
                             </label>
                             {% endfor %}
                             <div class="gallery-actions-btns">
-                                <button type="submit" class="btn btn-add {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-shopping-cart{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Add to Cart + Free Gift{% endif %}</button>
-                                <button type="submit" class="btn btn-buy {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" formaction="{% url 'store:buy_now' product.pk %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-bolt{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Buy Now + Free Gift{% endif %}</button>
+                                <button type="submit" class="btn btn-add action-btn-available" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}><i class="fas fa-shopping-cart"></i> Add to Cart + Free Gift</button>
+                                <button type="submit" class="btn btn-buy action-btn-available" formaction="{% url 'store:buy_now' product.pk %}" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}><i class="fas fa-bolt"></i> Buy Now + Free Gift</button>
+                                <button type="button" class="btn btn-out-of-stock-single action-btn-soldout" disabled {% if not selected_color_obj or selected_color_obj.in_stock %}style="display:none;"{% endif %}><i class="fas fa-ban"></i> Out of Stock</button>
                             </div>
                         </form>
                     </div>
                     {% else %}
                     <div class="gallery-actions-btns">
-                        <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form">
+                        <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form action-form-add" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
                             {% csrf_token %}
                             {% if product.available_colors %}
                             <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
-                            <button type="submit" class="btn btn-add {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-shopping-cart{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Add to Cart{% endif %}</button>
+                            <button type="submit" class="btn btn-add"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                         </form>
-                        <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form">
+                        <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form action-form-buy" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
                             {% csrf_token %}
                             {% if product.available_colors %}
                             <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
-                            <button type="submit" class="btn btn-buy {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-bolt{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Buy Now{% endif %}</button>
+                            <button type="submit" class="btn btn-buy"><i class="fas fa-bolt"></i> Buy Now</button>
                         </form>
+                        <button type="button" class="btn btn-out-of-stock-single action-btn-soldout" disabled {% if not selected_color_obj or selected_color_obj.in_stock %}style="display:none;"{% endif %}><i class="fas fa-ban"></i> Out of Stock</button>
                     </div>
                     {% endif %}
                 {% else %}
@@ -3571,6 +3621,25 @@
             ]
         };
 
+        function updateStockButtons(inStock) {
+            var normalForms = document.querySelectorAll('.action-form-add, .action-form-buy, .action-btn-available');
+            var soldOutBtns = document.querySelectorAll('.action-btn-soldout');
+            var stickyForms = document.querySelectorAll('.sticky-form-add, .sticky-form-buy');
+            var stickySoldOut = document.querySelector('.sticky-soldout-single');
+
+            if (inStock) {
+                normalForms.forEach(function(el) { el.style.display = ''; });
+                soldOutBtns.forEach(function(el) { el.style.display = 'none'; });
+                stickyForms.forEach(function(el) { el.style.display = ''; });
+                if (stickySoldOut) stickySoldOut.style.display = 'none';
+            } else {
+                normalForms.forEach(function(el) { el.style.display = 'none'; });
+                soldOutBtns.forEach(function(el) { el.style.display = 'inline-flex'; });
+                stickyForms.forEach(function(el) { el.style.display = 'none'; });
+                if (stickySoldOut) stickySoldOut.style.display = 'inline-flex';
+            }
+        }
+
         function resetToBaseProduct() {
             document.querySelectorAll('.color-swatch-item').forEach(function(el) {
                 el.classList.remove('active');
@@ -3611,13 +3680,8 @@
 
             // Restore stock note & button state
             var stockNote = document.getElementById('productStockNote');
-            var actionBtns = document.querySelectorAll('.gallery-actions-btns button, .sticky-btn-add, .sticky-btn-buy');
             if (baseProductState.inStock) {
-                actionBtns.forEach(function(b) {
-                    b.disabled = false;
-                    b.classList.remove('disabled-btn');
-                    if (b.dataset.origText) b.innerHTML = b.dataset.origText;
-                });
+                updateStockButtons(true);
                 if (stockNote) {
                     if (baseProductState.isLowStock) {
                         stockNote.style.display = 'block';
@@ -3628,17 +3692,12 @@
                     }
                 }
             } else {
+                updateStockButtons(false);
                 if (stockNote) {
                     stockNote.style.display = 'block';
                     stockNote.style.color = '#dc2626';
                     stockNote.innerHTML = '<i class="fas fa-times-circle"></i> Out of stock';
                 }
-                actionBtns.forEach(function(b) {
-                    b.disabled = true;
-                    b.classList.add('disabled-btn');
-                    if (!b.dataset.origText) b.dataset.origText = b.innerHTML;
-                    b.innerHTML = '<i class="fas fa-ban"></i> Out of Stock';
-                });
             }
 
             // Restore main image
@@ -3847,7 +3906,6 @@
             var stockVal = parseInt(btn.getAttribute('data-stock') || '0', 10);
             var inStock = btn.getAttribute('data-in-stock') === '1' && stockVal > 0;
             var stockNote = document.getElementById('productStockNote');
-            var actionBtns = document.querySelectorAll('.gallery-actions-btns button, .sticky-btn-add, .sticky-btn-buy');
 
             if (!inStock || stockVal <= 0) {
                 if (!stockNote) {
@@ -3862,18 +3920,9 @@
                     stockNote.style.color = '#dc2626';
                     stockNote.innerHTML = '<i class="fas fa-times-circle"></i> Out of stock in ' + colorName;
                 }
-                actionBtns.forEach(function(b) {
-                    b.disabled = true;
-                    b.classList.add('disabled-btn');
-                    if (!b.dataset.origText) b.dataset.origText = b.innerHTML;
-                    b.innerHTML = '<i class="fas fa-ban"></i> Out of Stock';
-                });
+                updateStockButtons(false);
             } else {
-                actionBtns.forEach(function(b) {
-                    b.disabled = false;
-                    b.classList.remove('disabled-btn');
-                    if (b.dataset.origText) b.innerHTML = b.dataset.origText;
-                });
+                updateStockButtons(true);
                 if (stockVal <= 5) {
                     if (!stockNote) {
                         stockNote = document.createElement('p');
@@ -4183,29 +4232,32 @@ if (h) {
         </div>
         <div class="sticky-bar-actions">
             {% if product.in_stock %}
-            <form action="{% url 'store:add_cart' product.id %}" method="POST" class="sticky-action-form">
+            <form action="{% url 'store:add_cart' product.id %}" method="POST" class="sticky-action-form sticky-form-add" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
                 {% csrf_token %}
                 {% if product.available_colors %}
                 <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
-                <button type="submit" class="sticky-btn sticky-btn-add {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" title="Add to Cart" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}>
-                    <i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-shopping-cart{% endif %}"></i> <span>{% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Add to Cart{% endif %}</span>
+                <button type="submit" class="sticky-btn sticky-btn-add" title="Add to Cart">
+                    <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
                 </button>
             </form>
-            <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="sticky-action-form">
+            <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="sticky-action-form sticky-form-buy" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
                 {% csrf_token %}
                 {% if product.available_colors %}
                 <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
-                <button type="submit" class="sticky-btn sticky-btn-buy {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}>
-                    <i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-bolt{% endif %}"></i> <span>{% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Buy Now{% endif %}</span>
+                <button type="submit" class="sticky-btn sticky-btn-buy">
+                    <i class="fas fa-bolt"></i> <span>Buy Now</span>
                 </button>
             </form>
+            <button type="button" class="sticky-btn sticky-btn-disabled sticky-soldout-single" disabled {% if not selected_color_obj or selected_color_obj.in_stock %}style="display:none;"{% endif %}>
+                <i class="fas fa-ban"></i> <span>Out of Stock</span>
+            </button>
             {% else %}
             <button class="sticky-btn sticky-btn-disabled" disabled>
-                <i class="fas fa-circle-xmark"></i> Out of Stock
+                <i class="fas fa-circle-xmark"></i> <span>Out of Stock</span>
             </button>
             {% endif %}
         </div>
