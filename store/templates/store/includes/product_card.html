@@ -60,35 +60,33 @@
             <a href="{% url 'store:product_detail' product.pk %}">{{ product.title }}</a>
         </h3>
 
-        <div class="card-swatches-slot">
-            {% if product.available_colors %}
-            <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
-                {% for c in product.available_colors|slice:":5" %}
-                <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
-                   class="card-swatch-dot"
-                   style="background: {{ c.display_hex|default:c.hex_code }};"
-                   title="{{ c.name }}"
-                   data-color-url="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
-                   {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)" onclick="event.preventDefault(); event.stopPropagation(); previewCardColor(this);"{% else %}onclick="event.stopPropagation();"{% endif %}></a>
-                {% endfor %}
-                {% if product.available_colors|length > 1 %}
-                <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
-                {% endif %}
-            </div>
+        {% if product.available_colors %}
+        <div class="card-color-swatches" title="{{ product.available_colors|length }} colour options">
+            {% for c in product.available_colors|slice:":5" %}
+            <a href="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+               class="card-swatch-dot"
+               style="background: {{ c.display_hex|default:c.hex_code }};"
+               title="{{ c.name }}"
+               data-color-url="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+               {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)" onclick="event.preventDefault(); event.stopPropagation(); previewCardColor(this);"{% else %}onclick="event.stopPropagation();"{% endif %}></a>
+            {% endfor %}
+            {% if product.available_colors|length > 1 %}
+            <span class="card-color-count">+{{ product.available_colors|length }} colours</span>
             {% endif %}
         </div>
+        {% endif %}
 
         <div class="col-price-row price-row">
             <div class="col-prices">
                 {% if product.mrp and product.mrp > product.price %}
-                <span class="col-mrp mrp">₹{{ product.mrp }}</span>
-                <span class="col-price price">₹{{ product.price }}</span>
+                <span class="col-mrp mrp">₹{{ product.mrp|floatformat:"-2" }}</span>
+                <span class="col-price price">₹{{ product.price|floatformat:"-2" }}</span>
                 <span class="discount-badge">{{ product.discount_percent }}% OFF</span>
                 {% elif product.mrp %}
-                <span class="col-mrp mrp">₹{{ product.mrp }}</span>
-                <span class="col-price price">₹{{ product.price }}</span>
+                <span class="col-mrp mrp">₹{{ product.mrp|floatformat:"-2" }}</span>
+                <span class="col-price price">₹{{ product.price|floatformat:"-2" }}</span>
                 {% else %}
-                <span class="col-price price">₹{{ product.price }}</span>
+                <span class="col-price price">₹{{ product.price|floatformat:"-2" }}</span>
                 {% endif %}
             </div>
             {% if product.offer %}

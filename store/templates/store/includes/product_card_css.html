@@ -40,13 +40,14 @@
             width: 100% !important;
             height: 100% !important;
             position: relative;
-            padding: 8px;
+            padding: 0 !important;
             box-sizing: border-box;
         }
         .col-img-link img, .card .thumb img, .col-card .col-thumb img {
             width: 100% !important;
             height: 100% !important;
-            object-fit: contain !important;
+            object-fit: cover !important;
+            object-position: center top !important;
             transition: opacity .35s ease, transform .4s ease;
         }
         .col-img-link .secondary-img {
@@ -54,9 +55,10 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            padding: 8px;
+            padding: 0 !important;
             box-sizing: border-box;
-            object-fit: contain;
+            object-fit: cover !important;
+            object-position: center top !important;
             opacity: 0;
             pointer-events: none;
             transition: opacity .35s ease, transform .4s ease;
@@ -142,31 +144,36 @@
             justify-content: space-between;
             margin-bottom: 6px;
             font-size: 11.5px;
+            gap: 4px;
         }
         .col-stars {
             color: #f59e0b;
             display: inline-flex;
             align-items: center;
             gap: 2px;
+            flex-shrink: 0;
         }
         .col-score {
             color: var(--ink);
             font-weight: 600;
-            margin-left: 5px;
-            font-size: 13px;
+            margin-left: 4px;
+            font-size: 12.5px;
         }
         .col-stock-badge {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
         }
         .col-stock-badge .dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
             display: inline-block;
+            flex-shrink: 0;
         }
         .col-stock-badge.in { color: var(--green); }
         .col-stock-badge.in .dot { background: var(--green); box-shadow: 0 0 0 2px rgba(31,157,99,.2); }
@@ -207,17 +214,11 @@
             color: var(--blue);
         }
 
-        .card-swatches-slot {
-            min-height: 22px;
-            display: flex;
-            align-items: center;
-            margin: 2px 0 8px;
-        }
         .card-color-swatches {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            margin: 0;
+            margin: 3px 0 8px;
         }
         .card-swatch-dot {
             width: 12px;
@@ -296,6 +297,7 @@
             padding: 10px 14px;
             background: var(--navy);
             color: #fff;
+            white-space: nowrap !important;
         }
         .col-btn-action.add:hover {
             background: var(--navy-2);
@@ -324,6 +326,7 @@
             background: var(--soft);
             color: var(--muted);
             cursor: not-allowed;
+            white-space: nowrap !important;
         }
 
         @media (max-width: 1024px) {
@@ -346,32 +349,93 @@
                 display: flex !important;
                 flex-direction: column !important;
             }
+            .col-img-link, .card .thumb a.col-img-link {
+                padding: 0 !important;
+            }
+            .col-rating-row {
+                font-size: 10.5px !important;
+                margin-bottom: 4px !important;
+                gap: 2px !important;
+            }
+            .col-stars {
+                gap: 1.5px !important;
+            }
+            .col-stars i {
+                font-size: 9.5px !important;
+            }
+            .col-score {
+                font-size: 11px !important;
+                margin-left: 2px !important;
+            }
+            .col-stock-badge {
+                font-size: 10px !important;
+                gap: 3px !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+            }
+            .col-stock-badge .dot {
+                width: 5px !important;
+                height: 5px !important;
+            }
+            .col-category {
+                font-size: 10px !important;
+                margin: 4px 0 2px !important;
+            }
             .col-title, .card .card-body h3 {
                 font-size: 13.5px !important;
                 min-height: 38px !important;
                 line-height: 1.35 !important;
-            }
-            .card-swatches-slot {
-                min-height: 20px !important;
                 margin: 2px 0 6px !important;
             }
             .card-color-swatches {
-                gap: 4px !important;
+                gap: 3px !important;
+                margin: 2px 0 6px !important;
             }
             .card-swatch-dot {
                 width: 10px !important;
                 height: 10px !important;
             }
             .card-color-count {
-                font-size: 10px !important;
+                font-size: 9.5px !important;
             }
             .col-price-row {
                 margin-top: auto !important;
                 padding-bottom: 8px !important;
             }
-            .col-price { font-size: 17px !important; }
+            .col-prices {
+                gap: 6px !important;
+            }
+            .col-price { font-size: 16px !important; }
             .col-mrp { font-size: 12px !important; }
-            .col-discount-pill, .discount-badge { font-size: 10px !important; padding: 2px 6px !important; }
+            .col-discount-pill, .discount-badge {
+                font-size: 9.5px !important;
+                padding: 2px 5px !important;
+                white-space: nowrap !important;
+            }
+            .col-actions {
+                gap: 6px !important;
+            }
+            .col-btn-action.add {
+                height: 36px !important;
+                padding: 6px 8px !important;
+                font-size: 11.5px !important;
+                white-space: nowrap !important;
+                border-radius: 10px !important;
+            }
+            .col-btn-action.detail {
+                width: 34px !important;
+                height: 36px !important;
+                font-size: 11px !important;
+                border-radius: 10px !important;
+                flex-shrink: 0 !important;
+            }
+            .col-btn-action.disabled {
+                height: 36px !important;
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                white-space: nowrap !important;
+                border-radius: 10px !important;
+            }
         }
         @media (max-width: 480px) {
             .collection-grid, .grid {
@@ -383,11 +447,61 @@
                 border-radius: 14px !important;
                 height: 100% !important;
             }
-            .col-img-link, .card .thumb a.col-img-link { padding: 6px !important; }
-            .col-title, .card .card-body h3 {
-                font-size: 13px !important;
-                min-height: 36px !important;
+            .col-thumb, .card .thumb, .col-card .col-thumb {
+                border-radius: 12px !important;
             }
-            .col-btn-action.add { height: 38px !important; padding: 6px 8px !important; font-size: 12px !important; }
-            .col-btn-action.detail { width: 38px !important; height: 38px !important; font-size: 12px !important; }
+            .col-img-link, .card .thumb a.col-img-link {
+                padding: 0 !important;
+            }
+            .col-rating-row {
+                font-size: 9px !important;
+            }
+            .col-stars i {
+                font-size: 8.5px !important;
+            }
+            .col-score {
+                font-size: 10px !important;
+            }
+            .col-stock-badge {
+                font-size: 9.5px !important;
+                gap: 2.5px !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+            }
+            .col-title, .card .card-body h3 {
+                font-size: 12.5px !important;
+                min-height: 34px !important;
+                line-height: 1.3 !important;
+                margin: 2px 0 5px !important;
+            }
+            .col-prices {
+                gap: 4px !important;
+            }
+            .col-price { font-size: 14.5px !important; }
+            .col-mrp { font-size: 11px !important; }
+            .discount-badge { font-size: 9px !important; padding: 2px 4px !important; }
+            .col-actions {
+                gap: 5px !important;
+            }
+            .col-btn-action.add {
+                height: 34px !important;
+                padding: 5px 6px !important;
+                font-size: 11px !important;
+                white-space: nowrap !important;
+            }
+            .col-btn-action.add i {
+                font-size: 10.5px !important;
+            }
+            .col-btn-action.detail {
+                width: 30px !important;
+                height: 34px !important;
+                font-size: 10.5px !important;
+                flex-shrink: 0 !important;
+            }
+            .col-btn-action.disabled {
+                height: 34px !important;
+                padding: 5px 6px !important;
+                font-size: 10.5px !important;
+                white-space: nowrap !important;
+            }
         }
