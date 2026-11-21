@@ -425,18 +425,78 @@
         });
     }
 
-    // Mobile Mega-Menu Accordion Toggles
-    document.querySelectorAll('.has-megamenu .nav-dropdown-trigger').forEach(function(trigger) {
-        trigger.addEventListener('click', function(e) {
-            if (window.innerWidth <= 1100) {
-                e.preventDefault();
-                e.stopPropagation();
-                var parent = trigger.closest('.has-megamenu');
-                if (parent) {
-                    parent.classList.toggle('active-mobile');
+    // Mega-Menu Interactions (Mobile Accordion + Desktop Hover Bridge & Click Lock)
+    var megamenuItems = document.querySelectorAll('.has-megamenu');
+
+    megamenuItems.forEach(function(item) {
+        var trigger = item.querySelector('.nav-dropdown-trigger');
+        var menu = item.querySelector('.megamenu');
+        var closeTimer = null;
+
+        function openDesktopMenu() {
+            if (window.innerWidth > 1100) {
+                if (closeTimer) {
+                    clearTimeout(closeTimer);
+                    closeTimer = null;
                 }
+                megamenuItems.forEach(function(other) {
+                    if (other !== item) other.classList.remove('dropdown-open');
+                });
+                item.classList.add('dropdown-open');
             }
-        });
+        }
+
+        function scheduleCloseDesktopMenu() {
+            if (window.innerWidth > 1100) {
+                if (closeTimer) clearTimeout(closeTimer);
+                closeTimer = setTimeout(function() {
+                    item.classList.remove('dropdown-open');
+                }, 220); // 220ms grace window ensures smooth mouse movement between nav and menu
+            }
+        }
+
+        item.addEventListener('mouseenter', openDesktopMenu);
+        item.addEventListener('mouseleave', scheduleCloseDesktopMenu);
+
+        if (menu) {
+            menu.addEventListener('mouseenter', openDesktopMenu);
+            menu.addEventListener('mouseleave', scheduleCloseDesktopMenu);
+        }
+
+        if (trigger) {
+            trigger.addEventListener('click', function(e) {
+                if (window.innerWidth <= 1100) {
+                    // Mobile accordion behavior
+                    e.preventDefault();
+                    e.stopPropagation();
+                    item.classList.toggle('active-mobile');
+                } else {
+                    // Desktop click: toggle open lock
+                    var isOpen = item.classList.contains('dropdown-open');
+                    if (!isOpen) {
+                        e.preventDefault();
+                        openDesktopMenu();
+                    }
+                }
+            });
+        }
+    });
+
+    // Close desktop megamenu on outside click or Escape
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth > 1100 && !e.target.closest('.has-megamenu')) {
+            megamenuItems.forEach(function(item) {
+                item.classList.remove('dropdown-open');
+            });
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && window.innerWidth > 1100) {
+            megamenuItems.forEach(function(item) {
+                item.classList.remove('dropdown-open');
+            });
+        }
     });
 
     // Header elevation on scroll
