@@ -67,8 +67,8 @@
                class="card-swatch-dot"
                style="background: {{ c.display_hex|default:c.hex_code }};"
                title="{{ c.name }}"
-               {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)"{% endif %}
-               onclick="event.stopPropagation();"></a>
+               data-color-url="{% url 'store:product_detail' product.pk %}?color={{ c.name|urlencode }}"
+               {% if c.image %}data-img="{{ c.image.url }}" onmouseenter="previewCardColor(this)" onclick="event.preventDefault(); event.stopPropagation(); previewCardColor(this);"{% else %}onclick="event.stopPropagation();"{% endif %}></a>
             {% endfor %}
             {% if product.available_colors|length > 1 %}
             <span class="card-color-count">+{{ product.available_colors|length }} colours</span>

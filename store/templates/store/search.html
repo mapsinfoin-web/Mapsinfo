@@ -1050,14 +1050,8 @@ var header = document.getElementById('header');
         }
 
         function previewCardColor(dot) {
-            if (!dot) return;
-            var newSrc = dot.getAttribute('data-img');
-            if (!newSrc) return;
-            var card = dot.closest('.card, article');
-            if (!card) return;
-            var img = card.querySelector('img');
-            if (img) {
-                img.src = newSrc;
+            if (window.previewCardColor) {
+                window.previewCardColor(dot);
             }
         }
     </script>

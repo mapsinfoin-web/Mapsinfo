@@ -24,7 +24,8 @@
             height: auto !important;
             border-radius: 16px;
             overflow: hidden;
-            background: linear-gradient(180deg, #F8FAFD 0%, #EEF4FA 100%);
+            background: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -34,38 +35,42 @@
             width: 100% !important;
             height: 100% !important;
             position: relative;
-            padding: 14px;
+            padding: 8px;
             box-sizing: border-box;
         }
         .col-img-link img, .card .thumb img, .col-card .col-thumb img {
             width: 100% !important;
             height: 100% !important;
             object-fit: contain !important;
-            transition: opacity .45s cubic-bezier(.2, .8, .2, 1), transform .55s cubic-bezier(.2, .8, .2, 1);
+            transition: opacity .35s ease, transform .4s ease;
         }
         .col-img-link .secondary-img {
             position: absolute;
-            inset: 14px;
-            width: calc(100% - 28px);
-            height: calc(100% - 28px);
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            box-sizing: border-box;
             object-fit: contain;
             opacity: 0;
             pointer-events: none;
-            transition: opacity .45s cubic-bezier(.2, .8, .2, 1), transform .55s cubic-bezier(.2, .8, .2, 1);
+            transition: opacity .35s ease, transform .4s ease;
         }
-        .col-card:hover .col-img-link.has-secondary .primary-img,
-        .card:hover .col-img-link.has-secondary .primary-img {
-            opacity: 0;
-            transform: scale(1.03);
-        }
-        .col-card:hover .col-img-link.has-secondary .secondary-img,
-        .card:hover .col-img-link.has-secondary .secondary-img {
-            opacity: 1;
-            transform: scale(1.08);
-        }
-        .col-card:hover .col-img-link:not(.has-secondary) img,
-        .card:hover .thumb .col-img-link:not(.has-secondary) img {
-            transform: scale(1.08);
+        @media (hover: hover) and (pointer: fine) {
+            .col-card:hover .col-img-link.has-secondary .primary-img,
+            .card:hover .col-img-link.has-secondary .primary-img {
+                opacity: 0;
+                transform: scale(1.03);
+            }
+            .col-card:hover .col-img-link.has-secondary .secondary-img,
+            .card:hover .col-img-link.has-secondary .secondary-img {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            .col-card:hover .col-img-link:not(.has-secondary) img,
+            .card:hover .thumb .col-img-link:not(.has-secondary) img {
+                transform: scale(1.05);
+            }
         }
         .col-no-image {
             height: 100%;

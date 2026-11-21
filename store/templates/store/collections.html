@@ -1176,12 +1176,9 @@
         })();
 
         function previewCardColor(swatchEl) {
-            var imgUrl = swatchEl.getAttribute('data-img');
-            if (!imgUrl) return;
-            var card = swatchEl.closest('.card');
-            if (!card) return;
-            var img = card.querySelector('.thumb img');
-            if (img) img.src = imgUrl;
+            if (window.previewCardColor) {
+                window.previewCardColor(swatchEl);
+            }
         }
 
         (function () {

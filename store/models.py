@@ -148,21 +148,18 @@ class Product(models.Model):
 
     @property
     def secondary_image(self):
-        """Returns the first gallery image or secondary color image for card hover preview, if available."""
+        """Returns a general gallery image (not tied to another colour variant) for card hover preview, if available."""
         if hasattr(self, '_prefetched_objects_cache') and 'gallery_images' in self._prefetched_objects_cache:
             for g in self.gallery_images.all():
-                if g.image:
+                if g.color_id is None and g.image and (not self.image or g.image.name != self.image.name):
                     return g.image
         else:
             try:
-                g = self.gallery_images.filter(image__isnull=False).exclude(image='').first()
-                if g and g.image:
+                g = self.gallery_images.filter(color__isnull=True, image__isnull=False).exclude(image='').first()
+                if g and g.image and (not self.image or g.image.name != self.image.name):
                     return g.image
             except Exception:
                 pass
-        for c in self.available_colors:
-            if c.image and (not self.image or c.image.name != self.image.name):
-                return c.image
         return None
 
     @property
