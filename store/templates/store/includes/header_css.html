@@ -52,22 +52,29 @@ header#header.scrolled {
 }
 .logo {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     flex-shrink: 0 !important;
     text-decoration: none;
 }
-.logo img,
-.logo-mark,
+.logo-mark {
+    display: block;
+    height: 35px;
+    width: auto;
+    margin-top: 2.5px;
+    object-fit: contain;
+    flex-shrink: 0 !important;
+    transition: transform .25s ease;
+}
 .logo-text {
     display: block;
     height: 50px;
     width: auto;
     max-width: 220px;
     object-fit: contain;
+    flex-shrink: 0 !important;
     transition: transform .25s ease;
 }
-.logo:hover img,
 .logo:hover .logo-mark,
 .logo:hover .logo-text {
     transform: scale(1.03);
@@ -941,16 +948,22 @@ header#header.scrolled {
     }
     .drawer-brand {
         display: flex !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         gap: 6px !important;
     }
-    .drawer-logo,
-    .drawer-logo-mark,
-    .drawer-logo-text {
-        height: 36px !important;
+    .drawer-logo-mark {
+        height: 26px !important;
         width: auto !important;
-        max-width: 140px !important;
+        margin-top: 2px !important;
         object-fit: contain !important;
+        flex-shrink: 0 !important;
+    }
+    .drawer-logo-text {
+        height: 38px !important;
+        width: auto !important;
+        max-width: 145px !important;
+        object-fit: contain !important;
+        flex-shrink: 0 !important;
     }
     .drawer-close-btn {
         width: 36px !important;
@@ -1426,11 +1439,13 @@ header#header.scrolled {
         gap: 8px !important;
         padding: 8px 12px !important;
     }
-    .logo img,
-    .logo-mark,
+    .logo-mark {
+        height: 28px !important;
+        margin-top: 2px !important;
+    }
     .logo-text {
-        height: 44px !important;
-        max-width: 195px !important;
+        height: 42px !important;
+        max-width: 185px !important;
     }
     .nav {
         gap: 1px !important;
@@ -1483,13 +1498,19 @@ header#header.scrolled {
         justify-content: flex-start !important;
         margin: 0 !important;
         gap: 4px !important;
+        align-items: flex-start !important;
     }
-    .logo img,
-    .logo-mark,
-    .logo-text {
-        height: 36px !important;
+    .logo-mark {
+        height: 24px !important;
+        margin-top: 2px !important;
         width: auto !important;
-        max-width: 100% !important;
+        flex-shrink: 0 !important;
+    }
+    .logo-text {
+        height: 35px !important;
+        width: auto !important;
+        max-width: 135px !important;
+        flex-shrink: 0 !important;
     }
     .actions {
         order: 2 !important;
@@ -1588,10 +1609,13 @@ header#header.scrolled {
     }
 }
 @media (max-width: 380px) {
-    .logo img,
-    .logo-mark,
+    .logo-mark {
+        height: 20px !important;
+        margin-top: 1.5px !important;
+    }
     .logo-text {
         height: 30px !important;
+        max-width: 115px !important;
     }
     .icon-btn {
         width: 33px !important;
