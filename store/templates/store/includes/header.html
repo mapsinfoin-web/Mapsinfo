@@ -2,20 +2,65 @@
 {% include 'store/includes/header_css.html' %}
 
 <!-- ===== HEADER ===== -->
+<div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
 <header class="header" id="header">
     <div class="container header-main">
         <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
             <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
         </a>
 
-        <nav class="nav" id="nav">
-            <a href="{% url 'store:all_products' %}" class="nav-link{% if request.path == '/' %} active{% endif %}">Home</a>
+        <nav class="nav" id="nav" aria-label="Main Navigation">
+            <!-- Mobile Drawer Branded Top Bar -->
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" class="drawer-logo" />
+                </div>
+                <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close navigation drawer" title="Close Menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
 
-            <!-- 1. COLLECTIONS MEGA-MENU -->
-            <div class="nav-item has-megamenu">
-                <a href="{% url 'store:collections' %}" class="nav-link nav-dropdown-trigger{% if '/collections' in request.path and not active_occasion %} active{% endif %}">
-                    Collections <i class="fas fa-chevron-down nav-arrow"></i>
+            <!-- Mobile Drawer User Banner / Greeting -->
+            <div class="drawer-user-banner">
+                {% if user.is_authenticated %}
+                <div class="drawer-user-info">
+                    <div class="drawer-user-avatar">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="drawer-user-text">
+                        <span class="drawer-user-greet">Namaste,</span>
+                        <strong class="drawer-user-name">{{ user.first_name|default:user.username }}</strong>
+                    </div>
+                </div>
+                <div class="drawer-user-actions">
+                    <a href="{% url 'store:my_orders' %}" class="drawer-pill-btn"><i class="fas fa-box"></i> My Orders</a>
+                    <a href="{% url 'store:logout_user' %}" class="drawer-pill-btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+                {% else %}
+                <div class="drawer-guest-box">
+                    <div class="drawer-guest-text">
+                        <strong>Welcome to MAPSKART</strong>
+                        <span>Explore handcrafted anti-tarnish jewelry</span>
+                    </div>
+                    <a href="{% url 'store:login_user' %}" class="drawer-login-btn">
+                        <i class="far fa-user"></i> Log In / Register
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="drawer-scroll-body">
+                <a href="{% url 'store:all_products' %}" class="nav-link{% if request.path == '/' %} active{% endif %}">
+                    <i class="fas fa-home drawer-nav-icon"></i>
+                    <span>Home</span>
                 </a>
+
+                <!-- 1. COLLECTIONS MEGA-MENU -->
+                <div class="nav-item has-megamenu">
+                    <a href="{% url 'store:collections' %}" class="nav-link nav-dropdown-trigger{% if '/collections' in request.path and not active_occasion %} active{% endif %}">
+                        <span class="nav-link-label"><i class="fas fa-gem drawer-nav-icon"></i> <span>Collections</span></span>
+                        <i class="fas fa-chevron-down nav-arrow"></i>
+                    </a>
                 <div class="megamenu megamenu-collections">
                     <div class="megamenu-mobile-all-link">
                         <a href="{% url 'store:collections' %}"><i class="fas fa-th-large"></i> Explore All Collections Directory &rarr;</a>
@@ -106,7 +151,8 @@
             <!-- 2. WEDDING & OCCASIONS MEGA-MENU (Kushal's & Rubans Style Faceted Discovery) -->
             <div class="nav-item has-megamenu">
                 <a href="{% url 'store:collections' %}?occasion=wedding-bridal" class="nav-link nav-dropdown-trigger highlight-nav{% if active_occasion %} active{% endif %}">
-                    <span class="nav-sparkle">✨</span> Wedding &amp; Occasions <i class="fas fa-chevron-down nav-arrow"></i>
+                    <span class="nav-link-label"><i class="fas fa-crown drawer-nav-icon"></i> <span class="nav-sparkle">✨</span> <span>Wedding &amp; Occasions</span></span>
+                    <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 <div class="megamenu megamenu-occasions">
                     <div class="megamenu-mobile-all-link">
@@ -195,31 +241,42 @@
                 </div>
             </div>
 
-            <a href="{% url 'store:all_products' %}#latest-arrivals" class="nav-link">Latest Arrivals</a>
-            <a href="{% url 'store:sale' %}" class="nav-link sale"><span class="sale-badge">SALE</span> Up to 50%</a>
-            <a href="{% url 'store:about' %}" class="nav-link{% if request.path == '/about/' %} active{% endif %}">About Us</a>
-            <a href="{% url 'store:contact' %}" class="nav-link{% if request.path == '/contact/' %} active{% endif %}">Contact</a>
+            <a href="{% url 'store:all_products' %}#latest-arrivals" class="nav-link">
+                <i class="fas fa-sparkles drawer-nav-icon"></i>
+                <span>Latest Arrivals</span>
+                <span class="drawer-badge-new">NEW</span>
+            </a>
+            <a href="{% url 'store:sale' %}" class="nav-link sale">
+                <i class="fas fa-percent drawer-nav-icon"></i>
+                <span>Sale</span>
+                <span class="sale-badge">Up to 50%</span>
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="nav-link drawer-only-link">
+                <i class="far fa-heart drawer-nav-icon"></i>
+                <span>My Wishlist</span>
+                {% if user_wishlist %}<span class="drawer-count-badge">{{ user_wishlist|length }}</span>{% endif %}
+            </a>
+            <a href="{% url 'store:about' %}" class="nav-link{% if request.path == '/about/' %} active{% endif %}">
+                <i class="fas fa-info-circle drawer-nav-icon"></i>
+                <span>About Us</span>
+            </a>
+            <a href="{% url 'store:contact' %}" class="nav-link{% if request.path == '/contact/' %} active{% endif %}">
+                <i class="fas fa-headset drawer-nav-icon"></i>
+                <span>Contact</span>
+            </a>
 
             <!-- Mobile Navigation Quick Actions & Atelier Concierge Strip -->
             <div class="nav-mobile-footer">
-                <div class="nav-mobile-actions">
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'store:my_orders' %}" class="nav-mobile-btn"><i class="far fa-user-circle"></i> My Orders</a>
-                    <a href="{% url 'store:logout_user' %}" class="nav-mobile-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    {% else %}
-                    <a href="{% url 'store:login_user' %}" class="nav-mobile-btn primary"><i class="far fa-user"></i> Log In / Register</a>
-                    <a href="{% url 'store:wishlist' %}" class="nav-mobile-btn"><i class="far fa-heart"></i> Wishlist</a>
-                    {% endif %}
-                </div>
                 <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="nav-mobile-wa">
                     <i class="fab fa-whatsapp"></i> Chat with Delhi Atelier Concierge
                 </a>
                 <div class="nav-mobile-trust">
-                    <span><i class="fas fa-certificate"></i> Anti-Tarnish Guarantee</span>
-                    <span><i class="fas fa-truck-fast"></i> Delhi NCR Dispatch</span>
+                    <span><i class="fas fa-shield-alt"></i> Anti-Tarnish Guarantee</span>
+                    <span><i class="fas fa-shipping-fast"></i> Delhi NCR Dispatch</span>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
         <form class="search" id="headerSearchForm" role="search" action="{% url 'store:search' %}" method="GET">
             <i class="fas fa-search search-icon"></i>
@@ -285,17 +342,27 @@
 (function() {
     var navToggle = document.getElementById('navToggle');
     var nav = document.getElementById('nav');
+    var navBackdrop = document.getElementById('navBackdrop');
+    var drawerCloseBtn = document.getElementById('drawerCloseBtn');
     var header = document.getElementById('header');
 
     if (navToggle && nav) {
-        function updateNavPosition() {
-            if (nav.classList.contains('open') && header) {
-                var rect = header.getBoundingClientRect();
-                var topPos = Math.max(Math.round(rect.bottom), 0);
-                nav.style.top = topPos + 'px';
-                nav.style.height = 'calc(100vh - ' + topPos + 'px)';
-                nav.style.maxHeight = 'calc(100vh - ' + topPos + 'px)';
-            }
+        function openDrawer() {
+            nav.classList.add('open');
+            if (navBackdrop) navBackdrop.classList.add('active');
+            navToggle.setAttribute('aria-expanded', 'true');
+            var icon = navToggle.querySelector('i');
+            if (icon) icon.className = 'fas fa-times';
+            document.body.classList.add('nav-open');
+        }
+
+        function closeDrawer() {
+            nav.classList.remove('open');
+            if (navBackdrop) navBackdrop.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', 'false');
+            var icon = navToggle.querySelector('i');
+            if (icon) icon.className = 'fas fa-bars';
+            document.body.classList.remove('nav-open');
         }
 
         function toggleNav(e) {
@@ -306,58 +373,45 @@
                     e.stopImmediatePropagation();
                 }
             }
-            var isOpen = nav.classList.toggle('open');
-            navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            var icon = navToggle.querySelector('i');
-            if (icon) {
-                icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
-            }
-
-            if (isOpen) {
-                updateNavPosition();
-                document.body.classList.add('nav-open');
+            if (nav.classList.contains('open')) {
+                closeDrawer();
             } else {
-                document.body.classList.remove('nav-open');
-                nav.style.top = '';
-                nav.style.height = '';
-                nav.style.maxHeight = '';
+                openDrawer();
             }
         }
 
-        // Capture phase ensures this handler runs FIRST and prevents duplicate listeners from firing
+        // Hamburger button click
         navToggle.addEventListener('click', toggleNav, true);
 
-        // Keep position accurate on resize and orientation change
+        // Dedicated drawer close button inside drawer
+        if (drawerCloseBtn) {
+            drawerCloseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeDrawer();
+            });
+        }
+
+        // Tap on frosted backdrop to close
+        if (navBackdrop) {
+            navBackdrop.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeDrawer();
+            });
+        }
+
+        // Close on window resize above mobile breakpoint
         window.addEventListener('resize', function() {
             if (window.innerWidth > 1100 && nav.classList.contains('open')) {
-                nav.classList.remove('open');
-                navToggle.setAttribute('aria-expanded', 'false');
-                var icon = navToggle.querySelector('i');
-                if (icon) icon.className = 'fas fa-bars';
-                document.body.classList.remove('nav-open');
-                nav.style.top = '';
-                nav.style.height = '';
-                nav.style.maxHeight = '';
-            } else if (nav.classList.contains('open')) {
-                updateNavPosition();
+                closeDrawer();
             }
         });
 
-        window.addEventListener('orientationchange', function() {
-            setTimeout(updateNavPosition, 100);
-        });
-
-        // Close drawer when clicking outside nav
-        document.addEventListener('click', function(e) {
-            if (nav.classList.contains('open') && !nav.contains(e.target) && !navToggle.contains(e.target)) {
-                nav.classList.remove('open');
-                navToggle.setAttribute('aria-expanded', 'false');
-                var icon = navToggle.querySelector('i');
-                if (icon) icon.className = 'fas fa-bars';
-                document.body.classList.remove('nav-open');
-                nav.style.top = '';
-                nav.style.height = '';
-                nav.style.maxHeight = '';
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && nav.classList.contains('open')) {
+                closeDrawer();
             }
         });
 
@@ -365,14 +419,7 @@
         nav.querySelectorAll('a:not(.nav-dropdown-trigger)').forEach(function(link) {
             link.addEventListener('click', function() {
                 if (nav.classList.contains('open')) {
-                    nav.classList.remove('open');
-                    navToggle.setAttribute('aria-expanded', 'false');
-                    var icon = navToggle.querySelector('i');
-                    if (icon) icon.className = 'fas fa-bars';
-                    document.body.classList.remove('nav-open');
-                    nav.style.top = '';
-                    nav.style.height = '';
-                    nav.style.maxHeight = '';
+                    closeDrawer();
                 }
             });
         });
