@@ -1,6 +1,6 @@
-# MAPSKART | A Think Trend
+# MAPSCART | A Think Trend
 
-MAPSKART is a responsive, full-stack e-commerce web application designed for a premium jewellery boutique. Built using the Django web framework, the platform provides a seamless shopping experience for curated collections of earrings, necklaces, rings, and bracelets.
+MAPSCART is a responsive, full-stack e-commerce web application designed for a premium jewellery boutique. Built using the Django web framework, the platform provides a seamless shopping experience for curated collections of earrings, necklaces, rings, and bracelets.
 
 The application emphasizes an elegant, modern user interface alongside robust backend functionality to handle product displays, user sessions, and shopping cart operations.
 
@@ -19,7 +19,7 @@ The application emphasizes an elegant, modern user interface alongside robust ba
 
 ## 🚀 Local Setup and Installation
 
-Follow these steps to run the MAPSKART project on your local machine.
+Follow these steps to run the MAPSCART project on your local machine.
 
 **1. Clone the repository:**
 ```bash

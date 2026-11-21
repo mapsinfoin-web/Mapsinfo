@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pay for Order #{{ order.id }} | MAPSKART</title>
+    <title>Pay for Order #{{ order.id }} | MAPSCART</title>
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />
@@ -102,8 +102,8 @@
 <body>
     <header class="header">
         <div class="container header-main">
-            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
-                <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
+            <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSCART home">
+                <img src="{% static 'logo_navbar.png' %}" alt="MAPSCART" />
             </a>
             <div class="nav-right">
                 <a href="{% url 'store:my_orders' %}">My Orders</a>
@@ -242,7 +242,7 @@
                 {% endif %}
 
                 <div class="amount">₹{{ order.amount_paid }}</div>
-                <div style="font-size: 13.5px; color: var(--muted); margin-bottom: 8px;">Pay to <b>{{ shop.payee_name|default:"MAPSKART" }}</b></div>
+                <div style="font-size: 13.5px; color: var(--muted); margin-bottom: 8px;">Pay to <b>{{ shop.payee_name|default:"MAPSCART" }}</b></div>
 
                 <!-- UPI Apps Supported Strip -->
                 <div class="upi-app-strip">
@@ -266,7 +266,7 @@
 
     <p style="text-align:center;font-size:13.5px;color:var(--muted);margin:0 0 40px;">
         Follow us:
-        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-instagram"></i> Instagram</a> &nbsp;&middot;&nbsp;
+        <a href="https://www.instagram.com/mapscart_official" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-instagram"></i> Instagram</a> &nbsp;&middot;&nbsp;
         <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:600;text-decoration:underline;"><i class="fab fa-facebook"></i> Facebook</a>
     </p>
     <script>

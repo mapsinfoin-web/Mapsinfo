@@ -50,7 +50,7 @@ class Product(models.Model):
     )
     title = models.CharField(max_length=255)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text="Unique Product ID")
-    brand = models.CharField(max_length=120, blank=True, default='MAPSKART', help_text="Brand name")
+    brand = models.CharField(max_length=120, blank=True, default='MAPSCART', help_text="Brand name")
     product_type = models.CharField(max_length=120, blank=True, default='', help_text="Product Type (e.g. Necklace, Earrings, Bracelet, Ring, Jewellery Set)")
     description = models.TextField(blank=True)
     mrp = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
@@ -1085,7 +1085,7 @@ class PaymentSettings(models.Model):
     """The shop's Paytm details. Only ONE row; edit it in the admin under 'Payment settings'."""
     paytm_qr = models.ImageField(upload_to='payment/', blank=True, null=True, verbose_name='Paytm QR code image',
                                  help_text="Upload the QR code image from your Paytm for Business app.")
-    payee_name = models.CharField(max_length=120, blank=True, default='MAPSKART', help_text="Name shown on the Paytm QR, e.g. MAPSKART.")
+    payee_name = models.CharField(max_length=120, blank=True, default='MAPSCART', help_text="Name shown on the Paytm QR, e.g. MAPSCART.")
     upi_id = models.CharField(max_length=120, blank=True, default=DEFAULT_UPI_ID, verbose_name='UPI ID',
                               help_text="Shown under the QR code and used for one-click UPI payments, e.g. maps536969@sbi.")
     vendor_whatsapp = models.CharField(

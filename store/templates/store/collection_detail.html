@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ category.name }} Collection | MAPSKART</title>
-    <meta name="description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Curated in Delhi, skin-safe with luxury velvet packaging." />
+    <title>{{ category.name }} Collection | MAPSCART</title>
+    <meta name="description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSCART. Curated in Delhi, skin-safe with luxury velvet packaging." />
     <link rel="canonical" href="{{ request.build_absolute_uri }}" />
 
     <!-- Bing Webmaster Tools Verification -->
@@ -13,19 +13,19 @@
 
     <!-- Open Graph (WhatsApp, Instagram, Facebook) -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="MAPSKART" />
-    <meta property="og:title" content="{{ category.name }} Collection | MAPSKART" />
-    <meta property="og:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Free shipping above ₹999." />
+    <meta property="og:site_name" content="MAPSCART" />
+    <meta property="og:title" content="{{ category.name }} Collection | MAPSCART" />
+    <meta property="og:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSCART. Free shipping above ₹999." />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
     <meta property="og:image" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
     <meta property="og:image:secure_url" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
-    <meta property="og:image:alt" content="MAPSKART {{ category.name }} Collection" />
+    <meta property="og:image:alt" content="MAPSCART {{ category.name }} Collection" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{{ category.name }} Collection | MAPSKART" />
-    <meta name="twitter:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSKART. Free shipping above ₹999." />
+    <meta name="twitter:title" content="{{ category.name }} Collection | MAPSCART" />
+    <meta name="twitter:description" content="Explore our handcrafted anti-tarnish {{ category.name|lower }} collection at MAPSCART. Free shipping above ₹999." />
     <meta name="twitter:image" content="{% if products.0.image %}{{ products.0.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'hero.png' %}{% endif %}" />
 
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
@@ -821,11 +821,11 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSCART" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
-                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/mapscart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                         <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
@@ -854,7 +854,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
+                <p style="margin:0">&copy; 2026 MAPSCART. All rights reserved.</p>
                 {% include 'store/includes/footer_payment_strip.html' %}
                 <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
             </div>

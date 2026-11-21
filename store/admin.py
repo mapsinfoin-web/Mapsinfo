@@ -874,15 +874,15 @@ class OrderAdmin(admin.ModelAdmin):
             if obj.tracking_number:
                 msg = (
                     f"Hi {obj.full_name}, great news! ✨\n"
-                    f"Your MAPSKART order #{obj.pk} has been shipped! 🚀\n\n"
+                    f"Your MAPSCART order #{obj.pk} has been shipped! 🚀\n\n"
                     f"📦 Tracking Details: {obj.tracking_number}\n\n"
-                    f"Your jewellery is on its way. Thank you for shopping with MAPSKART! 💎"
+                    f"Your jewellery is on its way. Thank you for shopping with MAPSCART! 💎"
                 )
                 btn_text = "📦 Send Tracking"
                 bg = "#059669"
             else:
                 msg = (
-                    f"Hi {obj.full_name}, your MAPSKART order #{obj.pk} has been dispatched! 🚀\n"
+                    f"Hi {obj.full_name}, your MAPSCART order #{obj.pk} has been dispatched! 🚀\n"
                     f"We will share the tracking number shortly."
                 )
                 btn_text = "🚚 Send Shipped"
@@ -890,14 +890,14 @@ class OrderAdmin(admin.ModelAdmin):
         elif obj.is_paid:
             msg = (
                 f"Hi {obj.full_name}, thank you! 🎉\n"
-                f"Your payment of Rs.{obj.amount_paid} for MAPSKART order #{obj.pk} has been verified.\n\n"
+                f"Your payment of Rs.{obj.amount_paid} for MAPSCART order #{obj.pk} has been verified.\n\n"
                 f"We are packing your jewellery with care. We will update you as soon as it ships! ✨"
             )
             btn_text = "✅ Send Paid Confirm"
             bg = "#16a34a"
         else:
             msg = (
-                f"Hi {obj.full_name}, this is MAPSKART regarding your order #{obj.pk} (Total: Rs.{obj.amount_paid}).\n"
+                f"Hi {obj.full_name}, this is MAPSCART regarding your order #{obj.pk} (Total: Rs.{obj.amount_paid}).\n"
                 f"Please let us know if you need any assistance completing your payment screenshot upload."
             )
             btn_text = "💬 WhatsApp"
@@ -1213,7 +1213,7 @@ class CartAdmin(admin.ModelAdmin):
                 clean_phone = '91' + clean_phone
             
             msg = (
-                f"Hi {name}, we noticed you were looking at {summary} on MAPSKART! "
+                f"Hi {name}, we noticed you were looking at {summary} on MAPSCART! "
                 f"We wanted to check if you had any questions about the product, quality, or delivery? "
                 f"We would be delighted to assist you!"
             )
@@ -1232,11 +1232,11 @@ class CartAdmin(admin.ModelAdmin):
         if email:
             email_body = (
                 f"Hi {name},\n\n"
-                f"We noticed you added {summary} to your shopping cart at MAPSKART.\n\n"
+                f"We noticed you added {summary} to your shopping cart at MAPSCART.\n\n"
                 f"Please let us know if you need help completing your order or have questions about our products.\n\n"
-                f"Best regards,\nMAPSKART Team"
+                f"Best regards,\nMAPSCART Team"
             )
-            mail_url = f"mailto:{email}?subject={quote('Your MAPSKART Shopping Bag')}&body={quote(email_body)}"
+            mail_url = f"mailto:{email}?subject={quote('Your MAPSCART Shopping Bag')}&body={quote(email_body)}"
             buttons.append(
                 format_html(
                     '<a href="{}" style="background:#1a73e8;color:#ffffff;padding:5px 10px;'
@@ -1264,7 +1264,7 @@ class CartAdmin(admin.ModelAdmin):
             clean_phone = '91' + clean_phone
 
         msg = (
-            f"Hi {name}, we noticed you were looking at {summary} on MAPSKART! "
+            f"Hi {name}, we noticed you were looking at {summary} on MAPSCART! "
             f"We wanted to check if you had any questions about the product, quality, or delivery? "
             f"We would be delighted to assist you!"
         )

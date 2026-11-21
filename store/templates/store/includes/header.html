@@ -5,15 +5,15 @@
 <header class="header" id="header">
     <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
     <div class="container header-main">
-        <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSKART home">
-            <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" />
+        <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSCART home">
+            <img src="{% static 'logo_navbar.png' %}" alt="MAPSCART" />
         </a>
 
         <nav class="nav" id="nav" aria-label="Main Navigation">
             <!-- Mobile Drawer Branded Top Bar -->
             <div class="drawer-header">
                 <div class="drawer-brand">
-                    <img src="{% static 'logo_navbar.png' %}" alt="MAPSKART" class="drawer-logo" />
+                    <img src="{% static 'logo_navbar.png' %}" alt="MAPSCART" class="drawer-logo" />
                 </div>
                 <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close navigation drawer" title="Close Menu">
                     <i class="fas fa-times"></i>
@@ -39,7 +39,7 @@
                 {% else %}
                 <div class="drawer-guest-box">
                     <div class="drawer-guest-text">
-                        <strong>Welcome to MAPSKART</strong>
+                        <strong>Welcome to MAPSCART</strong>
                         <span>Explore handcrafted anti-tarnish jewelry</span>
                     </div>
                     <a href="{% url 'store:login_user' %}" class="drawer-login-btn">
@@ -116,7 +116,7 @@
                             <div class="megamenu-card">
                                 <span class="megamenu-card-tag">ATELIER SIGNATURE</span>
                                 <h5>Signature Velvet Box Packaging</h5>
-                                <p>Every piece arrives with our MAPSKART Anti-Tarnish Purity &amp; Skin-Safe Guarantee inside signature velvet packaging.</p>
+                                <p>Every piece arrives with our MAPSCART Anti-Tarnish Purity &amp; Skin-Safe Guarantee inside signature velvet packaging.</p>
                                 <a href="{% url 'store:collections' %}" class="btn-megamenu-cta">Explore All Jewellery &rarr;</a>
                             </div>
                         </div>
@@ -232,7 +232,7 @@
                                 <span class="occasion-banner-pill">DELHI ATELIER CONCIERGE</span>
                                 <h3>Bridal Styling Assistance</h3>
                                 <p>Need help matching jewellery with your bridal lehenga? Chat with our styling concierge.</p>
-                                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="btn-wa-concierge">
+                                <a href="https://wa.me/919953595557?text=Hi%20MAPSCART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="btn-wa-concierge">
                                     <i class="fab fa-whatsapp"></i> Chat on WhatsApp
                                 </a>
                             </div>
@@ -267,7 +267,7 @@
 
             <!-- Mobile Navigation Quick Actions & Atelier Concierge Strip -->
             <div class="nav-mobile-footer">
-                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="nav-mobile-wa">
+                <a href="https://wa.me/919953595557?text=Hi%20MAPSCART,%20I%20need%20bridal%20jewellery%20styling%20advice" target="_blank" rel="noopener" class="nav-mobile-wa">
                     <i class="fab fa-whatsapp"></i> Chat with Delhi Atelier Concierge
                 </a>
                 <div class="nav-mobile-trust">
@@ -304,7 +304,7 @@
                         </div>
                         <div class="account-info">
                             <div class="account-name">{{ user.first_name|default:user.username }}</div>
-                            <div class="account-meta">{{ user.email|default:"MAPSKART Member" }}</div>
+                            <div class="account-meta">{{ user.email|default:"MAPSCART Member" }}</div>
                         </div>
                     </div>
                     <div class="account-dropdown-body">

@@ -28,7 +28,7 @@ def llms_txt(request):
     if llms_path.exists():
         content = llms_path.read_text(encoding='utf-8')
     else:
-        content = "# MAPSKART\n\n> Luxury Handcrafted Fashion Jewellery\n"
+        content = "# MAPSCART\n\n> Luxury Handcrafted Fashion Jewellery\n"
     return HttpResponse(content, content_type="text/markdown; charset=utf-8")
 
 
@@ -52,7 +52,7 @@ def sitemap_xml(request):
         # Fallback to static sitemap file
         sitemap_path = settings.BASE_DIR / 'sitemap.xml'
         if sitemap_path.exists():
-            xml = sitemap_path.read_text(encoding='utf-8').replace('https://mapskart.info.in', base_url)
+            xml = sitemap_path.read_text(encoding='utf-8').replace('https://mapscart.info.in', base_url)
         else:
             xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>{base_url}/</loc></url>\n</urlset>'
     return HttpResponse(xml, content_type="application/xml")

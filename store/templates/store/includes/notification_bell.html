@@ -1,4 +1,4 @@
-<!-- MAPSKART Notification Bell & Center -->
+<!-- MAPSCART Notification Bell & Center -->
 <div class="notif-wrapper" id="notifWrapper">
     <button type="button" class="icon-btn notif-btn" id="notifBtn" aria-label="Notifications" aria-expanded="false" title="Notifications">
         <i class="far fa-bell"></i>
@@ -65,7 +65,7 @@
 
         {% if store_notifications_count > 0 %}
         <div class="notif-foot">
-            <i class="fas fa-wand-magic-sparkles"></i> MAPSKART Exclusive Updates
+            <i class="fas fa-wand-magic-sparkles"></i> MAPSCART Exclusive Updates
         </div>
         {% endif %}
     </div>
@@ -417,7 +417,7 @@
         var badge = document.getElementById('notifBadge');
         var unreadCountTag = document.getElementById('notifUnreadCount');
         var cards = dropdown ? dropdown.querySelectorAll('.notif-card') : [];
-        var STORAGE_KEY = 'mapskart_read_notifs_v1';
+        var STORAGE_KEY = 'mapscart_read_notifs_v1';
 
         function getReadIds() {
             try {

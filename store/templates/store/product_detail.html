@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ product.title }} | MAPSKART</title>
-    <meta name="description" content="{{ product.description|striptags|truncatewords:25|default:'Shop handcrafted luxury jewellery from MAPSKART.' }}" />
+    <title>{{ product.title }} | MAPSCART</title>
+    <meta name="description" content="{{ product.description|striptags|truncatewords:25|default:'Shop handcrafted luxury jewellery from MAPSCART.' }}" />
     <link rel="canonical" href="{{ request.build_absolute_uri }}" />
 
     <!-- Bing Webmaster Tools Verification -->
@@ -13,8 +13,8 @@
 
     <!-- Open Graph (WhatsApp, Instagram, Facebook, iMessage) -->
     <meta property="og:type" content="product" />
-    <meta property="og:site_name" content="MAPSKART" />
-    <meta property="og:title" content="{{ product.title }} | MAPSKART" />
+    <meta property="og:site_name" content="MAPSCART" />
+    <meta property="og:title" content="{{ product.title }} | MAPSCART" />
     <meta property="og:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery with signature velvet packaging.' }}" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
     <meta property="og:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
@@ -28,8 +28,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{{ product.title }} | MAPSKART" />
-    <meta name="twitter:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery from MAPSKART.' }}" />
+    <meta name="twitter:title" content="{{ product.title }} | MAPSCART" />
+    <meta name="twitter:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery from MAPSCART.' }}" />
     <meta name="twitter:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
 
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
@@ -2859,8 +2859,8 @@
                 </div>
             </div>
 
-            <!-- Branded Digital Certificate Seal: MAPSKART Anti-Tarnish Purity & Skin-Safe Guarantee -->
-            <div class="certificate-seal-card" aria-label="MAPSKART Anti-Tarnish Purity and Skin-Safe Guarantee Certificate">
+            <!-- Branded Digital Certificate Seal: MAPSCART Anti-Tarnish Purity & Skin-Safe Guarantee -->
+            <div class="certificate-seal-card" aria-label="MAPSCART Anti-Tarnish Purity and Skin-Safe Guarantee Certificate">
                 <div class="cert-top">
                     <div class="cert-medallion" aria-hidden="true">
                         <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2891,7 +2891,7 @@
                         <span class="cert-eyebrow">
                             <i class="fas fa-award"></i> Official Digital Certificate &middot; MK-{{ product.sku|default:product.pk }}
                         </span>
-                        <h3 class="cert-title">MAPSKART Anti-Tarnish Purity &amp; Skin-Safe Guarantee</h3>
+                        <h3 class="cert-title">MAPSCART Anti-Tarnish Purity &amp; Skin-Safe Guarantee</h3>
                         <p class="cert-subtitle">Atelier-verified finish crafted for lasting brilliance, daily comfort, and zero skin irritation.</p>
                     </div>
                 </div>
@@ -2911,7 +2911,7 @@
                     <div class="cert-velvet-icon"><i class="fas fa-box-open"></i></div>
                     <div class="cert-velvet-text">
                         <strong>Signature Velvet Box Packaging Included</strong>
-                        Every piece is hand-inspected and sealed inside our Signature MAPSKART Velvet Box Packaging — gift-ready and ideal for dust-free heirloom care.
+                        Every piece is hand-inspected and sealed inside our Signature MAPSCART Velvet Box Packaging — gift-ready and ideal for dust-free heirloom care.
                     </div>
                 </div>
 
@@ -3084,13 +3084,13 @@
                 </div>
             </div>
 
-            <!-- MAPSKART Assurance Perks -->
+            <!-- MAPSCART Assurance Perks -->
             <div class="overview-perks-box">
                 <div class="perk-item">
                     <div class="perk-icon"><i class="fas fa-check-circle"></i></div>
                     <div class="perk-text">
                         <strong>Verified Atelier Reviews</strong>
-                        <span>Authentic purchases certified by MAPSKART.</span>
+                        <span>Authentic purchases certified by MAPSCART.</span>
                     </div>
                 </div>
                 <div class="perk-item">
@@ -3216,7 +3216,7 @@
                         <button type="button" class="helpful-vote-btn" onclick="voteHelpful({{ rev.pk }}, this)" title="Vote this review as helpful">
                             <i class="fas fa-thumbs-up"></i> Helpful (<span class="vote-cnt">{{ rev.helpful_count }}</span>)
                         </button>
-                        <span style="font-size:11.5px; color:#94a3b8;"><i class="fas fa-shield-alt"></i> MAPSKART Quality Verified</span>
+                        <span style="font-size:11.5px; color:#94a3b8;"><i class="fas fa-shield-alt"></i> MAPSCART Quality Verified</span>
                     </div>
                 </div>
                 {% endfor %}
@@ -3324,7 +3324,7 @@
                 <a href="{% url 'store:faq' %}" class="pdp-faq-more-link">
                     <i class="fas fa-circle-info"></i> View Full Help Center &amp; FAQs &rarr;
                 </a>
-                <a href="https://wa.me/919953595557?text=Hi%20MAPSKART,%20I%20have%20a%20question%20about%20{{ product.title|urlencode }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; color:#15803d; font-size:13px; font-weight:700; text-decoration:none;">
+                <a href="https://wa.me/919953595557?text=Hi%20MAPSCART,%20I%20have%20a%20question%20about%20{{ product.title|urlencode }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; color:#15803d; font-size:13px; font-weight:700; text-decoration:none;">
                     <i class="fab fa-whatsapp" style="font-size:15px;"></i> Ask styling concierge on WhatsApp
                 </a>
             </div>
@@ -3442,7 +3442,7 @@
                 <div id="ugcModalOutfit" style="margin-bottom:12px;"></div>
                 <p id="ugcModalReview" style="font-size:13.5px; color:#334155; line-height:1.6; margin:0 0 16px; flex:1;"></p>
                 <div style="border-top:1px solid #f1f5f9; padding-top:12px; font-size:11.5px; color:#94a3b8;">
-                    <i class="fas fa-gem"></i> Authentic MAPSKART Customer Look
+                    <i class="fas fa-gem"></i> Authentic MAPSCART Customer Look
                 </div>
             </div>
         </div>
@@ -3673,11 +3673,11 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static 'logo_footer.png' %}" alt="MAPSKART" />
+                        <img src="{% static 'logo_footer.png' %}" alt="MAPSCART" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
-                        <a href="https://www.instagram.com/mapskart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/mapscart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                         <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
@@ -3706,7 +3706,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p style="margin:0">&copy; 2026 MAPSKART. All rights reserved.</p>
+                <p style="margin:0">&copy; 2026 MAPSCART. All rights reserved.</p>
                 {% include 'store/includes/footer_payment_strip.html' %}
                 <div class="legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="{% url 'store:faq' %}">FAQ</a></div>
             </div>

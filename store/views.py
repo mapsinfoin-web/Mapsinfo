@@ -1038,7 +1038,7 @@ def order_payment(request, order_id):
             return redirect('store:order_payment', order_id=order.pk)
 
     upi_id = shop.get_upi_id() if shop else 'maps536969@sbi'
-    payee_name = (shop.payee_name if shop and shop.payee_name else 'MAPSKART').strip()
+    payee_name = (shop.payee_name if shop and shop.payee_name else 'MAPSCART').strip()
     amount_str = f"{float(order.amount_paid):.2f}"
     upi_intent_url = f"upi://pay?pa={upi_id}&pn={quote(payee_name)}&am={amount_str}&cu=INR&tn={quote(f'Order_{order.pk}')}"
 
