@@ -1008,10 +1008,12 @@ def _whatsapp_link(request, order, settings_obj=None):
     for item in order.items.select_related('product'):
         color_val = getattr(item, 'color', '') or cart_colors.get(str(item.product_id), '')
         color_tag = f" [Colour: {color_val}]" if color_val else ""
+        sku_val = getattr(item, 'sku', '')
+        sku_tag = f" (SKU: {sku_val})" if sku_val else ""
         if item.is_free_gift:
-            lines.append(f"- {item.quantity} x {item.product.title}{color_tag} (FREE GIFT)")
+            lines.append(f"- {item.quantity} x {item.product.title}{color_tag}{sku_tag} (FREE GIFT)")
         else:
-            lines.append(f"- {item.quantity} x {item.product.title}{color_tag} - Rs.{item.price * item.quantity}")
+            lines.append(f"- {item.quantity} x {item.product.title}{color_tag}{sku_tag} - Rs.{item.price * item.quantity}")
     lines += ["", f"*Amount paid (Paytm): Rs.{order.amount_paid}*"]
     if order.payment_screenshot:
         lines.append(f"Payment screenshot: {request.build_absolute_uri(order.payment_screenshot.url)}")

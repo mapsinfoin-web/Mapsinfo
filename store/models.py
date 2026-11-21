@@ -174,6 +174,29 @@ class Product(models.Model):
             return []
 
     @property
+    def has_variants(self):
+        """Returns True if this product has at least one colour variant."""
+        if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:
+            return len(self.colors.all()) > 0
+        return self.colors.exists()
+
+    @property
+    def min_variant_price(self):
+        """Returns lowest effective selling price across all available variants (or default product price)."""
+        avail = self.available_colors
+        if avail:
+            return min(c.effective_price for c in avail)
+        return self.price
+
+    @property
+    def max_variant_price(self):
+        """Returns highest effective selling price across all available variants (or default product price)."""
+        avail = self.available_colors
+        if avail:
+            return max(c.effective_price for c in avail)
+        return self.price
+
+    @property
     def packaging_text(self):
         """Returns custom packaging text: velvet jewellery box for earrings, velvet jewellery pouch for necklaces & others."""
         cat_slug = (self.category.slug.lower() if self.category and self.category.slug else '')
@@ -875,6 +898,16 @@ class ProductColor(models.Model):
         if m and m > p:
             return round(((m - p) / m) * 100)
         return 0
+
+    @property
+    def selling_price(self):
+        """Alias for effective_price (selling price for this colour variant)."""
+        return self.effective_price
+
+    @property
+    def original_price(self):
+        """Alias for effective_mrp (MRP for this colour variant)."""
+        return self.effective_mrp
 
     @property
     def all_images(self):

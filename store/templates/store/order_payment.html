@@ -199,7 +199,7 @@
                     <ul class="order-lines">
                         {% for item in items %}
                         <li>
-                            <span>{{ item.quantity }} &times; {{ item.product.title }}{% if item.is_free_gift %} <span class="free">FREE GIFT</span>{% endif %}</span>
+                            <span>{{ item.quantity }} &times; {{ item.product.title }}{% if item.color %} <span style="font-weight:600; color:var(--navy);">[{{ item.color }}]</span>{% endif %}{% if item.sku %} <span style="font-size:11px; color:var(--muted); font-family:monospace;">(SKU: {{ item.sku }})</span>{% endif %}{% if item.is_free_gift %} <span class="free">FREE GIFT</span>{% endif %}</span>
                             <span>{% if item.is_free_gift %}<span class="free">₹0</span>{% else %}₹{{ item.price }}{% endif %}</span>
                         </li>
                         {% endfor %}

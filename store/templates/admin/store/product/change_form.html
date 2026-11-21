@@ -296,6 +296,11 @@
     border-color: #2563EB;
     background: #F0F7FF;
 }
+.v-dropzone.drag-active {
+    border-color: #2563EB !important;
+    background: #EFF6FF !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
 .v-dropzone i {
     font-size: 26px;
     color: #64748B;
@@ -332,7 +337,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s, opacity 0.15s;
+    user-select: none;
+}
+.v-thumb-card[draggable="true"] {
+    cursor: grab;
+}
+.v-thumb-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+.v-thumb-card.dragging {
+    opacity: 0.35;
+    transform: scale(0.95);
+    border-color: #93C5FD;
+}
+.v-thumb-card.drag-over {
+    border-color: #2563EB !important;
+    outline: 2px dashed #2563EB;
+    outline-offset: 2px;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.v-thumb-drag-handle {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(15, 23, 42, 0.65);
+    color: #FFFFFF;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: grab;
+    z-index: 2;
+    backdrop-filter: blur(2px);
+    transition: background 0.15s;
+}
+.v-thumb-drag-handle:hover {
+    background: rgba(15, 23, 42, 0.9);
+}
+.v-thumb-primary-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #2563EB;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .v-thumb-card.is-primary {
     border-color: #2563EB;
@@ -503,6 +561,7 @@
         var stockVal = parseInt(v.stock !== undefined ? v.stock : 10, 10);
         var priceVal = v.price || '';
         var mrpVal = v.mrp || '';
+        var specialPriceVal = v.special_offer_price || '';
         var skuVal = v.sku || autoGenSku(v.name, index);
         var isAvail = v.is_available !== false && stockVal > 0;
 
@@ -552,14 +611,18 @@
                     '</div>' +
                 '</div>' +
 
-                '<div class="v-grid-row">' +
+                '<div class="v-grid-row" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));">' +
                     '<div class="v-field">' +
                         '<label>Selling Price (₹): <small>Customer price</small></label>' +
                         '<input type="number" step="0.01" id="vPrice_' + index + '" value="' + priceVal + '" placeholder="e.g. 999.00" oninput="onPriceChange(' + index + ')" />' +
                     '</div>' +
                     '<div class="v-field">' +
-                        '<label>MRP / Original Price (₹): <small>Crossed out</small></label>' +
+                        '<label>MRP / Original (₹): <small>Crossed out</small></label>' +
                         '<input type="number" step="0.01" id="vMrp_' + index + '" value="' + mrpVal + '" placeholder="e.g. 1499.00" oninput="onPriceChange(' + index + ')" />' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Special Offer (₹): <small>Optional sale price</small></label>' +
+                        '<input type="number" step="0.01" id="vSpecialPrice_' + index + '" value="' + specialPriceVal + '" placeholder="e.g. 899.00" oninput="onSpecialPriceChange(' + index + ')" />' +
                     '</div>' +
                     '<div class="v-field">' +
                         '<label>Discount %: <small>Auto-calculated</small></label>' +
@@ -581,12 +644,17 @@
                 '<div class="variant-gallery-section">' +
                     '<div class="variant-gallery-head">' +
                         '<h4><i class="fas fa-images"></i> Variant Photo Gallery</h4>' +
-                        '<span>Upload multiple pictures. Click ★ on any picture to select it as the primary cover photo.</span>' +
+                        '<span>Upload multiple pictures. First image is primary cover photo. Drag and drop pictures to reorder!</span>' +
                     '</div>' +
-                    '<div class="v-dropzone" onclick="document.getElementById(\'vFileInput_' + index + '\').click()">' +
+                    '<div class="v-dropzone" id="vDropzone_' + index + '" ' +
+                        'onclick="document.getElementById(\'vFileInput_' + index + '\').click()" ' +
+                        'ondragover="handleDropzoneDragOver(event, ' + index + ')" ' +
+                        'ondragenter="handleDropzoneDragEnter(event, ' + index + ')" ' +
+                        'ondragleave="handleDropzoneDragLeave(event, ' + index + ')" ' +
+                        'ondrop="handleDropzoneDrop(event, ' + index + ')">' +
                         '<i class="fas fa-cloud-arrow-up"></i>' +
                         '<p>Click or drag photos here to add to ' + nameVal + ' gallery</p>' +
-                        '<small>Supported: JPG, PNG, WEBP. You can select multiple images at once.</small>' +
+                        '<small>Supported: JPG, PNG, WEBP. You can drag and drop multiple images directly here.</small>' +
                         '<input type="file" id="vFileInput_' + index + '" name="variant_images_' + index + '" multiple accept="image/*" onchange="handleFileSelect(' + index + ', this)" />' +
                     '</div>' +
                     '<div class="v-previews-grid" id="vPreviewsGrid_' + index + '"></div>' +
@@ -597,6 +665,83 @@
         renderCardPreviews(index);
         updateDiscount(index);
     }
+
+    var draggedSource = null;
+
+    window.handleThumbDragStart = function(e, variantIndex, itemIndex, type) {
+        draggedSource = { variantIndex: variantIndex, itemIndex: itemIndex, type: type };
+        e.dataTransfer.effectAllowed = 'move';
+        try {
+            e.dataTransfer.setData('text/plain', JSON.stringify(draggedSource));
+        } catch(ex) {}
+        e.currentTarget.classList.add('dragging');
+    };
+
+    window.handleThumbDragOver = function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    window.handleThumbDragEnter = function(e, cardEl) {
+        e.preventDefault();
+        if (cardEl && !cardEl.classList.contains('dragging')) {
+            cardEl.classList.add('drag-over');
+        }
+    };
+
+    window.handleThumbDragLeave = function(e, cardEl) {
+        if (cardEl) cardEl.classList.remove('drag-over');
+    };
+
+    window.handleThumbDragEnd = function(e) {
+        document.querySelectorAll('.v-thumb-card').forEach(function(el) {
+            el.classList.remove('dragging');
+            el.classList.remove('drag-over');
+        });
+        draggedSource = null;
+    };
+
+    window.handleThumbDrop = function(e, targetVariantIdx, targetItemIdx, targetType) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.querySelectorAll('.v-thumb-card').forEach(function(el) {
+            el.classList.remove('dragging');
+            el.classList.remove('drag-over');
+        });
+
+        if (!draggedSource || draggedSource.variantIndex !== targetVariantIdx) return;
+        var v = variantsList[targetVariantIdx];
+        if (!v) return;
+
+        var srcType = draggedSource.type;
+        var srcIdx = draggedSource.itemIndex;
+
+        if (srcType === targetType) {
+            if (srcType === 'existing') {
+                var activeGallery = v.gallery;
+                var moved = activeGallery.splice(srcIdx, 1)[0];
+                activeGallery.splice(targetItemIdx, 0, moved);
+                // First image becomes primary automatically
+                if (targetItemIdx === 0) {
+                    activeGallery.forEach(function(g) { g.is_primary = false; });
+                    moved.is_primary = true;
+                    if (v.pendingFiles) v.pendingFiles.forEach(function(f) { f.is_primary = false; });
+                }
+                renderCardPreviews(targetVariantIdx);
+            } else if (srcType === 'pending') {
+                var activePending = v.pendingFiles;
+                var moved = activePending.splice(srcIdx, 1)[0];
+                activePending.splice(targetItemIdx, 0, moved);
+                if (targetItemIdx === 0 && (!v.gallery || !v.gallery.some(function(g){ return g.is_primary && !g.is_deleted; }))) {
+                    activePending.forEach(function(f) { f.is_primary = false; });
+                    moved.is_primary = true;
+                }
+                syncFileInput(targetVariantIdx);
+                renderCardPreviews(targetVariantIdx);
+            }
+        }
+        draggedSource = null;
+    };
 
     function renderCardPreviews(index) {
         var v = variantsList[index];
@@ -610,7 +755,22 @@
                 if (item.is_deleted) return;
                 var thumb = document.createElement('div');
                 thumb.className = 'v-thumb-card' + (item.is_primary ? ' is-primary' : '');
+                thumb.draggable = true;
+                thumb.dataset.variantIndex = index;
+                thumb.dataset.itemIndex = gIdx;
+                thumb.dataset.galleryType = 'existing';
+
+                thumb.ondragstart = function(e) { handleThumbDragStart(e, index, gIdx, 'existing'); };
+                thumb.ondragover = function(e) { handleThumbDragOver(e); };
+                thumb.ondragenter = function(e) { handleThumbDragEnter(e, thumb); };
+                thumb.ondragleave = function(e) { handleThumbDragLeave(e, thumb); };
+                thumb.ondrop = function(e) { handleThumbDrop(e, index, gIdx, 'existing'); };
+                thumb.ondragend = function(e) { handleThumbDragEnd(e); };
+
+                var primaryBadge = item.is_primary ? '<span class="v-thumb-primary-badge">★ Primary</span>' : '';
                 thumb.innerHTML = 
+                    '<div class="v-thumb-drag-handle" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></div>' +
+                    primaryBadge +
                     '<img src="' + item.url + '" alt="Photo" />' +
                     '<div class="v-thumb-actions">' +
                         '<button type="button" class="btn-make-primary" onclick="setPrimaryExisting(' + index + ', ' + gIdx + ')">' +
@@ -627,7 +787,22 @@
             v.pendingFiles.forEach(function(fileItem, fIdx) {
                 var thumb = document.createElement('div');
                 thumb.className = 'v-thumb-card' + (fileItem.is_primary ? ' is-primary' : '');
+                thumb.draggable = true;
+                thumb.dataset.variantIndex = index;
+                thumb.dataset.itemIndex = fIdx;
+                thumb.dataset.galleryType = 'pending';
+
+                thumb.ondragstart = function(e) { handleThumbDragStart(e, index, fIdx, 'pending'); };
+                thumb.ondragover = function(e) { handleThumbDragOver(e); };
+                thumb.ondragenter = function(e) { handleThumbDragEnter(e, thumb); };
+                thumb.ondragleave = function(e) { handleThumbDragLeave(e, thumb); };
+                thumb.ondrop = function(e) { handleThumbDrop(e, index, fIdx, 'pending'); };
+                thumb.ondragend = function(e) { handleThumbDragEnd(e); };
+
+                var primaryBadge = fileItem.is_primary ? '<span class="v-thumb-primary-badge">★ Primary</span>' : '';
                 thumb.innerHTML = 
+                    '<div class="v-thumb-drag-handle" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></div>' +
+                    primaryBadge +
                     '<img src="' + fileItem.previewUrl + '" alt="New File" />' +
                     '<div class="v-thumb-actions">' +
                         '<button type="button" class="btn-make-primary" onclick="setPrimaryNewFile(' + index + ', ' + fIdx + ')">' +
@@ -711,6 +886,11 @@
         updateSummaryStats();
     };
 
+    window.onSpecialPriceChange = function(index) {
+        var specialPrice = document.getElementById('vSpecialPrice_' + index).value;
+        variantsList[index].special_offer_price = specialPrice;
+    };
+
     window.onStockChange = function(index) {
         var stock = parseInt(document.getElementById('vStock_' + index).value || '0', 10);
         variantsList[index].stock = stock;
@@ -771,31 +951,76 @@
         input.files = dt.files;
     }
 
-    window.handleFileSelect = function(index, input) {
-        var files = input.files;
+    window.handleDropzoneDragOver = function(e, index) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    window.handleDropzoneDragEnter = function(e, index) {
+        e.preventDefault();
+        var dz = document.getElementById('vDropzone_' + index);
+        if (dz) dz.classList.add('drag-active');
+    };
+
+    window.handleDropzoneDragLeave = function(e, index) {
+        var dz = document.getElementById('vDropzone_' + index);
+        if (dz && (!e.relatedTarget || !dz.contains(e.relatedTarget))) {
+            dz.classList.remove('drag-active');
+        }
+    };
+
+    window.handleDropzoneDrop = function(e, index) {
+        e.preventDefault();
+        var dz = document.getElementById('vDropzone_' + index);
+        if (dz) dz.classList.remove('drag-active');
+
+        var files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            addFilesToVariant(index, files);
+        }
+    };
+
+    function addFilesToVariant(index, files) {
         if (!files || !files.length) return;
         var v = variantsList[index];
+        if (!v) return;
         if (!v.pendingFiles) v.pendingFiles = [];
 
         var hasAnyPrimary = (v.gallery && v.gallery.some(function(g) { return g.is_primary && !g.is_deleted; })) ||
                             v.pendingFiles.some(function(f) { return f.is_primary; });
 
+        var validFiles = [];
         for (var i = 0; i < files.length; i++) {
-            (function(file, fileIdx) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var isPrimary = (!hasAnyPrimary && fileIdx === 0 && v.pendingFiles.length === 0);
-                    v.pendingFiles.push({
-                        file: file,
-                        previewUrl: e.target.result,
-                        is_primary: isPrimary
-                    });
-                    if (isPrimary) hasAnyPrimary = true;
+            if (files[i].type.startsWith('image/')) {
+                validFiles.push(files[i]);
+            }
+        }
+        if (!validFiles.length) return;
+
+        var loaded = 0;
+        validFiles.forEach(function(file, fIdx) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var isPrimary = (!hasAnyPrimary && fIdx === 0 && v.pendingFiles.length === 0);
+                v.pendingFiles.push({
+                    file: file,
+                    previewUrl: e.target.result,
+                    is_primary: isPrimary
+                });
+                if (isPrimary) hasAnyPrimary = true;
+                loaded++;
+                if (loaded === validFiles.length) {
                     syncFileInput(index);
                     renderCardPreviews(index);
-                };
-                reader.readAsDataURL(file);
-            })(files[i], i);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    window.handleFileSelect = function(index, input) {
+        if (input && input.files) {
+            addFilesToVariant(index, input.files);
         }
     };
 
@@ -860,6 +1085,7 @@
             sku: '',
             price: document.getElementById('id_price') ? document.getElementById('id_price').value : '',
             mrp: document.getElementById('id_mrp') ? document.getElementById('id_mrp').value : '',
+            special_offer_price: '',
             stock: 10,
             is_available: true,
             gallery: [],
@@ -920,6 +1146,7 @@
                 var hex = document.getElementById('vHexText_' + idx) ? document.getElementById('vHexText_' + idx).value.trim() : (v.hex_code || '#D4AF37');
                 var price = document.getElementById('vPrice_' + idx) ? document.getElementById('vPrice_' + idx).value.trim() : (v.price || '');
                 var mrp = document.getElementById('vMrp_' + idx) ? document.getElementById('vMrp_' + idx).value.trim() : (v.mrp || '');
+                var specialPrice = document.getElementById('vSpecialPrice_' + idx) ? document.getElementById('vSpecialPrice_' + idx).value.trim() : (v.special_offer_price || '');
                 var stock = document.getElementById('vStock_' + idx) ? parseInt(document.getElementById('vStock_' + idx).value || '0', 10) : (v.stock || 0);
                 var isAvail = document.getElementById('vAvail_' + idx) ? document.getElementById('vAvail_' + idx).checked : (v.is_available !== false);
 
@@ -937,6 +1164,8 @@
                     });
                 }
 
+                var galleryOrder = (v.gallery || []).filter(function(g) { return !g.is_deleted && g.id; }).map(function(g) { return g.id; });
+
                 payload.push({
                     id: v.id || null,
                     name: name,
@@ -944,10 +1173,12 @@
                     hex_code: hex,
                     price: price,
                     mrp: mrp,
+                    special_offer_price: specialPrice,
                     stock: stock,
                     is_available: isAvail,
                     order: idx + 1,
                     primary_image_choice: primaryChoice,
+                    gallery_order: galleryOrder,
                     deleted_gallery_ids: v.deleted_gallery_ids || [],
                     delete: isDel
                 });

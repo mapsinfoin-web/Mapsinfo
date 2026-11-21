@@ -529,6 +529,7 @@ class ProductAdmin(admin.ModelAdmin):
                         'sku': c.sku or '',
                         'price': str(c.price) if c.price is not None else '',
                         'mrp': str(c.mrp) if c.mrp is not None else '',
+                        'special_offer_price': str(c.special_offer_price) if c.special_offer_price is not None else '',
                         'stock': c.stock,
                         'is_available': c.is_available,
                         'gallery': gallery_items,
@@ -601,6 +602,15 @@ class ProductAdmin(admin.ModelAdmin):
             else:
                 mrp = None
 
+            special_price_val = v_data.get('special_offer_price')
+            if special_price_val not in (None, '', 'None'):
+                try:
+                    special_offer_price = Decimal(str(special_price_val))
+                except Exception:
+                    special_offer_price = None
+            else:
+                special_offer_price = None
+
             try:
                 stock = int(v_data.get('stock', 0))
             except Exception:
@@ -618,6 +628,7 @@ class ProductAdmin(admin.ModelAdmin):
                 color_obj.hex_code = hex_code
                 color_obj.price = price
                 color_obj.mrp = mrp
+                color_obj.special_offer_price = special_offer_price
                 color_obj.stock = stock
                 color_obj.is_available = is_available
                 color_obj.order = order
@@ -630,6 +641,7 @@ class ProductAdmin(admin.ModelAdmin):
                     hex_code=hex_code,
                     price=price,
                     mrp=mrp,
+                    special_offer_price=special_offer_price,
                     stock=stock,
                     is_available=is_available,
                     order=order,
@@ -639,6 +651,15 @@ class ProductAdmin(admin.ModelAdmin):
             deleted_ids = v_data.get('deleted_gallery_ids', [])
             if deleted_ids:
                 ProductGallery.objects.filter(pk__in=deleted_ids, color=color_obj).delete()
+
+            # 1b. Update ordering of existing gallery images if drag-and-dropped
+            gallery_order = v_data.get('gallery_order', [])
+            if gallery_order and isinstance(gallery_order, list):
+                for pos, g_id in enumerate(gallery_order):
+                    try:
+                        ProductGallery.objects.filter(pk=int(g_id), color=color_obj).update(order=pos)
+                    except Exception:
+                        pass
 
             # 2. Save newly uploaded gallery images
             new_files = request.FILES.getlist(f'variant_images_{idx}')
@@ -813,8 +834,9 @@ class BogoOfferAdmin(admin.ModelAdmin):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
-    # Shows the exact items bought. Read-only so receipts cannot be accidentally altered.
-    readonly_fields = ['product', 'price', 'quantity', 'is_free_gift', 'bogo_offer']
+    # Shows the exact items bought including colour variant & SKU. Read-only so receipts cannot be accidentally altered.
+    fields = ['product', 'color', 'sku', 'price', 'quantity', 'is_free_gift', 'bogo_offer']
+    readonly_fields = ['product', 'color', 'sku', 'price', 'quantity', 'is_free_gift', 'bogo_offer']
     can_delete = False
 
     def has_add_permission(self, request, obj=None):

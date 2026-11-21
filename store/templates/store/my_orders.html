@@ -182,11 +182,12 @@
             <ul class="lines">
                 {% for item in order.items.all %}
                 <li>
-                    {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="thumb" loading="lazy" />
+                    {% if item.variant and item.variant.image %}<img src="{{ item.variant.image.url }}" alt="{{ item.product.title }}{% if item.color %} - {{ item.color }}{% endif %}" class="thumb" loading="lazy" />
+                    {% elif item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="thumb" loading="lazy" />
                     {% else %}<div class="thumb"></div>{% endif %}
                     <div class="l-title">
                         {{ item.product.title }}
-                        <small>Qty {{ item.quantity }}{% if item.is_free_gift %} &middot; <span class="free">FREE GIFT</span>{% endif %}
+                        <small>Qty {{ item.quantity }}{% if item.color %} &middot; <b>Colour:</b> {{ item.color }}{% endif %}{% if item.sku %} &middot; <span style="font-family: monospace; font-size: 11px;">SKU: {{ item.sku }}</span>{% endif %}{% if item.is_free_gift %} &middot; <span class="free">FREE GIFT</span>{% endif %}
                             {% if item.product.is_active %} &middot; <a href="{% url 'store:product_detail' item.product.pk %}" class="again">Buy again</a>{% endif %}</small>
                     </div>
                     <div class="l-price">{% if item.is_free_gift %}<span class="free">₹0</span>{% else %}₹{{ item.price }}{% endif %}</div>
