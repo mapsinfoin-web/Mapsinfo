@@ -1137,45 +1137,19 @@
 
         /* ===== 6. SHOP BY BUDGET ===== */
         .budget-section {
-            padding: 44px 0 20px;
+            padding: 36px 0 16px;
         }
         .budget-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-        @media (max-width: 991px) {
-            .budget-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 580px) {
-            .budget-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            .budget-card {
-                padding: 16px 12px;
-                border-radius: 16px;
-            }
-            .budget-price {
-                font-size: 20px;
-                margin-bottom: 4px;
-            }
-            .budget-desc {
-                font-size: 11.5px;
-                margin-bottom: 12px;
-            }
-            .budget-cta {
-                font-size: 11.5px;
-            }
+            gap: 16px;
         }
         .budget-card {
             position: relative;
             background: #FFFFFF;
             border: 1.5px solid #E2E8F0;
-            border-radius: 20px;
-            padding: 24px 20px;
+            border-radius: 18px;
+            padding: 20px 16px;
             text-decoration: none;
             color: inherit;
             display: flex;
@@ -1206,15 +1180,15 @@
         }
         .budget-badge {
             align-self: flex-start;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
-            padding: 3px 9px;
+            padding: 3px 8px;
             border-radius: 999px;
             background: #FEF3C7;
             color: #B45309;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
         .budget-badge.luxury {
             background: #EDE9FE;
@@ -1234,32 +1208,98 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
         .budget-price {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
             color: #0F172A;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .budget-desc {
-            font-size: 13px;
+            font-size: 12.5px;
             color: #64748B;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            line-height: 1.45;
+            margin-bottom: 14px;
             flex-grow: 1;
         }
         .budget-cta {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
+            gap: 6px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #D4AF37;
             transition: gap 0.2s;
         }
         .budget-card:hover .budget-cta {
-            gap: 12px;
+            gap: 10px;
             color: #B8860B;
+        }
+
+        @media (max-width: 991px) {
+            .budget-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+        @media (max-width: 768px) {
+            .budget-section {
+                padding: 20px 0 10px !important;
+            }
+            .budget-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+            }
+            .budget-card {
+                padding: 10px 10px !important;
+                border-radius: 13px !important;
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+            }
+            .budget-badge {
+                font-size: 8px !important;
+                font-weight: 700 !important;
+                padding: 2px 6px !important;
+                margin-bottom: 5px !important;
+                letter-spacing: 0.4px !important;
+            }
+            .budget-price {
+                font-size: 15px !important;
+                font-weight: 700 !important;
+                margin-bottom: 4px !important;
+                white-space: nowrap !important;
+                line-height: 1.2 !important;
+            }
+            .budget-desc {
+                display: none !important;
+            }
+            .budget-cta {
+                font-size: 11px !important;
+                gap: 4px !important;
+                white-space: nowrap !important;
+            }
+            .budget-cta i {
+                font-size: 9.5px !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .budget-grid {
+                gap: 7px !important;
+            }
+            .budget-card {
+                padding: 8px 8px !important;
+                border-radius: 11px !important;
+            }
+            .budget-badge {
+                font-size: 7.5px !important;
+                padding: 1.5px 5px !important;
+                margin-bottom: 4px !important;
+            }
+            .budget-price {
+                font-size: 14px !important;
+                margin-bottom: 3px !important;
+            }
+            .budget-cta {
+                font-size: 10.5px !important;
+            }
         }
 
         /* ===== 8. THE MAPSKART VELVET UNBOXING EXPERIENCE ===== */
@@ -2010,9 +2050,9 @@
                     <!-- Luxury Above 1499 -->
                     <a href="{% url 'store:collections' %}?price=above-2000" class="budget-card">
                         <span class="budget-badge luxury">Heirloom Atelier</span>
-                        <div class="budget-price">Luxury Above ₹1,499</div>
+                        <div class="budget-price">Above ₹1,499</div>
                         <p class="budget-desc">Grand bridal heritage sets, layered polki necklaces &amp; heirloom pieces made to be treasured.</p>
-                        <span class="budget-cta">Explore Luxury Edit <i class="fas fa-arrow-right"></i></span>
+                        <span class="budget-cta">Explore Luxury <i class="fas fa-arrow-right"></i></span>
                     </a>
                 </div>
             </div>
