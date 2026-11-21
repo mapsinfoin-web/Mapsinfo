@@ -243,18 +243,40 @@ header#header.scrolled {
     transform: translateX(4px);
     font-weight: 600;
 }
+.megamenu-list li.megamenu-all {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(209, 222, 232, 0.6);
+}
 .megamenu-list li.megamenu-all a {
-    margin-top: 6px;
-    font-size: 12.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--navy, #1F3A66);
-    border-bottom: 1.5px solid var(--accent, #B3E0FF);
-    display: inline-block;
-    padding-bottom: 1px;
+    background: #F0F6FC;
+    border: 1px solid rgba(179, 224, 255, 0.7);
+    text-decoration: none;
+    transition: all .2s ease;
+    width: fit-content;
 }
 .megamenu-list li.megamenu-all a:hover {
+    background: var(--navy, #1F3A66);
+    color: #ffffff !important;
     border-color: var(--navy, #1F3A66);
-    transform: none;
+    transform: translateX(3px);
+    box-shadow: 0 4px 12px rgba(31, 58, 102, 0.15);
+}
+.megamenu-list li.megamenu-all a i {
+    font-size: 10px;
+    transition: transform .2s ease;
+}
+.megamenu-list li.megamenu-all a:hover i {
+    transform: translateX(2px);
+    color: #ffffff !important;
 }
 
 /* Megamenu Featured Card */
@@ -1196,6 +1218,29 @@ header#header.scrolled {
         background: #EDF3F9;
         color: var(--navy, #1F3A66);
         transform: none;
+    }
+    .megamenu-list li.megamenu-all {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed rgba(209, 222, 232, 0.6);
+    }
+    .megamenu-list li.megamenu-all a {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 7px 12px !important;
+        border-radius: 8px !important;
+        background: #F0F6FC !important;
+        border: 1px solid rgba(179, 224, 255, 0.7) !important;
+        color: var(--navy, #1F3A66) !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        box-sizing: border-box !important;
+    }
+    .megamenu-list li.megamenu-all a:hover {
+        background: var(--navy, #1F3A66) !important;
+        color: #ffffff !important;
+        border-color: var(--navy, #1F3A66) !important;
     }
     .megamenu-card {
         padding: 14px;
