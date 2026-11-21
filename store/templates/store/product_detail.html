@@ -17,8 +17,8 @@
     <meta property="og:title" content="{{ product.title }} | MAPSCART" />
     <meta property="og:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery with signature velvet packaging.' }}" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
-    <meta property="og:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
-    <meta property="og:image:secure_url" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
+    <meta property="og:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'mapscart-logo.png' %}{% endif %}" />
+    <meta property="og:image:secure_url" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'mapscart-logo.png' %}{% endif %}" />
     <meta property="og:image:alt" content="{{ product.title }}" />
     <meta property="og:locale" content="en_IN" />
     <meta property="product:price:amount" content="{{ product.price }}" />
@@ -30,7 +30,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{ product.title }} | MAPSCART" />
     <meta name="twitter:description" content="{{ product.description|striptags|truncatewords:25|default:'Exquisite handcrafted jewellery from MAPSCART.' }}" />
-    <meta name="twitter:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'logo_navbar.png' %}{% endif %}" />
+    <meta name="twitter:image" content="{% if product.image %}{{ product.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'mapscart-logo.png' %}{% endif %}" />
 
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
@@ -3673,7 +3673,7 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static 'logo_footer.png' %}" alt="MAPSCART" />
+                        <img src="{% static 'mapscart-logo.png' %}" alt="MAPSCART" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
