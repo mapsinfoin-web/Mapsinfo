@@ -883,15 +883,24 @@
             }
         }
         @media (max-width: 768px) {
+            .hero-slider-wrap {
+                min-height: 540px !important;
+            }
             .hero-slide {
-                background-position: 85% 8% !important;
+                background-position: 54% 8% !important;
                 align-items: flex-end !important;
             }
+            .hero-slide.slide-bridal {
+                background-position: 54% 6% !important;
+            }
+            .hero-slide.slide-daily {
+                background-position: 48% 6% !important;
+            }
             .hero-slide-video {
-                object-position: 85% 8% !important;
+                object-position: 65% 10% !important;
             }
             .hero-slide-overlay {
-                background: linear-gradient(180deg, rgba(11, 19, 43, 0.0) 0%, rgba(11, 19, 43, 0.25) 25%, rgba(11, 19, 43, 0.92) 62%, rgba(11, 19, 43, 0.98) 100%) !important;
+                background: linear-gradient(180deg, rgba(11, 19, 43, 0.0) 0%, rgba(11, 19, 43, 0.12) 32%, rgba(11, 19, 43, 0.75) 55%, rgba(11, 19, 43, 0.94) 75%, rgba(11, 19, 43, 0.98) 100%) !important;
             }
             .hero-slide .container {
                 align-items: flex-end !important;
@@ -1722,7 +1731,7 @@
         <section class="hero-carousel-section">
             <div class="hero-slider-wrap">
                 <!-- Slide 1: Royal Wedding & Bridal Edit -->
-                <div class="hero-slide active" style="background-image:url('{% static 'bridal.png' %}');">
+                <div class="hero-slide active slide-bridal" style="background-image:url('{% static 'bridal.png' %}');">
                     <div class="hero-slide-overlay"></div>
                     <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center; justify-content:flex-start;">
                         <div class="hero-slide-content">
@@ -1738,7 +1747,7 @@
                 </div>
 
                 <!-- Slide 2: Minimalist Daily Luxe & Anti-Tarnish -->
-                <div class="hero-slide" style="background-image:url('{% static 'model.png' %}');">
+                <div class="hero-slide slide-daily" style="background-image:url('{% static 'model.png' %}');">
                     <div class="hero-slide-overlay"></div>
                     <div class="container" style="position:relative; z-index:2; height:100%; display:flex; align-items:center; justify-content:flex-start;">
                         <div class="hero-slide-content">
@@ -1754,7 +1763,7 @@
                 </div>
 
                 <!-- Slide 3: High-Shine Crystal & Cocktail Glam (Video Showcase) -->
-                <div class="hero-slide has-video">
+                <div class="hero-slide has-video slide-glam">
                     <video class="hero-slide-video" autoplay muted loop playsinline preload="auto">
                         <source src="{% static 'giff.mp4' %}" type="video/mp4">
                     </video>
