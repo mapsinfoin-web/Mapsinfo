@@ -53,17 +53,23 @@ header#header.scrolled {
 .logo {
     display: inline-flex;
     align-items: center;
+    gap: 6px;
     flex-shrink: 0 !important;
+    text-decoration: none;
 }
-.logo img {
+.logo img,
+.logo-mark,
+.logo-text {
     display: block;
-    height: 52px;
+    height: 50px;
     width: auto;
     max-width: 220px;
     object-fit: contain;
     transition: transform .25s ease;
 }
-.logo:hover img {
+.logo:hover img,
+.logo:hover .logo-mark,
+.logo:hover .logo-text {
     transform: scale(1.03);
 }
 
@@ -936,11 +942,14 @@ header#header.scrolled {
     .drawer-brand {
         display: flex !important;
         align-items: center !important;
+        gap: 6px !important;
     }
-    .drawer-logo {
-        height: 38px !important;
+    .drawer-logo,
+    .drawer-logo-mark,
+    .drawer-logo-text {
+        height: 36px !important;
         width: auto !important;
-        max-width: 165px !important;
+        max-width: 140px !important;
         object-fit: contain !important;
     }
     .drawer-close-btn {
@@ -1417,8 +1426,10 @@ header#header.scrolled {
         gap: 8px !important;
         padding: 8px 12px !important;
     }
-    .logo img {
-        height: 46px !important;
+    .logo img,
+    .logo-mark,
+    .logo-text {
+        height: 44px !important;
         max-width: 195px !important;
     }
     .nav {
@@ -1468,12 +1479,15 @@ header#header.scrolled {
     .logo {
         order: 1 !important;
         flex: 0 0 auto !important;
-        max-width: 175px !important;
+        max-width: 180px !important;
         justify-content: flex-start !important;
         margin: 0 !important;
+        gap: 4px !important;
     }
-    .logo img {
-        height: 44px !important;
+    .logo img,
+    .logo-mark,
+    .logo-text {
+        height: 36px !important;
         width: auto !important;
         max-width: 100% !important;
     }
@@ -1574,8 +1588,10 @@ header#header.scrolled {
     }
 }
 @media (max-width: 380px) {
-    .logo img {
-        height: 38px !important;
+    .logo img,
+    .logo-mark,
+    .logo-text {
+        height: 30px !important;
     }
     .icon-btn {
         width: 33px !important;

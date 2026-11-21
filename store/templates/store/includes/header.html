@@ -6,14 +6,16 @@
     <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
     <div class="container header-main">
         <a href="{% url 'store:all_products' %}" class="logo" aria-label="MAPSCART home">
-            <img src="{% static 'new-logo.png' %}" alt="MAPSCART" />
+            <img src="{% static '1.png' %}" alt="MAPSCART Emblem" class="logo-mark" />
+            <img src="{% static 'new-logo.png' %}" alt="MAPSCART" class="logo-text" />
         </a>
 
         <nav class="nav" id="nav" aria-label="Main Navigation">
             <!-- Mobile Drawer Branded Top Bar -->
             <div class="drawer-header">
                 <div class="drawer-brand">
-                    <img src="{% static 'new-logo.png' %}" alt="MAPSCART" class="drawer-logo" />
+                    <img src="{% static '1.png' %}" alt="MAPSCART Emblem" class="drawer-logo-mark" />
+                    <img src="{% static 'new-logo.png' %}" alt="MAPSCART" class="drawer-logo-text" />
                 </div>
                 <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close navigation drawer" title="Close Menu">
                     <i class="fas fa-times"></i>

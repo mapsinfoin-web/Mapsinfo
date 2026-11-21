@@ -490,7 +490,8 @@
             position: relative;
         }
         .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
-        .brand-logo img { height: 46px; }
+        .brand-logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        .brand-logo img { display: block; height: 46px; width: auto; max-width: 100%; object-fit: contain; }
         .footer-brand p { color: #A8B8C8; font-size: 13.5px; line-height: 1.6; margin: 14px 0 20px; max-width: 320px; }
         .socials { display: flex; gap: 10px; }
         .socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; color: #fff; transition: background .2s; text-decoration: none; }
@@ -865,7 +866,8 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="{% static 'new-logo.png' %}" alt="MAPSCART" />
+                        <img src="{% static '1.png' %}" alt="MAPSCART Emblem" class="brand-logo-mark" />
+                        <img src="{% static 'new-logo.png' %}" alt="MAPSCART" class="brand-logo-text" />
                     </div>
                     <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
                     <div class="socials">
