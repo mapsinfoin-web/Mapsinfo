@@ -1,0 +1,962 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+/* ===== PRODUCT VARIANTS MANAGEMENT STYLES ===== */
+.variants-manager-wrap {
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 18px;
+    padding: 24px;
+    margin: 24px 0 30px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+.variants-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E2E8F0;
+}
+.variants-title-box h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.variants-title-box h3 i {
+    color: #2563EB;
+}
+.variants-title-box p {
+    margin: 0;
+    font-size: 13.5px;
+    color: #64748B;
+}
+.variants-stats-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.stat-pill {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.stat-pill.active {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+    color: #1D4ED8;
+}
+
+/* Variant Card */
+.variant-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.variant-card:hover {
+    border-color: #94A3B8;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+.variant-card.is-deleted {
+    display: none !important;
+}
+
+.variant-card-header {
+    background: #F1F5F9;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid #E2E8F0;
+}
+.variant-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.variant-swatch-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    display: inline-block;
+    flex-shrink: 0;
+}
+.variant-name-display {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+}
+.variant-badge-tag {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.variant-badge-in-stock { background: #DCFCE7; color: #166534; }
+.variant-badge-low-stock { background: #FEF3C7; color: #92400E; }
+.variant-badge-out-stock { background: #FEE2E2; color: #991B1B; }
+.variant-badge-sku { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
+.variant-badge-price { background: #F8FAFC; color: #334155; border: 1px solid #E2E8F0; }
+
+.variant-card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-delete-variant {
+    background: transparent;
+    border: 1px solid #FCA5A5;
+    color: #DC2626;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-delete-variant:hover {
+    background: #FEE2E2;
+}
+.toggle-icon {
+    font-size: 14px;
+    color: #64748B;
+    transition: transform 0.2s;
+}
+.variant-card.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+.variant-card.collapsed .variant-card-body {
+    display: none;
+}
+
+.variant-card-body {
+    padding: 22px;
+}
+
+/* Grid Layouts */
+.v-grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+.v-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.v-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.v-field label small {
+    font-weight: normal;
+    color: #64748B;
+}
+.v-field input[type="text"],
+.v-field input[type="number"] {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: #0F172A;
+    box-sizing: border-box;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.v-field input:focus {
+    border-color: #2563EB;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Color Palette Quick Chips */
+.quick-palette-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+.palette-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    color: #334155;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s;
+}
+.palette-chip:hover {
+    border-color: #94A3B8;
+    background: #EFF6FF;
+    color: #1D4ED8;
+}
+.palette-chip-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Color Picker Input Row */
+.color-picker-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.color-picker-input-row input[type="color"] {
+    width: 44px;
+    height: 38px;
+    padding: 2px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #FFF;
+}
+
+/* Gallery Section inside Variant */
+.variant-gallery-section {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+}
+.variant-gallery-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.variant-gallery-head h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1E293B;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.variant-gallery-head span {
+    font-size: 12px;
+    color: #64748B;
+}
+
+.v-dropzone {
+    border: 2px dashed #CBD5E1;
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 14px;
+}
+.v-dropzone:hover {
+    border-color: #2563EB;
+    background: #F0F7FF;
+}
+.v-dropzone i {
+    font-size: 26px;
+    color: #64748B;
+    margin-bottom: 6px;
+    display: block;
+}
+.v-dropzone p {
+    margin: 0 0 4px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #334155;
+}
+.v-dropzone small {
+    color: #94A3B8;
+    font-size: 11.5px;
+}
+.v-dropzone input[type="file"] {
+    display: none;
+}
+
+/* Previews Grid */
+.v-previews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+}
+.v-thumb-card {
+    position: relative;
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.v-thumb-card.is-primary {
+    border-color: #2563EB;
+    background: #F0F7FF;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+.v-thumb-card.is-deleted {
+    display: none !important;
+}
+.v-thumb-card img {
+    width: 100%;
+    height: 105px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #F1F5F9;
+}
+.v-thumb-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+}
+.btn-make-primary {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 6px;
+    cursor: pointer;
+    color: #475569;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transition: all 0.15s;
+}
+.btn-make-primary:hover {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border-color: #93C5FD;
+}
+.v-thumb-card.is-primary .btn-make-primary {
+    background: #2563EB;
+    color: #FFFFFF;
+    border-color: #2563EB;
+    font-weight: 700;
+}
+.btn-remove-thumb {
+    background: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #DC2626;
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+}
+.btn-remove-thumb:hover {
+    background: #DC2626;
+    color: #FFFFFF;
+}
+
+/* Add Variant Button */
+.btn-add-variant {
+    background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+}
+.btn-add-variant:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(29, 78, 216, 0.35);
+}
+
+/* Hide legacy inline forms if requested */
+.hide-legacy-inline {
+    display: none !important;
+}
+</style>
+{% endblock %}
+
+{% block after_field_sets %}
+{{ block.super }}
+
+<!-- ===== PRODUCT VARIANTS MANAGEMENT SECTION ===== -->
+<div class="variants-manager-wrap" id="productVariantsSection">
+    <div class="variants-header">
+        <div class="variants-title-box">
+            <h3><i class="fas fa-layer-group"></i> Product Variants — Colour, Images, Price &amp; Stock</h3>
+            <p>Add independent colour variants for this product. Each variant maintains its own independent images, prices, stock quantity, and SKU.</p>
+        </div>
+        <div class="variants-stats-bar">
+            <span class="stat-pill active" id="statVariantCount"><i class="fas fa-palette"></i> 0 Variants</span>
+            <span class="stat-pill" id="statTotalStock"><i class="fas fa-boxes-stacked"></i> Total Stock: 0</span>
+            <span class="stat-pill" id="statPriceRange"><i class="fas fa-tag"></i> Price: —</span>
+        </div>
+    </div>
+
+    <!-- Hidden serialized input for submission -->
+    <input type="hidden" name="product_variants_payload" id="product_variants_payload" value="" />
+
+    <!-- Container where cards are dynamically appended -->
+    <div id="variantCardsContainer"></div>
+
+    <button type="button" class="btn-add-variant" id="btnAddVariant" onclick="addNewVariantCard()">
+        <i class="fas fa-plus-circle"></i> Add Another Colour Variant
+    </button>
+</div>
+
+<script>
+(function() {
+    // Existing variants injected from backend context
+    var initialVariants = {{ existing_variants_json|default:"[]"|safe }};
+    var variantsList = [];
+    var productSkuInput = document.getElementById('id_sku');
+
+    var COLOR_PALETTES = [
+        { name: 'Gold', hex: '#D4AF37' },
+        { name: 'Rose Gold', hex: '#B76E79' },
+        { name: 'Silver', hex: '#94A3B8' },
+        { name: 'Black', hex: '#1E293B' },
+        { name: 'Blue', hex: '#2563EB' },
+        { name: 'Emerald Green', hex: '#047857' },
+        { name: 'Ruby Red', hex: '#DC2626' },
+        { name: 'Pink', hex: '#EC4899' },
+        { name: 'White / Clear', hex: '#F8FAFC' },
+        { name: 'Yellow', hex: '#EAB308' }
+    ];
+
+    function getBaseSku() {
+        var el = document.getElementById('id_sku');
+        return (el && el.value.trim()) ? el.value.trim() : 'PRD';
+    }
+
+    function autoGenSku(colorName, index) {
+        var base = getBaseSku();
+        var clean = (colorName || 'VAR').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        var code = clean.substring(0, 4) || ('V' + (index + 1));
+        return base + '-' + code;
+    }
+
+    function renderCard(v, index) {
+        var container = document.getElementById('variantCardsContainer');
+        var card = document.createElement('div');
+        card.className = 'variant-card';
+        card.id = 'variantCard_' + index;
+        card.dataset.index = index;
+
+        var nameVal = v.name || ('Variant ' + (index + 1));
+        var hexVal = v.hex_code || '#D4AF37';
+        var stockVal = parseInt(v.stock !== undefined ? v.stock : 10, 10);
+        var priceVal = v.price || '';
+        var mrpVal = v.mrp || '';
+        var skuVal = v.sku || autoGenSku(v.name, index);
+        var isAvail = v.is_available !== false && stockVal > 0;
+
+        var stockBadgeClass = (stockVal <= 0) ? 'variant-badge-out-stock' : ((stockVal <= 5) ? 'variant-badge-low-stock' : 'variant-badge-in-stock');
+        var stockBadgeText = (stockVal <= 0) ? 'Out of Stock' : ((stockVal <= 5) ? 'Low Stock (' + stockVal + ')' : 'In Stock (' + stockVal + ')');
+
+        var paletteHtml = '';
+        COLOR_PALETTES.forEach(function(cp) {
+            paletteHtml += '<span class="palette-chip" onclick="applyColorChip(' + index + ', \'' + cp.name + '\', \'' + cp.hex + '\')">' +
+                '<span class="palette-chip-dot" style="background:' + cp.hex + '"></span>' + cp.name + '</span>';
+        });
+
+        card.innerHTML = 
+            '<div class="variant-card-header" onclick="toggleCardCollapse(' + index + ', event)">' +
+                '<div class="variant-card-header-left">' +
+                    '<span class="variant-swatch-dot" id="headerDot_' + index + '" style="background:' + hexVal + '"></span>' +
+                    '<span class="variant-name-display" id="headerTitle_' + index + '">' + nameVal + '</span>' +
+                    '<span class="variant-badge-tag ' + stockBadgeClass + '" id="headerStockBadge_' + index + '">' + stockBadgeText + '</span>' +
+                    '<span class="variant-badge-tag variant-badge-sku" id="headerSkuBadge_' + index + '">SKU: ' + (skuVal || 'Pending') + '</span>' +
+                    '<span class="variant-badge-tag variant-badge-price" id="headerPriceBadge_' + index + '">₹' + (priceVal || '0') + '</span>' +
+                '</div>' +
+                '<div class="variant-card-header-right">' +
+                    '<button type="button" class="btn-delete-variant" onclick="deleteVariantCard(' + index + ', event)"><i class="fas fa-trash-alt"></i> Delete</button>' +
+                    '<i class="fas fa-chevron-down toggle-icon"></i>' +
+                '</div>' +
+            '</div>' +
+            '<div class="variant-card-body">' +
+                '<div class="v-grid-row">' +
+                    '<div class="v-field" style="grid-column: span 2;">' +
+                        '<label>Colour Name: <small>e.g. Black, Royal Blue, Rose Gold</small></label>' +
+                        '<input type="text" id="vName_' + index + '" value="' + (v.name || '') + '" placeholder="e.g. Black, Blue, Emerald Green" oninput="onFieldChange(' + index + ')" />' +
+                        '<div class="quick-palette-chips">' + paletteHtml + '</div>' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Colour Swatch / Hex:</label>' +
+                        '<div class="color-picker-input-row">' +
+                            '<input type="color" id="vColorPicker_' + index + '" value="' + hexVal + '" onchange="onColorPickerChange(' + index + ')" />' +
+                            '<input type="text" id="vHexText_' + index + '" value="' + hexVal + '" oninput="onHexTextChange(' + index + ')" />' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Variant SKU: <small>Unique variant ID</small></label>' +
+                        '<div style="display:flex;gap:6px;">' +
+                            '<input type="text" id="vSku_' + index + '" value="' + skuVal + '" placeholder="e.g. NECK-BLK-001" oninput="onFieldChange(' + index + ')" />' +
+                            '<button type="button" class="stat-pill" onclick="generateSkuForCard(' + index + ')" title="Regenerate SKU"><i class="fas fa-rotate"></i></button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="v-grid-row">' +
+                    '<div class="v-field">' +
+                        '<label>Selling Price (₹): <small>Customer price</small></label>' +
+                        '<input type="number" step="0.01" id="vPrice_' + index + '" value="' + priceVal + '" placeholder="e.g. 999.00" oninput="onPriceChange(' + index + ')" />' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>MRP / Original Price (₹): <small>Crossed out</small></label>' +
+                        '<input type="number" step="0.01" id="vMrp_' + index + '" value="' + mrpVal + '" placeholder="e.g. 1499.00" oninput="onPriceChange(' + index + ')" />' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Discount %: <small>Auto-calculated</small></label>' +
+                        '<input type="text" id="vDiscount_' + index + '" readonly style="background:#F1F5F9;font-weight:700;color:#16A34A;" value="0% OFF" />' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Stock Quantity: <small>0 = Out of stock</small></label>' +
+                        '<input type="number" min="0" id="vStock_' + index + '" value="' + stockVal + '" placeholder="e.g. 25" oninput="onStockChange(' + index + ')" />' +
+                    '</div>' +
+                    '<div class="v-field">' +
+                        '<label>Status:</label>' +
+                        '<div style="display:flex;align-items:center;gap:8px;height:38px;">' +
+                            '<input type="checkbox" id="vAvail_' + index + '" ' + (isAvail ? 'checked' : '') + ' onchange="onAvailChange(' + index + ')" style="width:18px;height:18px;" />' +
+                            '<span id="vAvailLabel_' + index + '" style="font-weight:600;font-size:13.5px;">' + (isAvail ? 'In Stock' : 'Out of Stock') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="variant-gallery-section">' +
+                    '<div class="variant-gallery-head">' +
+                        '<h4><i class="fas fa-images"></i> Variant Photo Gallery</h4>' +
+                        '<span>Upload multiple pictures. Click ★ on any picture to select it as the primary cover photo.</span>' +
+                    '</div>' +
+                    '<div class="v-dropzone" onclick="document.getElementById(\'vFileInput_' + index + '\').click()">' +
+                        '<i class="fas fa-cloud-arrow-up"></i>' +
+                        '<p>Click or drag photos here to add to ' + nameVal + ' gallery</p>' +
+                        '<small>Supported: JPG, PNG, WEBP. You can select multiple images at once.</small>' +
+                        '<input type="file" id="vFileInput_' + index + '" name="variant_images_' + index + '" multiple accept="image/*" onchange="handleFileSelect(' + index + ', this)" />' +
+                    '</div>' +
+                    '<div class="v-previews-grid" id="vPreviewsGrid_' + index + '"></div>' +
+                '</div>' +
+            '</div>';
+
+        container.appendChild(card);
+        renderCardPreviews(index);
+        updateDiscount(index);
+    }
+
+    function renderCardPreviews(index) {
+        var v = variantsList[index];
+        var grid = document.getElementById('vPreviewsGrid_' + index);
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        // Existing gallery images
+        if (v.gallery && v.gallery.length > 0) {
+            v.gallery.forEach(function(item, gIdx) {
+                if (item.is_deleted) return;
+                var thumb = document.createElement('div');
+                thumb.className = 'v-thumb-card' + (item.is_primary ? ' is-primary' : '');
+                thumb.innerHTML = 
+                    '<img src="' + item.url + '" alt="Photo" />' +
+                    '<div class="v-thumb-actions">' +
+                        '<button type="button" class="btn-make-primary" onclick="setPrimaryExisting(' + index + ', ' + gIdx + ')">' +
+                            '<i class="fas fa-star"></i> ' + (item.is_primary ? 'Primary' : 'Set Primary') +
+                        '</button>' +
+                        '<button type="button" class="btn-remove-thumb" onclick="deleteExistingImage(' + index + ', ' + gIdx + ')" title="Delete image">✕</button>' +
+                    '</div>';
+                grid.appendChild(thumb);
+            });
+        }
+
+        // Newly selected pending files
+        if (v.pendingFiles && v.pendingFiles.length > 0) {
+            v.pendingFiles.forEach(function(fileItem, fIdx) {
+                var thumb = document.createElement('div');
+                thumb.className = 'v-thumb-card' + (fileItem.is_primary ? ' is-primary' : '');
+                thumb.innerHTML = 
+                    '<img src="' + fileItem.previewUrl + '" alt="New File" />' +
+                    '<div class="v-thumb-actions">' +
+                        '<button type="button" class="btn-make-primary" onclick="setPrimaryNewFile(' + index + ', ' + fIdx + ')">' +
+                            '<i class="fas fa-star"></i> ' + (fileItem.is_primary ? 'Primary' : 'Set Primary') +
+                        '</button>' +
+                        '<button type="button" class="btn-remove-thumb" onclick="removePendingFile(' + index + ', ' + fIdx + ')" title="Remove">✕</button>' +
+                    '</div>';
+                grid.appendChild(thumb);
+            });
+        }
+    }
+
+    window.toggleCardCollapse = function(index, e) {
+        if (e.target.closest('button') || e.target.closest('input')) return;
+        var card = document.getElementById('variantCard_' + index);
+        if (card) card.classList.toggle('collapsed');
+    };
+
+    window.applyColorChip = function(index, name, hex) {
+        var v = variantsList[index];
+        v.name = name;
+        v.hex_code = hex;
+        document.getElementById('vName_' + index).value = name;
+        document.getElementById('vColorPicker_' + index).value = hex;
+        document.getElementById('vHexText_' + index).value = hex;
+        document.getElementById('headerDot_' + index).style.background = hex;
+        document.getElementById('headerTitle_' + index).textContent = name;
+        if (!v.sku || v.sku.indexOf('PRD') === 0) {
+            var newSku = autoGenSku(name, index);
+            v.sku = newSku;
+            document.getElementById('vSku_' + index).value = newSku;
+            document.getElementById('headerSkuBadge_' + index).textContent = 'SKU: ' + newSku;
+        }
+        updateSummaryStats();
+    };
+
+    window.onColorPickerChange = function(index) {
+        var val = document.getElementById('vColorPicker_' + index).value;
+        document.getElementById('vHexText_' + index).value = val;
+        document.getElementById('headerDot_' + index).style.background = val;
+        variantsList[index].hex_code = val;
+    };
+
+    window.onHexTextChange = function(index) {
+        var val = document.getElementById('vHexText_' + index).value.trim();
+        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+            document.getElementById('vColorPicker_' + index).value = val;
+            document.getElementById('headerDot_' + index).style.background = val;
+            variantsList[index].hex_code = val;
+        }
+    };
+
+    window.onFieldChange = function(index) {
+        var name = document.getElementById('vName_' + index).value.trim();
+        var sku = document.getElementById('vSku_' + index).value.trim();
+        variantsList[index].name = name;
+        variantsList[index].sku = sku;
+        document.getElementById('headerTitle_' + index).textContent = name || ('Variant ' + (index + 1));
+        document.getElementById('headerSkuBadge_' + index).textContent = 'SKU: ' + (sku || 'Pending');
+    };
+
+    function updateDiscount(index) {
+        var price = parseFloat(document.getElementById('vPrice_' + index).value) || 0;
+        var mrp = parseFloat(document.getElementById('vMrp_' + index).value) || 0;
+        var discEl = document.getElementById('vDiscount_' + index);
+        if (mrp > price && price > 0) {
+            var pct = Math.round(((mrp - price) / mrp) * 100);
+            discEl.value = pct + '% OFF';
+        } else {
+            discEl.value = '0% OFF';
+        }
+    }
+
+    window.onPriceChange = function(index) {
+        var price = document.getElementById('vPrice_' + index).value;
+        var mrp = document.getElementById('vMrp_' + index).value;
+        variantsList[index].price = price;
+        variantsList[index].mrp = mrp;
+        document.getElementById('headerPriceBadge_' + index).textContent = '₹' + (price || '0');
+        updateDiscount(index);
+        updateSummaryStats();
+    };
+
+    window.onStockChange = function(index) {
+        var stock = parseInt(document.getElementById('vStock_' + index).value || '0', 10);
+        variantsList[index].stock = stock;
+        var isAvail = stock > 0;
+        variantsList[index].is_available = isAvail;
+        document.getElementById('vAvail_' + index).checked = isAvail;
+        document.getElementById('vAvailLabel_' + index).textContent = isAvail ? 'In Stock' : 'Out of Stock';
+
+        var badge = document.getElementById('headerStockBadge_' + index);
+        badge.className = 'variant-badge-tag ' + ((stock <= 0) ? 'variant-badge-out-stock' : ((stock <= 5) ? 'variant-badge-low-stock' : 'variant-badge-in-stock'));
+        badge.textContent = (stock <= 0) ? 'Out of Stock' : ((stock <= 5) ? 'Low Stock (' + stock + ')' : 'In Stock (' + stock + ')');
+        updateSummaryStats();
+    };
+
+    window.onAvailChange = function(index) {
+        var checked = document.getElementById('vAvail_' + index).checked;
+        variantsList[index].is_available = checked;
+        document.getElementById('vAvailLabel_' + index).textContent = checked ? 'In Stock' : 'Out of Stock';
+        var stock = variantsList[index].stock || 0;
+        var badge = document.getElementById('headerStockBadge_' + index);
+        if (!checked) {
+            badge.className = 'variant-badge-tag variant-badge-out-stock';
+            badge.textContent = 'Out of Stock';
+        } else {
+            badge.className = 'variant-badge-tag ' + ((stock <= 5) ? 'variant-badge-low-stock' : 'variant-badge-in-stock');
+            badge.textContent = (stock <= 5) ? 'Low Stock (' + stock + ')' : 'In Stock (' + stock + ')';
+        }
+    };
+
+    window.generateSkuForCard = function(index) {
+        var name = document.getElementById('vName_' + index).value;
+        var sku = autoGenSku(name, index);
+        document.getElementById('vSku_' + index).value = sku;
+        variantsList[index].sku = sku;
+        document.getElementById('headerSkuBadge_' + index).textContent = 'SKU: ' + sku;
+    };
+
+    window.deleteVariantCard = function(index, e) {
+        if (e) e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this colour variant?')) return;
+        variantsList[index].is_deleted = true;
+        var card = document.getElementById('variantCard_' + index);
+        if (card) card.classList.add('is-deleted');
+        updateSummaryStats();
+    };
+
+    // Images handling
+    function syncFileInput(index) {
+        var input = document.getElementById('vFileInput_' + index);
+        if (!input || !window.DataTransfer) return;
+        var v = variantsList[index];
+        var dt = new DataTransfer();
+        if (v && v.pendingFiles) {
+            v.pendingFiles.forEach(function(item) {
+                if (item.file) dt.items.add(item.file);
+            });
+        }
+        input.files = dt.files;
+    }
+
+    window.handleFileSelect = function(index, input) {
+        var files = input.files;
+        if (!files || !files.length) return;
+        var v = variantsList[index];
+        if (!v.pendingFiles) v.pendingFiles = [];
+
+        var hasAnyPrimary = (v.gallery && v.gallery.some(function(g) { return g.is_primary && !g.is_deleted; })) ||
+                            v.pendingFiles.some(function(f) { return f.is_primary; });
+
+        for (var i = 0; i < files.length; i++) {
+            (function(file, fileIdx) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var isPrimary = (!hasAnyPrimary && fileIdx === 0 && v.pendingFiles.length === 0);
+                    v.pendingFiles.push({
+                        file: file,
+                        previewUrl: e.target.result,
+                        is_primary: isPrimary
+                    });
+                    if (isPrimary) hasAnyPrimary = true;
+                    syncFileInput(index);
+                    renderCardPreviews(index);
+                };
+                reader.readAsDataURL(file);
+            })(files[i], i);
+        }
+    };
+
+    window.setPrimaryExisting = function(index, gIdx) {
+        var v = variantsList[index];
+        if (v.gallery) {
+            v.gallery.forEach(function(g) { g.is_primary = false; });
+            v.gallery[gIdx].is_primary = true;
+        }
+        if (v.pendingFiles) {
+            v.pendingFiles.forEach(function(f) { f.is_primary = false; });
+        }
+        renderCardPreviews(index);
+    };
+
+    window.setPrimaryNewFile = function(index, fIdx) {
+        var v = variantsList[index];
+        if (v.gallery) {
+            v.gallery.forEach(function(g) { g.is_primary = false; });
+        }
+        if (v.pendingFiles) {
+            v.pendingFiles.forEach(function(f) { f.is_primary = false; });
+            v.pendingFiles[fIdx].is_primary = true;
+        }
+        renderCardPreviews(index);
+    };
+
+    window.deleteExistingImage = function(index, gIdx) {
+        var v = variantsList[index];
+        if (!v.gallery || !v.gallery[gIdx]) return;
+        var item = v.gallery[gIdx];
+        item.is_deleted = true;
+        if (!v.deleted_gallery_ids) v.deleted_gallery_ids = [];
+        if (item.id) v.deleted_gallery_ids.push(item.id);
+
+        if (item.is_primary) {
+            // Re-assign primary to first available
+            var next = v.gallery.find(function(g) { return !g.is_deleted; }) || (v.pendingFiles && v.pendingFiles[0]);
+            if (next) next.is_primary = true;
+        }
+        renderCardPreviews(index);
+    };
+
+    window.removePendingFile = function(index, fIdx) {
+        var v = variantsList[index];
+        if (!v.pendingFiles) return;
+        var removed = v.pendingFiles.splice(fIdx, 1)[0];
+        if (removed && removed.is_primary) {
+            var next = (v.gallery && v.gallery.find(function(g) { return !g.is_deleted; })) || (v.pendingFiles && v.pendingFiles[0]);
+            if (next) next.is_primary = true;
+        }
+        syncFileInput(index);
+        renderCardPreviews(index);
+    };
+
+    window.addNewVariantCard = function(data) {
+        var idx = variantsList.length;
+        var newV = data || {
+            id: null,
+            name: '',
+            hex_code: '#D4AF37',
+            sku: '',
+            price: document.getElementById('id_price') ? document.getElementById('id_price').value : '',
+            mrp: document.getElementById('id_mrp') ? document.getElementById('id_mrp').value : '',
+            stock: 10,
+            is_available: true,
+            gallery: [],
+            pendingFiles: []
+        };
+        variantsList.push(newV);
+        renderCard(newV, idx);
+        updateSummaryStats();
+
+        // Focus colour name if newly added by button
+        if (!data) {
+            var input = document.getElementById('vName_' + idx);
+            if (input) input.focus();
+        }
+    };
+
+    function updateSummaryStats() {
+        var active = variantsList.filter(function(v) { return !v.is_deleted; });
+        var totalStock = 0;
+        var prices = [];
+
+        active.forEach(function(v) {
+            var st = parseInt(v.stock !== undefined ? v.stock : 0, 10);
+            totalStock += (st > 0 ? st : 0);
+            var pr = parseFloat(v.price);
+            if (!isNaN(pr) && pr > 0) prices.push(pr);
+        });
+
+        document.getElementById('statVariantCount').innerHTML = '<i class="fas fa-palette"></i> ' + active.length + ' Colour Variants';
+        document.getElementById('statTotalStock').innerHTML = '<i class="fas fa-boxes-stacked"></i> Combined Stock: ' + totalStock + ' units';
+
+        if (prices.length > 0) {
+            var minP = Math.min.apply(null, prices);
+            var maxP = Math.max.apply(null, prices);
+            var pRange = (minP === maxP) ? '₹' + minP : '₹' + minP + ' – ₹' + maxP;
+            document.getElementById('statPriceRange').innerHTML = '<i class="fas fa-tag"></i> ' + pRange;
+        } else {
+            document.getElementById('statPriceRange').innerHTML = '<i class="fas fa-tag"></i> Price: —';
+        }
+    }
+
+    // Initialize from existing variants
+    if (initialVariants && initialVariants.length > 0) {
+        initialVariants.forEach(function(v) {
+            addNewVariantCard(v);
+        });
+    }
+
+    // Before main form submit, compile JSON payload
+    var mainForm = document.getElementById('product_form') || document.querySelector('form[method="post"]');
+    if (mainForm) {
+        mainForm.addEventListener('submit', function(e) {
+            var payload = [];
+            variantsList.forEach(function(v, idx) {
+                var isDel = !!v.is_deleted;
+                var name = document.getElementById('vName_' + idx) ? document.getElementById('vName_' + idx).value.trim() : (v.name || '');
+                var sku = document.getElementById('vSku_' + idx) ? document.getElementById('vSku_' + idx).value.trim() : (v.sku || '');
+                var hex = document.getElementById('vHexText_' + idx) ? document.getElementById('vHexText_' + idx).value.trim() : (v.hex_code || '#D4AF37');
+                var price = document.getElementById('vPrice_' + idx) ? document.getElementById('vPrice_' + idx).value.trim() : (v.price || '');
+                var mrp = document.getElementById('vMrp_' + idx) ? document.getElementById('vMrp_' + idx).value.trim() : (v.mrp || '');
+                var stock = document.getElementById('vStock_' + idx) ? parseInt(document.getElementById('vStock_' + idx).value || '0', 10) : (v.stock || 0);
+                var isAvail = document.getElementById('vAvail_' + idx) ? document.getElementById('vAvail_' + idx).checked : (v.is_available !== false);
+
+                var primaryChoice = null;
+                if (v.gallery) {
+                    v.gallery.forEach(function(g) {
+                        if (g.is_primary && !g.is_deleted && g.id) {
+                            primaryChoice = 'existing:' + g.id;
+                        }
+                    });
+                }
+                if (!primaryChoice && v.pendingFiles) {
+                    v.pendingFiles.forEach(function(f, fIdx) {
+                        if (f.is_primary) primaryChoice = 'new:' + fIdx;
+                    });
+                }
+
+                payload.push({
+                    id: v.id || null,
+                    name: name,
+                    sku: sku,
+                    hex_code: hex,
+                    price: price,
+                    mrp: mrp,
+                    stock: stock,
+                    is_available: isAvail,
+                    order: idx + 1,
+                    primary_image_choice: primaryChoice,
+                    deleted_gallery_ids: v.deleted_gallery_ids || [],
+                    delete: isDel
+                });
+            });
+
+            document.getElementById('product_variants_payload').value = JSON.stringify(payload);
+        });
+    }
+
+})();
+</script>
+{% endblock %}

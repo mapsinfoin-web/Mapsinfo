@@ -50,6 +50,8 @@ class Product(models.Model):
     )
     title = models.CharField(max_length=255)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text="Unique Product ID")
+    brand = models.CharField(max_length=120, blank=True, default='MAPSKART', help_text="Brand name")
+    product_type = models.CharField(max_length=120, blank=True, default='', help_text="Product Type (e.g. Necklace, Earrings, Bracelet, Ring, Jewellery Set)")
     description = models.TextField(blank=True)
     mrp = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
                               help_text="Original Retail Price (crossed out)")
@@ -613,23 +615,59 @@ class Cart(models.Model):
 class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    variant = models.ForeignKey('ProductColor', on_delete=models.SET_NULL, null=True, blank=True, related_name='cart_items')
+    color_name = models.CharField(max_length=60, blank=True, default='', help_text="Colour variant name at time of addition")
     quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     is_active = models.BooleanField(default=True)
 
     @property
     def unit_price(self):
         """Returns the price for the selected colour variant if defined, else product base price."""
+        if self.variant and self.variant.price is not None:
+            return self.variant.price
         if hasattr(self, 'selected_color') and self.selected_color:
             color_obj = self.product.colors.filter(name__iexact=self.selected_color).first()
             if color_obj and color_obj.price is not None:
                 return color_obj.price
         return self.product.price
 
+    @property
+    def display_image(self):
+        """Returns variant image if available, else product image."""
+        if self.variant and self.variant.image:
+            return self.variant.image
+        if hasattr(self, 'selected_color') and self.selected_color:
+            color_obj = self.product.colors.filter(name__iexact=self.selected_color).first()
+            if color_obj and color_obj.image:
+                return color_obj.image
+        return self.product.image
+
+    @property
+    def display_sku(self):
+        """Returns variant SKU if available, else product SKU."""
+        if self.variant and self.variant.sku:
+            return self.variant.sku
+        if hasattr(self, 'selected_color') and self.selected_color:
+            color_obj = self.product.colors.filter(name__iexact=self.selected_color).first()
+            if color_obj and color_obj.sku:
+                return color_obj.sku
+        return self.product.sku
+
+    @property
+    def effective_color_name(self):
+        """Returns color name from variant or color_name or selected_color."""
+        if self.variant and self.variant.name:
+            return self.variant.name
+        if self.color_name:
+            return self.color_name
+        return getattr(self, 'selected_color', '') or ''
+
     def sub_total(self):
         return self.unit_price * self.quantity
 
     def __str__(self):
-        return self.product.title
+        v = f" [{self.effective_color_name}]" if self.effective_color_name else ""
+        return f"{self.product.title}{v}"
 
 
 class CartGift(models.Model):
@@ -657,12 +695,16 @@ class ProductGallery(models.Model):
         help_text="Optional: link this picture to a specific colour variant (e.g. Blue, Pink)"
     )
     image = models.ImageField(upload_to='images/gallery/', max_length=255)
+    is_primary = models.BooleanField(default=False, help_text="Set as primary/cover image for this colour variant")
+    order = models.PositiveIntegerField(default=0, help_text="Display order inside gallery")
 
     def __str__(self):
         color_str = f" [{self.color.name}]" if self.color else ""
-        return f"Image for {self.product.title}{color_str}"
+        primary_str = " (Primary)" if self.is_primary else ""
+        return f"Image for {self.product.title}{color_str}{primary_str}"
 
     class Meta:
+        ordering = ['order', 'id']
         verbose_name = 'Product Gallery'
         verbose_name_plural = 'Product Galleries'
 
@@ -773,6 +815,13 @@ class ProductColor(models.Model):
         blank=True,
         help_text="Original retail price (crossed out) for this colour (optional)"
     )
+    special_offer_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Optional special offer price for this colour variant"
+    )
     stock = models.PositiveIntegerField(
         default=10,
         help_text="Units available for this colour variant. 0 = Out of Stock"
@@ -866,6 +915,11 @@ class ProductColor(models.Model):
                 pass
         return urls
 
+    @property
+    def status_label(self):
+        """Returns human-readable stock status ('In Stock' or 'Out of Stock')."""
+        return "In Stock" if self.in_stock else "Out of Stock"
+
     def clean(self):
         super().clean()
         if self.name:
@@ -905,6 +959,10 @@ class ProductColor(models.Model):
         sku_part = f" ({self.sku})" if self.sku else ""
         price_part = f" - ₹{self.price}" if self.price is not None else ""
         return f"{self.product.title} - {self.name}{sku_part}{price_part}"
+
+
+# Alias ProductVariant to ProductColor
+ProductVariant = ProductColor
 
 
 class Order(models.Model):
@@ -962,12 +1020,17 @@ class Order(models.Model):
     def restore_stock(self):
         """Put every item in this order back into stock (used when an order is cancelled)."""
         for item in self.items.all():
-            Product.objects.filter(pk=item.product_id).update(stock=F('stock') + item.quantity)
-            if item.color:
-                ProductColor.objects.filter(
+            if item.variant_id:
+                ProductColor.objects.filter(pk=item.variant_id).update(stock=F('stock') + item.quantity)
+            elif item.color:
+                updated = ProductColor.objects.filter(
                     product_id=item.product_id,
                     name__iexact=item.color
                 ).update(stock=F('stock') + item.quantity)
+                if not updated:
+                    Product.objects.filter(pk=item.product_id).update(stock=F('stock') + item.quantity)
+            else:
+                Product.objects.filter(pk=item.product_id).update(stock=F('stock') + item.quantity)
 
     def __str__(self):
         return f'Order #{self.id} - {self.full_name}'
@@ -977,6 +1040,8 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     # PROTECT: a product that appears in past orders can't be deleted by accident
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    variant = models.ForeignKey('ProductColor', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_items')
+    sku = models.CharField(max_length=64, blank=True, default="", help_text="SKU of purchased product or variant")
     color = models.CharField(max_length=60, blank=True, default="", help_text="Selected colour variant")
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
@@ -987,7 +1052,8 @@ class OrderItem(models.Model):
 
     def __str__(self):
         color_str = f" [{self.color}]" if self.color else ""
-        return f'{self.quantity} x {self.product.title}{color_str}'
+        sku_str = f" ({self.sku})" if self.sku else ""
+        return f'{self.quantity} x {self.product.title}{color_str}{sku_str}'
 
 
 class ContactInquiry(models.Model):

@@ -2493,6 +2493,7 @@
                     {% for c in product.available_colors %}
                     <button type="button"
                             class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id %}active{% endif %} {% if not c.in_stock %}out-of-stock{% endif %}"
+                            data-variant-id="{{ c.id }}"
                             data-name="{{ c.name }}"
                             data-sku="{% if c.sku %}{{ c.sku }}{% else %}{{ product.sku }}{% endif %}"
                             data-image="{% if c.image %}{{ c.image.url }}{% endif %}"
@@ -2512,7 +2513,7 @@
                         {% endif %}
                         <span class="swatch-title">{{ c.name }}</span>
                         {% if not c.in_stock %}
-                        <span class="swatch-stock-badge sold-out">Sold Out</span>
+                        <span class="swatch-stock-badge sold-out">Out of Stock</span>
                         {% elif c.is_low_stock %}
                         <span class="swatch-stock-badge low">{{ c.stock }} left</span>
                         {% endif %}
@@ -2544,6 +2545,7 @@
                         <form action="{% url 'store:add_cart' product.id %}" method="POST">
                             {% csrf_token %}
                             {% if product.available_colors %}
+                            <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
                             <p class="gift-offer-sub">Choose your FREE gift:</p>
@@ -2566,6 +2568,7 @@
                         <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form">
                             {% csrf_token %}
                             {% if product.available_colors %}
+                            <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
                             <button type="submit" class="btn btn-add {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-shopping-cart{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Add to Cart{% endif %}</button>
@@ -2573,6 +2576,7 @@
                         <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form">
                             {% csrf_token %}
                             {% if product.available_colors %}
+                            <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
                             <button type="submit" class="btn btn-buy {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}><i class="fas {% if selected_color_obj and not selected_color_obj.in_stock %}fa-ban{% else %}fa-bolt{% endif %}"></i> {% if selected_color_obj and not selected_color_obj.in_stock %}Out of Stock{% else %}Buy Now{% endif %}</button>
@@ -3639,17 +3643,13 @@
 
         function selectColor(btn) {
             if (!btn) return;
-            var isAlreadyActive = btn.classList.contains('active');
-            if (isAlreadyActive) {
-                resetToBaseProduct();
-                return;
-            }
 
             document.querySelectorAll('.color-swatch-item').forEach(function(el) {
                 el.classList.remove('active');
             });
             btn.classList.add('active');
 
+            var variantId = btn.getAttribute('data-variant-id') || '';
             var colorName = btn.getAttribute('data-name') || '';
             var colorSku = btn.getAttribute('data-sku') || '';
             var imgUrl = btn.getAttribute('data-image') || '';
@@ -3668,9 +3668,20 @@
                 skuDisplay.textContent = 'SKU: ' + colorSku;
             }
 
+            document.querySelectorAll('.productSelectedVariantId').forEach(function(input) {
+                input.value = variantId;
+            });
             document.querySelectorAll('.productSelectedColor').forEach(function(input) {
                 input.value = colorName;
             });
+
+            if (variantId && window.history && history.replaceState) {
+                try {
+                    var u = new URL(window.location.href);
+                    u.searchParams.set('variant', variantId);
+                    history.replaceState(null, '', u.toString());
+                } catch(e) {}
+            }
 
             // Update Price & MRP & Discount
             if (priceVal) {
@@ -4125,6 +4136,7 @@ if (h) {
             <form action="{% url 'store:add_cart' product.id %}" method="POST" class="sticky-action-form">
                 {% csrf_token %}
                 {% if product.available_colors %}
+                <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
                 <button type="submit" class="sticky-btn sticky-btn-add {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" title="Add to Cart" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}>
@@ -4134,6 +4146,7 @@ if (h) {
             <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="sticky-action-form">
                 {% csrf_token %}
                 {% if product.available_colors %}
+                <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
                 <button type="submit" class="sticky-btn sticky-btn-buy {% if selected_color_obj and not selected_color_obj.in_stock %}disabled-btn{% endif %}" {% if selected_color_obj and not selected_color_obj.in_stock %}disabled{% endif %}>

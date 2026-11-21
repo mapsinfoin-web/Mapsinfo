@@ -254,7 +254,9 @@
                     <div class="summary-items">
                         {% for item in cart_items %}
                         <div class="s-item">
-                            {% if item.product.image %}
+                            {% if item.display_image %}
+                            <img src="{{ item.display_image.url }}" alt="{{ item.product.title }}" class="s-img" loading="lazy" />
+                            {% elif item.product.image %}
                             <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="s-img" loading="lazy" />
                             {% else %}
                             <div class="s-img" style="display:grid;place-items:center;font-size:10px;">No Image</div>
@@ -262,7 +264,12 @@
                             
                             <div class="s-details">
                                 <h4 class="s-title">{{ item.product.title }}</h4>
-                                {% if item.selected_color %}
+                                {% if item.display_sku %}
+                                <div style="font-size: 11px; color: var(--muted); margin-bottom: 2px;">SKU: {{ item.display_sku }}</div>
+                                {% endif %}
+                                {% if item.effective_color_name %}
+                                <div style="font-size: 12px; color: var(--navy); font-weight: 600; margin: 2px 0 4px;"><i class="fas fa-palette"></i> Colour: {{ item.effective_color_name }}</div>
+                                {% elif item.selected_color %}
                                 <div style="font-size: 12px; color: var(--navy); font-weight: 600; margin: 2px 0 4px;"><i class="fas fa-palette"></i> Colour: {{ item.selected_color }}</div>
                                 {% endif %}
                                 <div class="s-meta">

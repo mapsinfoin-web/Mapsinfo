@@ -25,7 +25,7 @@ from django.http import JsonResponse
 
 from .forms import CustomRegistrationForm
 from .models import (
-    Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product, ProductReview, Wishlist
+    Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product, ProductColor, ProductVariant, ProductReview, Wishlist
 )
 from .offers import (
     add_gift, attach_offers, auto_fill_single_gift, calculate as calculate_offers, eligible_gifts,
@@ -146,15 +146,24 @@ def product_detail(request, pk):
     # product.offer / offer: the live offer for this product (or None) - explain it on the page
     gift_choices = eligible_gifts(product.offer) if product.offer else []
 
-    # Check if a specific colour was requested via ?color=
+    # Check if a specific colour or variant was requested via ?variant= or ?color=
+    requested_variant = request.GET.get('variant', '').strip()
     requested_color = request.GET.get('color', '').strip()
     selected_color_obj = None
     colors = product.available_colors
-    if requested_color and colors:
+    if requested_variant and colors:
+        for c in colors:
+            if str(c.id) == requested_variant or (c.sku and c.sku.lower() == requested_variant.lower()):
+                selected_color_obj = c
+                break
+    if not selected_color_obj and requested_color and colors:
         for c in colors:
             if c.name.lower() == requested_color.lower():
                 selected_color_obj = c
                 break
+    if not selected_color_obj and colors:
+        # Pre-select first in-stock variant, or first variant if all out of stock
+        selected_color_obj = next((c for c in colors if c.in_stock), colors[0])
 
     # Curated "You May Also Like" / Related Products Recommendations
     suggested_products = []
@@ -403,17 +412,22 @@ def _stock_problems(cart_items):
         product = item.product
         if not product.is_active:
             problems.append(f"{product.title} is no longer available. Please remove it from your cart.")
-        elif product.stock <= 0:
-            problems.append(f"{product.title} is out of stock. Please remove it from your cart.")
-        elif item.quantity > product.stock:
-            problems.append(f"Only {product.stock} of {product.title} left. Please reduce the quantity.")
-        elif getattr(item, 'selected_color', None):
-            color_obj = product.colors.filter(name__iexact=item.selected_color).first()
-            if color_obj:
-                if not color_obj.in_stock or color_obj.stock <= 0:
-                    problems.append(f"{product.title} in {color_obj.name} is out of stock. Please choose another colour.")
-                elif item.quantity > color_obj.stock:
-                    problems.append(f"Only {color_obj.stock} of {product.title} in {color_obj.name} left. Please reduce the quantity.")
+            continue
+
+        variant_obj = getattr(item, 'variant', None)
+        if not variant_obj and getattr(item, 'selected_color', None):
+            variant_obj = product.colors.filter(name__iexact=item.selected_color).first()
+
+        if variant_obj:
+            if not variant_obj.in_stock or variant_obj.stock <= 0:
+                problems.append(f"{product.title} in {variant_obj.name} is out of stock. Please remove it or choose another colour.")
+            elif item.quantity > variant_obj.stock:
+                problems.append(f"Only {variant_obj.stock} of {product.title} in {variant_obj.name} left. Please reduce the quantity.")
+        else:
+            if product.stock <= 0:
+                problems.append(f"{product.title} is out of stock. Please remove it from your cart.")
+            elif item.quantity > product.stock:
+                problems.append(f"Only {product.stock} of {product.title} left. Please reduce the quantity.")
     return problems
 
 
@@ -457,63 +471,88 @@ def add_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id, is_active=True)
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json'
 
-    # Save selected color variant in session
+    # Support explicit variant_id or color name
+    variant_id = request.POST.get('variant_id') or request.GET.get('variant_id')
     selected_color = (request.POST.get('selected_color') or request.GET.get('selected_color') or '').strip()
+
+    variant_obj = None
+    if variant_id:
+        try:
+            variant_obj = product.colors.filter(pk=int(variant_id)).first()
+        except (ValueError, TypeError):
+            variant_obj = None
+    if not variant_obj and selected_color:
+        variant_obj = product.colors.filter(name__iexact=selected_color).first()
+
+    if variant_obj:
+        selected_color = variant_obj.name
+
     if selected_color:
         cart_colors = request.session.get('cart_colors', {})
         cart_colors[str(product.id)] = selected_color
         request.session['cart_colors'] = cart_colors
         request.session.modified = True
 
+    # Check overall availability
     if not product.in_stock:
+        msg = f"Sorry, {product.title} is out of stock."
         if is_ajax:
-            return JsonResponse({'status': 'error', 'error': f"Sorry, {product.title} is out of stock."}, status=400)
-        messages.error(request, f"Sorry, {product.title} is out of stock.")
+            return JsonResponse({'status': 'error', 'error': msg}, status=400)
+        messages.error(request, msg)
         return redirect('store:product_detail', pk=product.pk)
 
-    # Check variant stock if color is selected
-    if selected_color:
-        color_obj = product.colors.filter(name__iexact=selected_color).first()
-        if color_obj:
-            if not color_obj.in_stock or color_obj.stock <= 0:
-                if is_ajax:
-                    return JsonResponse({'status': 'error', 'error': f"Sorry, {product.title} ({color_obj.name}) is out of stock."}, status=400)
-                messages.error(request, f"Sorry, {product.title} ({color_obj.name}) is out of stock.")
-                return redirect('store:product_detail', pk=product.pk)
+    # Check variant stock
+    if variant_obj:
+        if not variant_obj.in_stock or variant_obj.stock <= 0:
+            msg = f"Sorry, {product.title} ({variant_obj.name}) is out of stock."
+            if is_ajax:
+                return JsonResponse({'status': 'error', 'error': msg}, status=400)
+            messages.error(request, msg)
+            return redirect('store:product_detail', pk=product.pk)
 
     cart = _get_cart(request, create=True)
-    cart_item = CartItem.objects.filter(product=product, cart=cart).first()
+
+    # Find matching cart item
+    item_id = request.GET.get('item_id') or request.POST.get('item_id')
+    if item_id:
+        cart_item = CartItem.objects.filter(pk=item_id, cart=cart).first()
+    elif variant_obj:
+        cart_item = CartItem.objects.filter(product=product, cart=cart, variant=variant_obj).first()
+    else:
+        cart_item = CartItem.objects.filter(product=product, cart=cart, variant__isnull=True).first()
+
     current_qty = cart_item.quantity if cart_item else 0
+    max_stock = variant_obj.stock if variant_obj else product.stock
 
-    if current_qty + 1 > product.stock:
+    if current_qty + 1 > max_stock:
+        var_label = f" ({variant_obj.name})" if variant_obj else ""
+        msg = f"Only {max_stock} of {product.title}{var_label} available. You already have {current_qty} in your cart."
         if is_ajax:
-            return JsonResponse({'status': 'error', 'error': f"Only {product.stock} of {product.title} available."}, status=400)
-        messages.error(request, f"Only {product.stock} of {product.title} available. "
-                                f"You already have {current_qty} in your cart.")
+            return JsonResponse({'status': 'error', 'error': msg}, status=400)
+        messages.error(request, msg)
         return redirect('store:product_detail', pk=product.pk)
-
-    if selected_color:
-        color_obj = product.colors.filter(name__iexact=selected_color).first()
-        if color_obj and current_qty + 1 > color_obj.stock:
-            if is_ajax:
-                return JsonResponse({'status': 'error', 'error': f"Only {color_obj.stock} of {product.title} ({color_obj.name}) available."}, status=400)
-            messages.error(request, f"Only {color_obj.stock} of {product.title} ({color_obj.name}) available. You already have {current_qty} in your cart.")
-            return redirect('store:product_detail', pk=product.pk)
 
     if cart_item:
         cart_item.quantity += 1
-        cart_item.save()
+        cart_item.save(update_fields=['quantity'])
     else:
-        CartItem.objects.create(product=product, cart=cart, quantity=1)
+        CartItem.objects.create(
+            product=product,
+            cart=cart,
+            variant=variant_obj,
+            color_name=variant_obj.name if variant_obj else selected_color,
+            quantity=1
+        )
 
     went_to_gifts = _handle_gift_after_add(request, cart, product)
 
     if is_ajax:
-        total_items = sum(CartItem.objects.filter(cart=cart).values_list('quantity', flat=True))
+        total_items = sum(CartItem.objects.filter(cart=cart, is_active=True).values_list('quantity', flat=True))
+        var_str = f" ({variant_obj.name})" if variant_obj else ""
         return JsonResponse({
             'status': 'success',
             'cart_count': total_items,
-            'message': f"{product.title} added to cart!"
+            'message': f"{product.title}{var_str} added to cart!"
         })
 
     if went_to_gifts:
@@ -551,11 +590,14 @@ def add_combo_cart(request, product_id, pair_id):
 def _priced_cart(cart, request=None):
     """Drop invalid gifts, then price the cart. Returns (cart_items, pricing, notes)."""
     notes = sync_gifts(cart)
-    cart_items = CartItem.objects.filter(cart=cart, is_active=True).select_related('product')
+    cart_items = CartItem.objects.filter(cart=cart, is_active=True).select_related('product', 'variant')
     if request:
         cart_colors = request.session.get('cart_colors', {})
         for item in cart_items:
-            item.selected_color = cart_colors.get(str(item.product_id), '')
+            item.selected_color = item.effective_color_name or cart_colors.get(str(item.product_id), '')
+    else:
+        for item in cart_items:
+            item.selected_color = item.effective_color_name
     gifts = cart.gifts.select_related('product', 'offer__main_product')
     return cart_items, calculate_offers(cart_items, gifts), notes
 
@@ -568,9 +610,6 @@ def cart_detail(request):
     cart = _get_cart(request)
     if cart:
         cart_items, pricing, notes = _priced_cart(cart, request)
-        cart_colors = request.session.get('cart_colors', {})
-        for item in cart_items:
-            item.selected_color = cart_colors.get(str(item.product_id), '')
         for note in notes:
             messages.warning(request, note)
         for problem in _stock_problems(cart_items):
@@ -630,11 +669,15 @@ def remove_cart(request, product_id):
     cart = _get_cart(request)
     product = get_object_or_404(Product, id=product_id)
     if cart:
-        cart_item = CartItem.objects.filter(product=product, cart=cart).first()
+        item_id = request.GET.get('item_id') or request.POST.get('item_id')
+        if item_id:
+            cart_item = CartItem.objects.filter(pk=item_id, cart=cart).first()
+        else:
+            cart_item = CartItem.objects.filter(product=product, cart=cart).first()
         if cart_item:
             if cart_item.quantity > 1:
                 cart_item.quantity -= 1
-                cart_item.save()
+                cart_item.save(update_fields=['quantity'])
             else:
                 cart_item.delete()
     return redirect('store:cart_detail')
@@ -644,17 +687,34 @@ def remove_cart_item(request, product_id):
     cart = _get_cart(request)
     product = get_object_or_404(Product, id=product_id)
     if cart:
-        CartItem.objects.filter(product=product, cart=cart).delete()
+        item_id = request.GET.get('item_id') or request.POST.get('item_id')
+        if item_id:
+            CartItem.objects.filter(pk=item_id, cart=cart).delete()
+        else:
+            CartItem.objects.filter(product=product, cart=cart).delete()
     return redirect('store:cart_detail')
 
 
 @require_POST
 def buy_now(request, pk):
-    """Put the product in the cart. Products with a free-gift offer go to the cart so the gift can be picked."""
+    """Put the product variant in the cart and go directly to checkout."""
     product = get_object_or_404(Product, pk=pk, is_active=True)
 
-    # Save selected color variant in session
+    variant_id = request.POST.get('variant_id') or request.GET.get('variant_id')
     selected_color = (request.POST.get('selected_color') or request.GET.get('selected_color') or '').strip()
+
+    variant_obj = None
+    if variant_id:
+        try:
+            variant_obj = product.colors.filter(pk=int(variant_id)).first()
+        except (ValueError, TypeError):
+            variant_obj = None
+    if not variant_obj and selected_color:
+        variant_obj = product.colors.filter(name__iexact=selected_color).first()
+
+    if variant_obj:
+        selected_color = variant_obj.name
+
     if selected_color:
         cart_colors = request.session.get('cart_colors', {})
         cart_colors[str(product.id)] = selected_color
@@ -665,20 +725,39 @@ def buy_now(request, pk):
         messages.error(request, f"Sorry, {product.title} is out of stock.")
         return redirect('store:product_detail', pk=product.pk)
 
-    if selected_color:
-        color_obj = product.colors.filter(name__iexact=selected_color).first()
-        if color_obj and (not color_obj.in_stock or color_obj.stock <= 0):
-            messages.error(request, f"Sorry, {product.title} ({color_obj.name}) is out of stock.")
-            return redirect('store:product_detail', pk=product.pk)
+    if variant_obj and (not variant_obj.in_stock or variant_obj.stock <= 0):
+        messages.error(request, f"Sorry, {product.title} ({variant_obj.name}) is out of stock.")
+        return redirect('store:product_detail', pk=product.pk)
 
     cart = _get_cart(request, create=True)
-    if not CartItem.objects.filter(product=product, cart=cart).exists():
-        CartItem.objects.create(product=product, cart=cart, quantity=1)
+    if variant_obj:
+        cart_item = CartItem.objects.filter(product=product, cart=cart, variant=variant_obj).first()
+    else:
+        cart_item = CartItem.objects.filter(product=product, cart=cart, variant__isnull=True).first()
+
+    max_stock = variant_obj.stock if variant_obj else product.stock
+    current_qty = cart_item.quantity if cart_item else 0
+    if current_qty + 1 > max_stock:
+        var_label = f" ({variant_obj.name})" if variant_obj else ""
+        messages.error(request, f"Only {max_stock} of {product.title}{var_label} available.")
+        return redirect('store:product_detail', pk=product.pk)
+
+    if cart_item:
+        cart_item.quantity += 1
+        cart_item.save(update_fields=['quantity'])
+    else:
+        CartItem.objects.create(
+            product=product,
+            cart=cart,
+            variant=variant_obj,
+            color_name=variant_obj.name if variant_obj else selected_color,
+            quantity=1
+        )
 
     went_to_gifts = _handle_gift_after_add(request, cart, product)
     if went_to_gifts and not request.POST.get('gift'):
-        return redirect(_cart_url())      # no gift chosen yet: let the customer pick one in the cart
-    return redirect('store:checkout')      # gift already chosen on the product page (or no offer)
+        return redirect(_cart_url())
+    return redirect('store:checkout')
 
 
 # ---------------------------------------------------------------------------
@@ -821,22 +900,34 @@ def checkout(request):
                 )
 
                 for item in cart_items:
-                    updated = Product.objects.filter(
-                        pk=item.product_id, stock__gte=item.quantity
-                    ).update(stock=F('stock') - item.quantity)
-                    if not updated:
-                        raise OutOfStock(item.product.title)
-                    item_color = getattr(item, 'selected_color', '') or ''
-                    if item_color:
-                        ProductColor.objects.filter(
-                            product_id=item.product_id,
-                            name__iexact=item_color,
-                            stock__gte=item.quantity
+                    variant_obj = getattr(item, 'variant', None)
+                    if not variant_obj and getattr(item, 'selected_color', None):
+                        variant_obj = item.product.colors.filter(name__iexact=item.selected_color).first()
+
+                    if variant_obj:
+                        updated = ProductColor.objects.filter(
+                            pk=variant_obj.pk, stock__gte=item.quantity
                         ).update(stock=F('stock') - item.quantity)
-                    OrderItem.objects.create(order=order, product=item.product,
-                                             color=item_color,
-                                             price=getattr(item, 'unit_price', item.product.price),
-                                             quantity=item.quantity)
+                        if not updated:
+                            raise OutOfStock(f"{item.product.title} ({variant_obj.name})")
+                    else:
+                        updated = Product.objects.filter(
+                            pk=item.product_id, stock__gte=item.quantity
+                        ).update(stock=F('stock') - item.quantity)
+                        if not updated:
+                            raise OutOfStock(item.product.title)
+
+                    item_color = (variant_obj.name if variant_obj else getattr(item, 'selected_color', '')) or ''
+                    item_sku = (variant_obj.sku if variant_obj and variant_obj.sku else item.product.sku) or ''
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item.product,
+                        variant=variant_obj,
+                        sku=item_sku,
+                        color=item_color,
+                        price=getattr(item, 'unit_price', item.product.price),
+                        quantity=item.quantity
+                    )
 
                 # Free gifts: a separate line at Rs.0, linked to the offer, and they leave the shelf too
                 for gift in pricing['gifts']:

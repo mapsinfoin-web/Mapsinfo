@@ -7,6 +7,11 @@ from django.db.models import Q
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from urllib.parse import quote
+import json
+import logging
+from decimal import Decimal
+
+logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -343,7 +348,7 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'category', 'sub_categories', 'title', 'sku', 'description',
+            'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
             'mrp', 'price', 'stock', 'image', 'video', 'is_active',
             'weight_grams', 'dimensions', 'closure_type', 'pair_with',
             'occasions_list', 'metal_finish_list',
@@ -374,13 +379,14 @@ class ProductAdminForm(forms.ModelForm):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ['title', 'sku', 'category', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
-    list_filter = [StockStatusFilter, 'category', 'is_active']
+    change_form_template = 'admin/store/product/change_form.html'
+    list_display = ['title', 'sku', 'category', 'brand', 'product_type', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
+    list_filter = [StockStatusFilter, 'category', 'brand', 'product_type', 'is_active']
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
-    search_fields = ['title', 'sku']
+    search_fields = ['title', 'sku', 'brand', 'product_type']
     filter_horizontal = ['sub_categories', 'pair_with']
-    inlines = [ProductGalleryInline, ProductColorInline]
+    inlines = [ProductGalleryInline]
 
     class Media:
         js = ('store/js/admin_prevent_double_submit.js',)
@@ -388,7 +394,7 @@ class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Basic Details', {
             'fields': (
-                'category', 'sub_categories', 'title', 'sku', 'description',
+                'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
                 'mrp', 'price', 'stock', 'image', 'video', 'video_player_preview', 'is_active'
             )
         }),
@@ -450,7 +456,13 @@ class ProductAdmin(admin.ModelAdmin):
             inline_instances.append(inline)
         return inline_instances
 
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['existing_variants_json'] = '[]'
+        return super().add_view(request, form_url, extra_context)
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
         try:
             from django.db import connection
             tables = connection.introspection.table_names()
@@ -462,7 +474,231 @@ class ProductAdmin(admin.ModelAdmin):
                 )
         except Exception:
             pass
+
+        try:
+            obj = self.get_object(request, object_id)
+            if obj:
+                colors = obj.colors.all().order_by('order', 'id').prefetch_related('gallery_images')
+                variants_data = []
+                for c in colors:
+                    gallery_items = []
+                    galleries = list(c.gallery_images.all().order_by('order', 'id'))
+                    has_primary = False
+                    for g in galleries:
+                        if g.image:
+                            try:
+                                url = g.image.url
+                                is_p = bool(g.is_primary)
+                                if is_p:
+                                    has_primary = True
+                                gallery_items.append({
+                                    'id': g.id,
+                                    'url': url,
+                                    'is_primary': is_p,
+                                })
+                            except Exception:
+                                pass
+                    if c.image:
+                        try:
+                            c_url = c.image.url
+                            found = any(g['url'] == c_url for g in gallery_items)
+                            if not found:
+                                pg, _ = ProductGallery.objects.get_or_create(
+                                    product=obj,
+                                    color=c,
+                                    image=c.image,
+                                    defaults={'is_primary': not has_primary, 'order': 0}
+                                )
+                                gallery_items.insert(0, {
+                                    'id': pg.id,
+                                    'url': c_url,
+                                    'is_primary': not has_primary,
+                                })
+                                if not has_primary:
+                                    has_primary = True
+                        except Exception:
+                            pass
+
+                    if gallery_items and not has_primary:
+                        gallery_items[0]['is_primary'] = True
+
+                    variants_data.append({
+                        'id': c.id,
+                        'name': c.name,
+                        'hex_code': c.hex_code or '#D4AF37',
+                        'sku': c.sku or '',
+                        'price': str(c.price) if c.price is not None else '',
+                        'mrp': str(c.mrp) if c.mrp is not None else '',
+                        'stock': c.stock,
+                        'is_available': c.is_available,
+                        'gallery': gallery_items,
+                    })
+                extra_context['existing_variants_json'] = json.dumps(variants_data)
+        except Exception as e:
+            logger.exception("Error preparing variants for change_view: %s", e)
+            extra_context['existing_variants_json'] = '[]'
+
         return super().change_view(request, object_id, form_url, extra_context)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        product = form.instance
+
+        payload_raw = request.POST.get('product_variants_payload')
+        if not payload_raw:
+            return
+
+        try:
+            variants = json.loads(payload_raw)
+        except Exception:
+            return
+
+        if not isinstance(variants, list):
+            return
+
+        created_or_updated_colors = []
+        for idx, v_data in enumerate(variants):
+            if not isinstance(v_data, dict):
+                continue
+
+            v_id = v_data.get('id')
+            is_deleted = bool(v_data.get('delete', False))
+
+            color_obj = None
+            if v_id:
+                try:
+                    color_obj = ProductColor.objects.filter(pk=v_id, product=product).first()
+                except Exception:
+                    color_obj = None
+
+            if is_deleted:
+                if color_obj:
+                    color_obj.delete()
+                continue
+
+            name = (v_data.get('name') or '').strip()
+            if not name:
+                continue
+
+            sku = (v_data.get('sku') or '').strip()
+            hex_code = (v_data.get('hex_code') or '').strip() or '#D4AF37'
+
+            price_val = v_data.get('price')
+            if price_val not in (None, '', 'None'):
+                try:
+                    price = Decimal(str(price_val))
+                except Exception:
+                    price = None
+            else:
+                price = None
+
+            mrp_val = v_data.get('mrp')
+            if mrp_val not in (None, '', 'None'):
+                try:
+                    mrp = Decimal(str(mrp_val))
+                except Exception:
+                    mrp = None
+            else:
+                mrp = None
+
+            try:
+                stock = int(v_data.get('stock', 0))
+            except Exception:
+                stock = 0
+            if stock < 0:
+                stock = 0
+
+            is_available = bool(v_data.get('is_available', True))
+            order = int(v_data.get('order', idx + 1))
+
+            if color_obj:
+                color_obj.name = name
+                if sku:
+                    color_obj.sku = sku
+                color_obj.hex_code = hex_code
+                color_obj.price = price
+                color_obj.mrp = mrp
+                color_obj.stock = stock
+                color_obj.is_available = is_available
+                color_obj.order = order
+                color_obj.save()
+            else:
+                color_obj = ProductColor.objects.create(
+                    product=product,
+                    name=name,
+                    sku=sku or None,
+                    hex_code=hex_code,
+                    price=price,
+                    mrp=mrp,
+                    stock=stock,
+                    is_available=is_available,
+                    order=order,
+                )
+
+            # 1. Delete removed gallery images
+            deleted_ids = v_data.get('deleted_gallery_ids', [])
+            if deleted_ids:
+                ProductGallery.objects.filter(pk__in=deleted_ids, color=color_obj).delete()
+
+            # 2. Save newly uploaded gallery images
+            new_files = request.FILES.getlist(f'variant_images_{idx}')
+            created_new_galleries = []
+            for file_obj in new_files:
+                pg = ProductGallery.objects.create(
+                    product=product,
+                    color=color_obj,
+                    image=file_obj,
+                    is_primary=False,
+                    order=10 + len(created_new_galleries),
+                )
+                created_new_galleries.append(pg)
+
+            # 3. Handle primary image assignment
+            primary_choice = v_data.get('primary_image_choice')
+            chosen_primary_gallery = None
+            if primary_choice:
+                if str(primary_choice).startswith('existing:'):
+                    try:
+                        g_id = int(primary_choice.split(':')[1])
+                        chosen_primary_gallery = ProductGallery.objects.filter(pk=g_id, color=color_obj).first()
+                    except Exception:
+                        pass
+                elif str(primary_choice).startswith('new:'):
+                    try:
+                        f_idx = int(primary_choice.split(':')[1])
+                        if 0 <= f_idx < len(created_new_galleries):
+                            chosen_primary_gallery = created_new_galleries[f_idx]
+                    except Exception:
+                        pass
+
+            all_variant_galleries = list(ProductGallery.objects.filter(color=color_obj).order_by('order', 'id'))
+            if not chosen_primary_gallery and all_variant_galleries:
+                for g in all_variant_galleries:
+                    if g.is_primary:
+                        chosen_primary_gallery = g
+                        break
+                if not chosen_primary_gallery:
+                    chosen_primary_gallery = all_variant_galleries[0]
+
+            if chosen_primary_gallery:
+                ProductGallery.objects.filter(color=color_obj).update(is_primary=False)
+                chosen_primary_gallery.is_primary = True
+                chosen_primary_gallery.save(update_fields=['is_primary'])
+                color_obj.image = chosen_primary_gallery.image
+                color_obj.save(update_fields=['image'])
+
+            created_or_updated_colors.append(color_obj)
+
+        # 4. Sync product overall stock and main image
+        all_colors = product.colors.all()
+        if all_colors.exists():
+            total_variant_stock = sum(c.stock for c in all_colors if c.is_available)
+            product.stock = total_variant_stock
+            if not product.image and created_or_updated_colors and created_or_updated_colors[0].image:
+                product.image = created_or_updated_colors[0].image
+                product.save(update_fields=['stock', 'image'])
+            else:
+                product.save(update_fields=['stock'])
 
     def delete_queryset(self, request, queryset):
         """Ensure each product's delete method and signals run so all Cloudinary images are purged."""

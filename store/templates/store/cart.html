@@ -220,7 +220,9 @@
             <div class="cart-items">
                 {% for item in cart_items %}
                 <div class="cart-item">
-                    {% if item.product.image %}
+                    {% if item.display_image %}
+                    <img src="{{ item.display_image.url }}" alt="{{ item.product.title }}" class="item-img" loading="lazy" />
+                    {% elif item.product.image %}
                     <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="item-img" loading="lazy" />
                     {% else %}
                     <div class="item-img" style="display:grid;place-items:center;color:var(--muted);">No Image</div>
@@ -232,19 +234,24 @@
                         {% endif %}
                         
                         <h4 class="item-title">{{ item.product.title }}</h4>
-                        {% if item.selected_color %}
+                        {% if item.display_sku %}
+                        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500;">SKU: {{ item.display_sku }}</div>
+                        {% endif %}
+                        {% if item.effective_color_name %}
+                        <div class="cart-color-badge"><i class="fas fa-palette"></i> Colour: <b>{{ item.effective_color_name }}</b></div>
+                        {% elif item.selected_color %}
                         <div class="cart-color-badge"><i class="fas fa-palette"></i> Colour: <b>{{ item.selected_color }}</b></div>
                         {% endif %}
                         <div class="item-price">₹{{ item.unit_price }} each</div>
                         
                         <div class="qty-box">
-                            <a href="{% url 'store:remove_cart' item.product.id %}" class="qty-btn"><i class="fas fa-minus"></i></a>
+                            <a href="{% url 'store:remove_cart' item.product.id %}?item_id={{ item.id }}" class="qty-btn" aria-label="Decrease quantity"><i class="fas fa-minus"></i></a>
                             <div class="qty-num">{{ item.quantity }}</div>
-                            <a href="{% url 'store:add_cart' item.product.id %}" class="qty-btn"><i class="fas fa-plus"></i></a>
+                            <a href="{% url 'store:add_cart' item.product.id %}?item_id={{ item.id }}{% if item.variant %}&variant_id={{ item.variant.id }}{% endif %}" class="qty-btn" aria-label="Increase quantity"><i class="fas fa-plus"></i></a>
                         </div>
                     </div>
                     
-                    <a href="{% url 'store:remove_cart_item' item.product.id %}" class="remove-btn" aria-label="Remove item"><i class="far fa-trash-alt"></i></a>
+                    <a href="{% url 'store:remove_cart_item' item.product.id %}?item_id={{ item.id }}" class="remove-btn" aria-label="Remove item"><i class="far fa-trash-alt"></i></a>
                 </div>
 
                 {% if item.offer %}
