@@ -794,6 +794,52 @@
                 margin-top: 1px !important;
                 line-height: 1.2 !important;
             }
+            .product-specs-box {
+                margin: 10px 0 14px !important;
+                padding: 10px 12px !important;
+                border-radius: 12px !important;
+            }
+            .specs-box-title {
+                font-size: 11px !important;
+                gap: 6px !important;
+                margin-bottom: 8px !important;
+                padding-bottom: 6px !important;
+                letter-spacing: .5px !important;
+            }
+            .specs-box-title i {
+                font-size: 12px !important;
+            }
+            .specs-grid {
+                grid-template-columns: 1fr !important;
+                gap: 6px !important;
+            }
+            .spec-item {
+                padding: 6px 8px !important;
+                gap: 8px !important;
+                border-radius: 9px !important;
+                align-items: center !important;
+            }
+            .spec-icon {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 11px !important;
+                border-radius: 6px !important;
+            }
+            .spec-content {
+                gap: 1px !important;
+            }
+            .spec-label {
+                font-size: 9px !important;
+                letter-spacing: .3px !important;
+            }
+            .spec-value {
+                font-size: 11.5px !important;
+                line-height: 1.25 !important;
+            }
+            .spec-hint {
+                font-size: 9.5px !important;
+                line-height: 1.2 !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -818,6 +864,39 @@
             }
             .g-badge p {
                 font-size: 9.5px !important;
+            }
+            .product-specs-box {
+                margin: 8px 0 12px !important;
+                padding: 8px 10px !important;
+                border-radius: 11px !important;
+            }
+            .specs-box-title {
+                font-size: 10.5px !important;
+                margin-bottom: 6px !important;
+                padding-bottom: 5px !important;
+            }
+            .specs-grid {
+                gap: 5px !important;
+            }
+            .spec-item {
+                padding: 5px 7px !important;
+                gap: 7px !important;
+                border-radius: 8px !important;
+            }
+            .spec-icon {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+                border-radius: 5px !important;
+            }
+            .spec-label {
+                font-size: 8.5px !important;
+            }
+            .spec-value {
+                font-size: 11px !important;
+            }
+            .spec-hint {
+                font-size: 9px !important;
             }
         }
 
@@ -862,11 +941,11 @@
         /* ===== Jewellery Specifications Card ===== */
         .product-specs-box {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid rgba(19, 38, 57, .1);
             box-shadow: 0 4px 18px rgba(19, 38, 57, .04);
-            padding: 18px 20px;
-            margin: 18px 0 22px;
+            padding: 14px 16px;
+            margin: 14px 0 18px;
             box-sizing: border-box;
             width: 100%;
             overflow: hidden;
@@ -874,35 +953,35 @@
         .specs-box-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 13px;
+            gap: 8px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--navy);
             text-transform: uppercase;
             letter-spacing: .7px;
-            margin-bottom: 14px;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 1px dashed var(--line);
         }
         .specs-box-title i {
             color: var(--blue);
-            font-size: 15px;
+            font-size: 13.5px;
         }
         .specs-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
+            gap: 10px;
             width: 100%;
             box-sizing: border-box;
         }
         .spec-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 10px;
             background: #F8FAFC;
             border: 1px solid rgba(19, 38, 57, .08);
-            border-radius: 14px;
-            padding: 12px 14px;
+            border-radius: 12px;
+            padding: 9px 11px;
             min-width: 0;
             box-sizing: border-box;
             width: 100%;
@@ -914,27 +993,27 @@
             box-shadow: 0 4px 12px rgba(31, 58, 102, .08);
         }
         .spec-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
             background: rgba(31, 58, 102, .08);
             color: var(--navy);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12.5px;
             flex-shrink: 0;
         }
         .spec-content {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
             min-width: 0;
             flex: 1;
             overflow: hidden;
         }
         .spec-label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: .5px;
             color: var(--muted);
@@ -942,17 +1021,17 @@
             line-height: 1.2;
         }
         .spec-value {
-            font-size: 13.5px;
+            font-size: 12.5px;
             font-weight: 700;
             color: var(--ink);
-            line-height: 1.35;
+            line-height: 1.3;
             white-space: normal;
             word-break: break-word;
         }
         .spec-hint {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--muted);
-            line-height: 1.3;
+            line-height: 1.25;
         }
 
         /* ===== Branded Digital Certificate Seal (Anti-Tarnish Purity & Skin-Safe Guarantee) ===== */
