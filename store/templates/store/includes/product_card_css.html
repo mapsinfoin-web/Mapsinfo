@@ -1,16 +1,21 @@
         /* ===== UNIFIED PRODUCT CARD (Matches Home Collection Grid) ===== */
-        .col-card, .grid > .card, .collection-grid > .card {
+        .col-card, .grid > .card, .collection-grid > .card, article.card, article.col-card {
             background: #fff;
             border: 1px solid rgba(209, 222, 232, 0.85);
             border-radius: 22px;
             padding: 12px;
-            display: flex;
-            flex-direction: column;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            box-sizing: border-box !important;
             box-shadow: 0 4px 18px rgba(19, 38, 57, 0.05);
             transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease, border-color .35s ease;
             position: relative;
         }
-        .col-card:hover, .grid > .card:hover, .collection-grid > .card:hover {
+        .grid, .collection-grid {
+            align-items: stretch !important;
+        }
+        .col-card:hover, .grid > .card:hover, .collection-grid > .card:hover, article.card:hover, article.col-card:hover {
             transform: translateY(-8px);
             border-color: var(--blue);
             box-shadow: 0 20px 44px rgba(19, 38, 57, 0.12);
@@ -126,9 +131,9 @@
 
         .col-body, .card .card-body {
             padding: 14px 4px 2px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 auto !important;
             text-align: left;
         }
         .col-rating-row {
@@ -202,11 +207,17 @@
             color: var(--blue);
         }
 
+        .card-swatches-slot {
+            min-height: 22px;
+            display: flex;
+            align-items: center;
+            margin: 2px 0 8px;
+        }
         .card-color-swatches {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            margin: 2px 0 8px;
+            margin: 0;
         }
         .card-swatch-dot {
             width: 12px;
@@ -230,7 +241,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: auto;
+            margin-top: auto !important;
             padding-bottom: 12px;
         }
         .col-prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -316,20 +327,67 @@
         }
 
         @media (max-width: 1024px) {
-            .collection-grid, .grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+            .collection-grid, .grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 18px !important;
+                align-items: stretch !important;
+            }
         }
         @media (max-width: 768px) {
-            .collection-grid, .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-            .col-card, .grid > .card, .collection-grid > .card { padding: 10px; border-radius: 16px; }
-            .col-title, .card .card-body h3 { font-size: 14px; min-height: 38px; }
-            .col-price { font-size: 17px; }
-            .col-mrp { font-size: 12px; }
-            .col-discount-pill, .discount-badge { font-size: 10px; padding: 2px 6px; }
+            .collection-grid, .grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 14px !important;
+                align-items: stretch !important;
+            }
+            .col-card, .grid > .card, .collection-grid > .card, article.card, article.col-card {
+                padding: 10px !important;
+                border-radius: 16px !important;
+                height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            .col-title, .card .card-body h3 {
+                font-size: 13.5px !important;
+                min-height: 38px !important;
+                line-height: 1.35 !important;
+            }
+            .card-swatches-slot {
+                min-height: 20px !important;
+                margin: 2px 0 6px !important;
+            }
+            .card-color-swatches {
+                gap: 4px !important;
+            }
+            .card-swatch-dot {
+                width: 10px !important;
+                height: 10px !important;
+            }
+            .card-color-count {
+                font-size: 10px !important;
+            }
+            .col-price-row {
+                margin-top: auto !important;
+                padding-bottom: 8px !important;
+            }
+            .col-price { font-size: 17px !important; }
+            .col-mrp { font-size: 12px !important; }
+            .col-discount-pill, .discount-badge { font-size: 10px !important; padding: 2px 6px !important; }
         }
         @media (max-width: 480px) {
-            .collection-grid, .grid { gap: 10px; }
-            .col-card, .grid > .card, .collection-grid > .card { padding: 8px; border-radius: 14px; }
-            .col-img-link, .card .thumb a.col-img-link { padding: 8px; }
-            .col-btn-action.add { height: 38px; padding: 6px 8px; font-size: 12px; }
-            .col-btn-action.detail { width: 38px; height: 38px; font-size: 12px; }
+            .collection-grid, .grid {
+                gap: 10px !important;
+                align-items: stretch !important;
+            }
+            .col-card, .grid > .card, .collection-grid > .card, article.card, article.col-card {
+                padding: 8px !important;
+                border-radius: 14px !important;
+                height: 100% !important;
+            }
+            .col-img-link, .card .thumb a.col-img-link { padding: 6px !important; }
+            .col-title, .card .card-body h3 {
+                font-size: 13px !important;
+                min-height: 36px !important;
+            }
+            .col-btn-action.add { height: 38px !important; padding: 6px 8px !important; font-size: 12px !important; }
+            .col-btn-action.detail { width: 38px !important; height: 38px !important; font-size: 12px !important; }
         }
