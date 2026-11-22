@@ -1527,9 +1527,9 @@
         .deal-copy h2 em { color: var(--accent); }
         .deal-copy p { color: #C2D6E8; margin: 0 0 26px; line-height: 1.7; max-width: 400px; font-weight: 300; }
         .timer { display: flex; gap: 12px; margin-bottom: 30px; }
-        .timer div { width: 74px; padding: 14px 0; text-align: center; border-radius: 16px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); }
-        .timer strong { display: block; font-size: 28px; font-weight: 700; }
-        .timer span { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(194,214,232,.75); }
+        .timer div { width: 74px; padding: 14px 4px; text-align: center; border-radius: 16px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); box-sizing: border-box; }
+        .timer strong { display: block; font-size: 28px; font-weight: 700; line-height: 1.15; margin-bottom: 3px; color: #fff; }
+        .timer span { display: block; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(194,214,232,.75); white-space: nowrap; line-height: 1.1; }
         .deal-img { height: 100%; min-height: 420px; background: url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1000&auto=format&fit=crop') center/cover; clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%); }
         .promo-code { display: inline-block; padding: 6px 14px; border: 1.5px dashed var(--accent); color: var(--accent); border-radius: 10px; font-weight: 700; letter-spacing: 2px; margin-left: 10px; font-size: 13px; }
 
@@ -1670,11 +1670,13 @@
             .cat-info h3 { font-size: 14px; }
             .cat-info p { display: none; }
             .cat-arrow { width: 24px; height: 24px; font-size: 9px; }
-            .deal-copy h2 { font-size: 34px; }
-            .timer { gap: 8px !important; justify-content: center !important; }
-            .timer div { width: 52px !important; padding: 6px 0 !important; border-radius: 12px !important; }
-            .timer span { font-size: 18px !important; }
-            .timer small { font-size: 9px !important; }
+            .deal-copy { padding: 34px 20px !important; }
+            .deal-copy h2 { font-size: 32px !important; line-height: 1.15 !important; }
+            .deal-copy p { font-size: 14px !important; margin-bottom: 20px !important; }
+            .timer { display: flex !important; gap: 8px !important; justify-content: flex-start !important; margin-bottom: 24px !important; max-width: 100% !important; }
+            .timer div { width: auto !important; flex: 1 1 0 !important; max-width: 70px !important; min-width: 48px !important; padding: 10px 3px !important; border-radius: 12px !important; text-align: center !important; box-sizing: border-box !important; overflow: hidden !important; }
+            .timer strong { font-size: 22px !important; font-weight: 700 !important; line-height: 1.1 !important; margin-bottom: 2px !important; display: block !important; color: #fff !important; }
+            .timer span { font-size: 9px !important; letter-spacing: 0.6px !important; text-transform: uppercase !important; color: rgba(194,214,232,.8) !important; display: block !important; line-height: 1.1 !important; white-space: nowrap !important; }
             .unboxing-wrap { padding: 20px 16px !important; border-radius: 20px !important; gap: 20px !important; }
             .story h2 { font-size: 32px; }
             .stats { gap: 26px; }
