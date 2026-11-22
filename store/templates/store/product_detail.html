@@ -2949,20 +2949,14 @@
                     {% for img_url in selected_color_obj.all_images %}
                     <img src="{{ img_url }}" class="thumb {% if forloop.first %}active{% endif %}" onclick="swapImage(this)" alt="{{ selected_color_obj.name }} view {{ forloop.counter }}" loading="lazy" />
                     {% endfor %}
-                    {% if product.image and product.image.url not in selected_color_obj.all_images %}
-                    <img src="{{ product.image.url }}" class="thumb" onclick="swapImage(this)" alt="Main view" loading="lazy" />
-                    {% endif %}
-                    {% for gallery_img in product.gallery_images.all %}
-                    {% if gallery_img.image.url not in selected_color_obj.all_images %}
-                    <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
-                    {% endif %}
-                    {% endfor %}
                 {% else %}
                     {% if product.image %}
                     <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" loading="lazy" />
                     {% endif %}
                     {% for gallery_img in product.gallery_images.all %}
+                    {% if not gallery_img.color %}
                     <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
+                    {% endif %}
                     {% endfor %}
                 {% endif %}
                 {% if product.video %}
@@ -2979,7 +2973,9 @@
                 <img src="{{ product.image.url }}" class="thumb active" onclick="swapImage(this)" alt="Main view" loading="lazy" />
                 {% endif %}
                 {% for gallery_img in product.gallery_images.all %}
+                {% if not gallery_img.color %}
                 <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
+                {% endif %}
                 {% endfor %}
                 {% if product.video %}
                 <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
@@ -4163,7 +4159,9 @@
             galleryImages: [
                 {% if product.image %}'{{ product.image.url }}',{% endif %}
                 {% for gallery_img in product.gallery_images.all %}
+                {% if not gallery_img.color %}
                 '{{ gallery_img.image.url }}'{% if not forloop.last %},{% endif %}
+                {% endif %}
                 {% endfor %}
             ]
         };
@@ -4387,7 +4385,7 @@
             var combinedImages = [];
             var seen = {};
 
-            // 1. Colour images first
+            // 1. Show ONLY this selected colour's images
             for (var i = 0; i < colorList.length; i++) {
                 var cu = colorList[i];
                 if (cu && !seen[cu]) {
@@ -4399,18 +4397,12 @@
                 }
             }
 
-            // 2. Base product gallery images after the colour
-            if (baseProductState.galleryImages && baseProductState.galleryImages.length > 0) {
-                for (var j = 0; j < baseProductState.galleryImages.length; j++) {
-                    var gu = baseProductState.galleryImages[j];
-                    if (gu && !seen[gu]) {
-                        seen[gu] = true;
-                        combinedImages.push({
-                            url: gu,
-                            alt: 'Gallery view ' + (j + 1)
-                        });
-                    }
-                }
+            // Fallback: only if this specific colour has NO images at all, fall back to base product main image
+            if (combinedImages.length === 0 && baseProductState.mainImage) {
+                combinedImages.push({
+                    url: baseProductState.mainImage,
+                    alt: baseProductState.mainTitle
+                });
             }
 
             var thumbsContainer = document.getElementById('productThumbsContainer');
