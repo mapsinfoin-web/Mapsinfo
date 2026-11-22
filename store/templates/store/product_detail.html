@@ -186,45 +186,110 @@
         .thumbs .thumb:hover { transform: translateY(-2px); }
         .thumbs .thumb.active { border-color: var(--navy); }
         .video-thumb-btn {
+            position: relative;
             width: 74px;
             height: 74px;
             flex-shrink: 0;
             border-radius: 14px;
             border: 2px solid transparent;
-            background: linear-gradient(135deg, #0b192c 0%, #1e3e62 100%);
-            color: #fff;
+            background: #0b192c;
             cursor: pointer;
             box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
             display: inline-flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            transition: all .2s ease;
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
             box-sizing: border-box;
-            padding: 4px;
+            outline: none;
         }
-        .video-thumb-btn i {
-            font-size: 18px;
+        .video-thumb-btn .video-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 12px;
+            transition: transform .3s ease;
+        }
+        .video-thumb-btn .video-thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(11, 25, 44, 0.1) 0%, rgba(11, 25, 44, 0.65) 100%);
+            border-radius: 12px;
+            pointer-events: none;
+            transition: background .25s ease;
+        }
+        .video-thumb-btn .video-thumb-play {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(11, 25, 44, 0.85);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: grid;
+            place-items: center;
             color: #fbbf24;
-            transition: transform .2s ease;
-        }
-        .video-thumb-btn span {
             font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            padding-left: 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(251, 191, 36, 0.55);
+            transition: all .25s ease;
+            pointer-events: none;
+        }
+        .video-thumb-btn .video-thumb-tag {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 25, 44, 0.92);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 8.5px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 2px 7px;
+            border-radius: 999px;
             text-transform: uppercase;
+            white-space: nowrap;
+            border: 0.8px solid rgba(251, 191, 36, 0.6);
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all .25s ease;
+        }
+        .video-thumb-btn .video-thumb-tag i {
+            color: #fbbf24;
+            font-size: 7px;
         }
         .video-thumb-btn:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg, #1e3e62 0%, #0b192c 100%);
+            border-color: #fbbf24;
         }
-        .video-thumb-btn:hover i {
-            transform: scale(1.2);
+        .video-thumb-btn:hover .video-thumb-img {
+            transform: scale(1.08);
+        }
+        .video-thumb-btn:hover .video-thumb-play {
+            background: #fbbf24;
+            color: #0b192c;
+            border-color: #fbbf24;
+            transform: translate(-50%, -50%) scale(1.12);
         }
         .video-thumb-btn.active {
             border-color: #fbbf24;
-            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.4);
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.5), var(--shadow);
+        }
+        .video-thumb-btn.active .video-thumb-play {
+            background: #fbbf24;
+            color: #0b192c;
         }
 
         /* Info card */
@@ -2708,8 +2773,10 @@
                 {% endif %}
                 {% if product.video %}
                 <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
-                    <i class="fas fa-play"></i>
-                    <span>Video</span>
+                    <img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                    <span class="video-thumb-overlay"></span>
+                    <span class="video-thumb-play"><i class="fas fa-play"></i></span>
+                    <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
                 </button>
                 {% endif %}
             </div>
@@ -2722,8 +2789,10 @@
                 {% endfor %}
                 {% if product.video %}
                 <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
-                    <i class="fas fa-play"></i>
-                    <span>Video</span>
+                    <img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                    <span class="video-thumb-overlay"></span>
+                    <span class="video-thumb-play"><i class="fas fa-play"></i></span>
+                    <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
                 </button>
                 {% endif %}
             </template>
@@ -4091,6 +4160,14 @@
                     var activeCls = (k === 0) ? 'thumb active' : 'thumb';
                     thumbsHtml += '<img src="' + item.url + '" class="' + activeCls + '" onclick="swapImage(this)" alt="' + item.alt + '" loading="lazy" />';
                 }
+                {% if product.video %}
+                thumbsHtml += '<button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">' +
+                    '<img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />' +
+                    '<span class="video-thumb-overlay"></span>' +
+                    '<span class="video-thumb-play"><i class="fas fa-play"></i></span>' +
+                    '<span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>' +
+                '</button>';
+                {% endif %}
                 thumbsContainer.innerHTML = thumbsHtml;
             }
 

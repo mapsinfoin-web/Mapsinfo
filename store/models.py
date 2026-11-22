@@ -163,6 +163,29 @@ class Product(models.Model):
         return None
 
     @property
+    def video_thumbnail_url(self):
+        """
+        Returns a thumbnail image URL for the video clip.
+        If hosted on Cloudinary, generates an auto-extracted video frame thumbnail.
+        Falls back to the product's primary image if available.
+        """
+        if self.video:
+            try:
+                v_url = self.video.url
+                if 'res.cloudinary.com' in v_url:
+                    base_url = re.sub(r'\.(mp4|webm|mov|mkv|ogv)$', '', v_url, flags=re.IGNORECASE)
+                    if '/video/upload/' in base_url:
+                        return base_url.replace('/video/upload/', '/video/upload/so_auto,w_250,h_250,c_fill/') + '.jpg'
+                    return base_url + '.jpg'
+                elif self.image:
+                    return self.image.url
+            except Exception:
+                pass
+        if self.image:
+            return self.image.url
+        return ''
+
+    @property
     def available_colors(self):
         """Returns active colors for this product if defined, otherwise empty list."""
         if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:
