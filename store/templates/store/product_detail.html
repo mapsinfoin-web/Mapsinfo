@@ -509,6 +509,200 @@
             width: 100% !important;
             justify-content: center !important;
         }
+
+        /* ===== Progressive Tiered Bundle Box ===== */
+        .tiered-bundle-container {
+            background: linear-gradient(145deg, #f8fafc, #ffffff);
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: 0 4px 18px rgba(19, 38, 57, 0.05);
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .tiered-bundle-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .tiered-bundle-badge {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tiered-bundle-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.3;
+        }
+        .tiered-bundle-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        @media (max-width: 640px) {
+            .tiered-bundle-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+        .tier-card {
+            position: relative;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            user-select: none;
+        }
+        .tier-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.12);
+        }
+        .tier-card.active {
+            border-color: #1e3a8a;
+            background: #f0f7ff;
+            box-shadow: 0 0 0 2px #3b82f6, 0 6px 16px rgba(30, 58, 138, 0.12);
+        }
+        .tier-card.popular {
+            border-color: #f59e0b;
+        }
+        .tier-card.popular.active {
+            border-color: #d97706;
+            background: #fffbeb;
+            box-shadow: 0 0 0 2px #f59e0b, 0 6px 16px rgba(245, 158, 11, 0.18);
+        }
+        .tier-popular-pill {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 999px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+        }
+        .tier-radio-circle {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid #94a3b8;
+            background: #ffffff;
+            display: grid;
+            place-items: center;
+            font-size: 8px;
+            color: transparent;
+            transition: all 0.2s;
+        }
+        .tier-card.active .tier-radio-circle {
+            background: #1e3a8a;
+            border-color: #1e3a8a;
+            color: #ffffff;
+        }
+        .tier-card.popular.active .tier-radio-circle {
+            background: #d97706;
+            border-color: #d97706;
+            color: #ffffff;
+        }
+        .tier-qty-badge {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+        .tier-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-bottom: 3px;
+        }
+        .tier-card.popular .tier-price {
+            color: #b45309;
+        }
+        .tier-tag {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #64748b;
+            line-height: 1.2;
+        }
+        .tier-tag.save {
+            color: #059669;
+            font-weight: 700;
+        }
+        .tier-tag.mega {
+            color: #b45309;
+            font-weight: 700;
+        }
+        .tiered-summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 12px;
+            background: #ffffff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tiered-summary-text {
+            font-size: 13px;
+            color: #475569;
+        }
+        .tiered-summary-prices {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .tiered-old-total {
+            font-size: 13px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .tiered-final-total {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .tiered-savings-pill {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
         @media (max-width: 480px) {
             .gallery-actions-btns {
                 gap: 8px;
@@ -2921,6 +3115,67 @@
                         {% endif %}
                     </p>
 
+                    {% if quantity_offer %}
+                    <!-- Progressive Tiered Quantity Discount Selector -->
+                    <div class="tiered-bundle-container" id="tieredBundleContainer"
+                         data-t1="{{ quantity_offer.tier_1_discount }}"
+                         data-t2="{{ quantity_offer.tier_2_discount }}"
+                         data-t3="{{ quantity_offer.tier_3_discount }}"
+                         data-t4="{{ quantity_offer.tier_4_discount }}">
+                        <div class="tiered-bundle-header">
+                            <span class="tiered-bundle-badge"><i class="fas fa-tags"></i> {{ quantity_offer.badge_text }}</span>
+                            <div class="tiered-bundle-title">{{ quantity_offer.headline }}</div>
+                        </div>
+                        <div class="tiered-bundle-cards">
+                            <!-- 1 Piece -->
+                            <div class="tier-card active" data-tier="1" onclick="selectTier(1)">
+                                <div class="tier-radio-circle"><i class="fas fa-check"></i></div>
+                                <div class="tier-content">
+                                    <div class="tier-qty-badge">1 Piece</div>
+                                    <div class="tier-price" id="tierPriceVal1">₹{{ product.effective_price|default:product.price }}</div>
+                                    <div class="tier-tag">Standard Price</div>
+                                </div>
+                            </div>
+                            <!-- 2 Pieces -->
+                            <div class="tier-card" data-tier="2" onclick="selectTier(2)">
+                                <div class="tier-radio-circle"><i class="fas fa-check"></i></div>
+                                <div class="tier-content">
+                                    <div class="tier-qty-badge">2 Pieces</div>
+                                    <div class="tier-price" id="tierPriceVal2">₹...</div>
+                                    <div class="tier-tag save">Save {{ quantity_offer.tier_2_discount|floatformat:0 }}% on 2nd</div>
+                                </div>
+                            </div>
+                            <!-- 3 Pieces -->
+                            <div class="tier-card" data-tier="3" onclick="selectTier(3)">
+                                <div class="tier-radio-circle"><i class="fas fa-check"></i></div>
+                                <div class="tier-content">
+                                    <div class="tier-qty-badge">3 Pieces</div>
+                                    <div class="tier-price" id="tierPriceVal3">₹...</div>
+                                    <div class="tier-tag save">Save {{ quantity_offer.tier_3_discount|floatformat:0 }}% on 3rd</div>
+                                </div>
+                            </div>
+                            <!-- 4 Pieces -->
+                            <div class="tier-card popular" data-tier="4" onclick="selectTier(4)">
+                                <div class="tier-popular-pill">Best Value</div>
+                                <div class="tier-radio-circle"><i class="fas fa-check"></i></div>
+                                <div class="tier-content">
+                                    <div class="tier-qty-badge">4 Pieces</div>
+                                    <div class="tier-price" id="tierPriceVal4">₹...</div>
+                                    <div class="tier-tag mega">🔥 {{ quantity_offer.tier_4_discount|floatformat:0 }}% OFF 4th!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tiered-summary-row" id="tieredSummaryRow">
+                            <div class="tiered-summary-text">Total for <b id="tierSelectedQtyText">1 item</b>:</div>
+                            <div class="tiered-summary-prices">
+                                <span class="tiered-old-total" id="tierOldTotal" style="display:none;"></span>
+                                <span class="tiered-final-total" id="tierFinalTotal">₹{{ product.effective_price|default:product.price }}</span>
+                            </div>
+                            <div class="tiered-savings-pill" id="tierSavingsPill" style="display:none;"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {% if offer and gift_choices %}
                     <!-- Buy 1 Get 1 Free: customer picks gift, one click adds both -->
                     <div class="gift-offer">
@@ -2931,6 +3186,7 @@
                             <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
+                            <input type="hidden" name="quantity" class="productSelectedQuantity" value="1" />
                             <p class="gift-offer-sub">Choose your FREE gift:</p>
                             {% for g in gift_choices %}
                             <label class="gift-choice">
@@ -2955,6 +3211,7 @@
                             <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
+                            <input type="hidden" name="quantity" class="productSelectedQuantity" value="1" />
                             <button type="submit" class="btn btn-add"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                         </form>
                         <form action="{% url 'store:buy_now' product.pk %}" method="POST" class="action-form action-form-buy" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
@@ -2963,6 +3220,7 @@
                             <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                             <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                             {% endif %}
+                            <input type="hidden" name="quantity" class="productSelectedQuantity" value="1" />
                             <button type="submit" class="btn btn-buy"><i class="fas fa-bolt"></i> Buy Now</button>
                         </form>
                         <button type="button" class="btn btn-out-of-stock-single action-btn-soldout" disabled {% if not selected_color_obj or selected_color_obj.in_stock %}style="display:none;"{% endif %}><i class="fas fa-ban"></i> Out of Stock</button>
@@ -4087,6 +4345,9 @@
                 if (priceEl) priceEl.textContent = '₹' + priceVal;
                 var stickyPrice = document.getElementById('stickyMobilePrice');
                 if (stickyPrice) stickyPrice.textContent = '₹' + priceVal;
+                if (typeof updateTierCalculations === 'function') {
+                    updateTierCalculations(parseFloat(priceVal));
+                }
             }
             if (imgUrl) {
                 var stickyImg = document.getElementById('stickyBarImg');
@@ -4299,6 +4560,109 @@
                 vBtn.classList.add('active');
             }
         }
+
+        // ===== Progressive Tiered Quantity Discount Calculation =====
+        var selectedTierQuantity = 1;
+
+        function updateTierCalculations(unitPrice) {
+            var box = document.getElementById('tieredBundleContainer');
+            if (!box) return;
+
+            if (typeof unitPrice === 'undefined' || isNaN(unitPrice) || unitPrice <= 0) {
+                var activeSwatch = document.querySelector('.color-swatch-item.active');
+                if (activeSwatch) {
+                    unitPrice = parseFloat(activeSwatch.getAttribute('data-price')) || 0;
+                }
+                if (!unitPrice) {
+                    var priceEl = document.getElementById('productPriceDisplay');
+                    if (priceEl) {
+                        var pText = priceEl.textContent.replace(/[^0-9.]/g, '');
+                        unitPrice = parseFloat(pText) || 0;
+                    }
+                }
+            }
+            if (!unitPrice || unitPrice <= 0) return;
+
+            var t1 = parseFloat(box.getAttribute('data-t1')) || 0;
+            var t2 = parseFloat(box.getAttribute('data-t2')) || 10;
+            var t3 = parseFloat(box.getAttribute('data-t3')) || 25;
+            var t4 = parseFloat(box.getAttribute('data-t4')) || 80;
+
+            var p1 = Math.round(unitPrice * (1 - t1 / 100));
+            var p2 = Math.round(unitPrice * (1 - t2 / 100));
+            var p3 = Math.round(unitPrice * (1 - t3 / 100));
+            var p4 = Math.round(unitPrice * (1 - t4 / 100));
+
+            var total1 = p1;
+            var total2 = p1 + p2;
+            var total3 = p1 + p2 + p3;
+            var total4 = p1 + p2 + p3 + p4;
+
+            var elP1 = document.getElementById('tierPriceVal1');
+            var elP2 = document.getElementById('tierPriceVal2');
+            var elP3 = document.getElementById('tierPriceVal3');
+            var elP4 = document.getElementById('tierPriceVal4');
+
+            if (elP1) elP1.textContent = '₹' + total1.toLocaleString('en-IN');
+            if (elP2) elP2.textContent = '₹' + total2.toLocaleString('en-IN');
+            if (elP3) elP3.textContent = '₹' + total3.toLocaleString('en-IN');
+            if (elP4) elP4.textContent = '₹' + total4.toLocaleString('en-IN');
+
+            var currentTotal = total1;
+            var undiscTotal = Math.round(unitPrice * selectedTierQuantity);
+            if (selectedTierQuantity === 2) currentTotal = total2;
+            else if (selectedTierQuantity === 3) currentTotal = total3;
+            else if (selectedTierQuantity >= 4) {
+                currentTotal = total4 + Math.round((selectedTierQuantity - 4) * p4);
+            }
+            var totalSavings = undiscTotal - currentTotal;
+
+            var sumQtyText = document.getElementById('tierSelectedQtyText');
+            if (sumQtyText) {
+                sumQtyText.textContent = selectedTierQuantity + (selectedTierQuantity === 1 ? ' piece' : ' pieces');
+            }
+
+            var finalEl = document.getElementById('tierFinalTotal');
+            if (finalEl) finalEl.textContent = '₹' + currentTotal.toLocaleString('en-IN');
+
+            var oldEl = document.getElementById('tierOldTotal');
+            var pillEl = document.getElementById('tierSavingsPill');
+            if (totalSavings > 0) {
+                if (oldEl) {
+                    oldEl.textContent = '₹' + undiscTotal.toLocaleString('en-IN');
+                    oldEl.style.display = 'inline';
+                }
+                if (pillEl) {
+                    pillEl.innerHTML = '<i class="fas fa-tags"></i> You Save ₹' + totalSavings.toLocaleString('en-IN') + '!';
+                    pillEl.style.display = 'inline-flex';
+                }
+            } else {
+                if (oldEl) oldEl.style.display = 'none';
+                if (pillEl) pillEl.style.display = 'none';
+            }
+        }
+
+        function selectTier(qty) {
+            selectedTierQuantity = parseInt(qty, 10) || 1;
+            document.querySelectorAll('.tier-card').forEach(function(card) {
+                var cardQty = parseInt(card.getAttribute('data-tier'), 10);
+                if (cardQty === selectedTierQuantity) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.productSelectedQuantity').forEach(function(input) {
+                input.value = selectedTierQuantity;
+            });
+
+            updateTierCalculations();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTierCalculations();
+        });
 
         // ===== Photo viewer with zoom =====
         (function () {
@@ -4535,6 +4899,7 @@ if (h) {
                 <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
+                <input type="hidden" name="quantity" class="productSelectedQuantity" value="1" />
                 <button type="submit" class="sticky-btn sticky-btn-add" title="Add to Cart">
                     <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
                 </button>
@@ -4545,6 +4910,7 @@ if (h) {
                 <input type="hidden" name="variant_id" class="productSelectedVariantId" value="{% if selected_color_obj %}{{ selected_color_obj.id }}{% endif %}" />
                 <input type="hidden" name="selected_color" class="productSelectedColor" value="{% if selected_color_obj %}{{ selected_color_obj.name }}{% endif %}" />
                 {% endif %}
+                <input type="hidden" name="quantity" class="productSelectedQuantity" value="1" />
                 <button type="submit" class="sticky-btn sticky-btn-buy">
                     <i class="fas fa-bolt"></i> <span>Buy Now</span>
                 </button>

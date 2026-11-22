@@ -1,5 +1,6 @@
 import re
 import uuid
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -614,6 +615,143 @@ class BogoOffer(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.main_product.title})"
+
+
+class QuantityOffer(models.Model):
+    """
+    Progressive Tiered Quantity Discount Offer.
+    Allows admin to customize:
+    - Tier 1 discount % (default 0%)
+    - Tier 2 discount % (default 10%)
+    - Tier 3 discount % (default 25%)
+    - Tier 4 discount % (default 80%)
+    - Scope: All products or specific categories / products
+    - Custom headline, badge text, dates, active switch
+    """
+    name = models.CharField(
+        max_length=150,
+        default="Buy More, Save More (10%, 25%, 80%)",
+        help_text="Name of this offer (e.g. 'Festive Progressive Quantity Discount')."
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Master switch. Untick to turn this offer off immediately."
+    )
+    apply_to_all = models.BooleanField(
+        default=True,
+        verbose_name="Apply to all products",
+        help_text="When ticked, all active products in the store get this tiered discount. Untick to pick specific categories or products below."
+    )
+    categories = models.ManyToManyField(
+        Category,
+        blank=True,
+        related_name='quantity_offers',
+        verbose_name="Specific Categories (optional)",
+        help_text="If not applied to all, apply to products belonging to these categories."
+    )
+    products = models.ManyToManyField(
+        Product,
+        blank=True,
+        related_name='quantity_offers',
+        verbose_name="Specific Products (optional)",
+        help_text="If not applied to all, apply to these specific products."
+    )
+    tier_1_discount = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        verbose_name="1st Item Discount (%)",
+        help_text="Discount percentage for 1st unit (default 0%)."
+    )
+    tier_2_discount = models.DecimalField(
+        max_digits=5, decimal_places=2, default=10.0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        verbose_name="2nd Item Discount (%)",
+        help_text="Discount percentage for 2nd unit (e.g. 10%)."
+    )
+    tier_3_discount = models.DecimalField(
+        max_digits=5, decimal_places=2, default=25.0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        verbose_name="3rd Item Discount (%)",
+        help_text="Discount percentage for 3rd unit (e.g. 25%)."
+    )
+    tier_4_discount = models.DecimalField(
+        max_digits=5, decimal_places=2, default=80.0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        verbose_name="4th Item & Above Discount (%)",
+        help_text="Discount percentage for 4th unit and all subsequent units (e.g. 80%)."
+    )
+    badge_text = models.CharField(
+        max_length=60,
+        default="Buy More, Save More",
+        help_text="Short badge shown on product card & detail (e.g. 'Buy 2 Get 10% Off', 'Up to 80% Off')."
+    )
+    headline = models.CharField(
+        max_length=200,
+        default="Buy 2 & Get 10% Off 2nd • Buy 3 & Get 25% Off 3rd • Buy 4 & Get 80% Off 4th",
+        blank=True,
+        help_text="Promotional headline displayed above the quantity selector on product page."
+    )
+    start_date = models.DateTimeField(null=True, blank=True, help_text="Leave empty to start immediately.")
+    end_date = models.DateTimeField(null=True, blank=True, help_text="Leave empty for no expiration.")
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = 'Quantity / Tiered Offer'
+        verbose_name_plural = 'Quantity / Tiered Offers'
+
+    def clean(self):
+        if self.start_date and self.end_date and self.end_date <= self.start_date:
+            raise ValidationError({'end_date': 'End date must be after the start date.'})
+
+    def status(self, now=None):
+        now = now or timezone.now()
+        if not self.is_active:
+            return 'Disabled'
+        if self.start_date and now < self.start_date:
+            return 'Scheduled'
+        if self.end_date and now > self.end_date:
+            return 'Expired'
+        return 'Live'
+
+    def is_live(self, now=None):
+        return self.status(now) == 'Live'
+
+    def get_tier_rate(self, unit_index):
+        """Returns Decimal discount rate between 0.0 and 1.0 for unit_index (1-based)."""
+        if unit_index == 1:
+            pct = self.tier_1_discount
+        elif unit_index == 2:
+            pct = self.tier_2_discount
+        elif unit_index == 3:
+            pct = self.tier_3_discount
+        else:
+            pct = self.tier_4_discount
+        return Decimal(str(pct)) / Decimal('100')
+
+    def calculate_units(self, unit_price, quantity):
+        unit_price = Decimal(str(unit_price))
+        total_undiscounted = unit_price * quantity
+        total_discount = Decimal('0')
+        breakdown = []
+        for i in range(1, quantity + 1):
+            rate = self.get_tier_rate(i)
+            disc = (unit_price * rate).quantize(Decimal('0.01'))
+            pay = unit_price - disc
+            total_discount += disc
+            pct = (rate * Decimal('100')).quantize(Decimal('1'))
+            breakdown.append({
+                'unit': i,
+                'rate_percent': int(pct),
+                'discount': disc,
+                'price': pay
+            })
+        total_payable = total_undiscounted - total_discount
+        return total_undiscounted, total_discount, total_payable, breakdown
+
+    def __str__(self):
+        return f"{self.name} ({self.status()})"
 
 
 class Cart(models.Model):

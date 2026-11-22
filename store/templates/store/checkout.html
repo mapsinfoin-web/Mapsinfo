@@ -308,7 +308,7 @@
                         </div>
                         {% for offer in applied_offers %}
                         <div class="summary-line savings">
-                            <span>Free gift ({{ offer.name }})</span>
+                            <span>{% if offer.type == 'tiered' %}<i class="fas fa-tags"></i> {{ offer.badge|default:offer.name }}{% else %}<i class="fas fa-gift"></i> Free gift ({{ offer.name }}){% endif %}</span>
                             <span>-₹{{ offer.discount }}</span>
                         </div>
                         {% endfor %}

@@ -19,6 +19,8 @@
                 <span class="col-tag out">SOLD OUT</span>
             {% elif product.offer %}
                 <span class="col-tag bogo">{{ product.offer.badge_text|upper }}</span>
+            {% elif product.quantity_offer %}
+                <span class="col-tag bogo">{{ product.quantity_offer.badge_text|upper }}</span>
             {% endif %}
         </div>
 

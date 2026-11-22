@@ -18,7 +18,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import (
     BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Notification, Order, OrderItem, PaymentSettings,
-    Product, ProductColor, ProductGallery, ProductReview, Profile,
+    Product, ProductColor, ProductGallery, ProductReview, Profile, QuantityOffer,
 )
 
 
@@ -825,6 +825,88 @@ class BogoOfferAdmin(admin.ModelAdmin):
     @admin.action(description='Turn OFF selected offers')
     def disable_offers(self, request, queryset):
         self.message_user(request, f"{queryset.update(is_active=False)} offer(s) turned off.", messages.SUCCESS)
+
+
+# --- PROGRESSIVE QUANTITY / TIERED OFFERS ---
+class QuantityOfferForm(forms.ModelForm):
+    class Meta:
+        model = QuantityOffer
+        fields = '__all__'
+
+
+@admin.register(QuantityOffer)
+class QuantityOfferAdmin(admin.ModelAdmin):
+    form = QuantityOfferForm
+    list_display = [
+        'name', 'discount_tiers_summary', 'scope_display', 'status_badge',
+        'is_active', 'start_date', 'end_date'
+    ]
+    list_editable = ['is_active']
+    list_filter = ['is_active', 'apply_to_all']
+    search_fields = ['name', 'headline', 'badge_text']
+    autocomplete_fields = ['products', 'categories']
+    actions = ['enable_offers', 'disable_offers']
+    fieldsets = (
+        ('Offer Details & Messaging', {
+            'fields': ('name', 'is_active', 'badge_text', 'headline'),
+            'description': 'Configure the promotional name, badge, and headline shown to customers on the storefront.'
+        }),
+        ('Applicability & Scope', {
+            'fields': ('apply_to_all', 'categories', 'products'),
+            'description': 'Ticking <b>Apply to all products</b> applies this tiered discount across the entire store. Untick to restrict to selected categories or products.'
+        }),
+        ('Progressive Tier Discount Percentages', {
+            'fields': (
+                ('tier_1_discount', 'tier_2_discount'),
+                ('tier_3_discount', 'tier_4_discount')
+            ),
+            'description': (
+                '<b>Progressive Discount Rules (Customizable):</b><br>'
+                '• <b>1st item:</b> Discount on the 1st unit (default: 0% / full price).<br>'
+                '• <b>2nd item:</b> Discount on the 2nd unit (default: 10%).<br>'
+                '• <b>3rd item:</b> Discount on the 3rd unit (default: 25%).<br>'
+                '• <b>4th item & above:</b> Discount on the 4th unit and all extra units (default: 80%).'
+            )
+        }),
+        ('Schedule (Optional)', {
+            'fields': ('start_date', 'end_date'),
+            'classes': ('collapse',),
+            'description': 'Leave empty for an ongoing offer, or set start and end dates.'
+        })
+    )
+
+    @admin.display(description='Progressive Tiers')
+    def discount_tiers_summary(self, obj):
+        return f"1st: {int(obj.tier_1_discount)}% | 2nd: {int(obj.tier_2_discount)}% | 3rd: {int(obj.tier_3_discount)}% | 4th+: {int(obj.tier_4_discount)}%"
+
+    @admin.display(description='Applicability')
+    def scope_display(self, obj):
+        if obj.apply_to_all:
+            return mark_safe('<span style="color:#059669; font-weight:600;"><i class="fas fa-globe"></i> All Products</span>')
+        parts = []
+        c_count = obj.categories.count()
+        p_count = obj.products.count()
+        if c_count:
+            parts.append(f"{c_count} category(ies)")
+        if p_count:
+            parts.append(f"{p_count} product(s)")
+        return ", ".join(parts) or "None selected"
+
+    @admin.display(description='Status')
+    def status_badge(self, obj):
+        s = obj.status()
+        colour = {'Live': '#1e8449', 'Scheduled': '#2874a6'}.get(s, '#c0392b')
+        return format_html('<span style="color:{}; font-weight:700;">{}</span>', colour, s)
+
+    @admin.action(description='Turn ON selected offers')
+    def enable_offers(self, request, queryset):
+        count = queryset.update(is_active=True)
+        self.message_user(request, f"{count} offer(s) activated.", messages.SUCCESS)
+
+    @admin.action(description='Turn OFF selected offers')
+    def disable_offers(self, request, queryset):
+        count = queryset.update(is_active=False)
+        self.message_user(request, f"{count} offer(s) paused.", messages.SUCCESS)
 
 
 # --- CART (Registered below with full abandoned cart tracking & WhatsApp follow-up) ---

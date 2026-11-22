@@ -29,7 +29,7 @@ from .models import (
 )
 from .offers import (
     add_gift, attach_offers, auto_fill_single_gift, calculate as calculate_offers, eligible_gifts,
-    gift_slots_left, live_offers, offer_by_main, sync_gifts,
+    get_quantity_offer_for_product, gift_slots_left, live_offers, offer_by_main, sync_gifts,
 )
 
 
@@ -251,9 +251,12 @@ def product_detail(request, pk):
         'recommended_pct': 98 if total_reviews == 0 else min(100, round(((stars_5 + stars_4) / max(total_reviews, 1)) * 100)),
     }
 
+    quantity_offer = get_quantity_offer_for_product(product)
+
     return render(request, 'store/product_detail.html', {
         'product': product,
         'offer': product.offer,
+        'quantity_offer': quantity_offer,
         'gift_choices': gift_choices,   # free gifts the customer can pick (active + in stock)
         'trust_words': _trust_words(product),   # [(icon, text), ...] shown under the price
         'selected_color_obj': selected_color_obj,
@@ -521,10 +524,17 @@ def add_cart(request, product_id):
     else:
         cart_item = CartItem.objects.filter(product=product, cart=cart, variant__isnull=True).first()
 
+    try:
+        qty_to_add = int(request.POST.get('quantity') or request.GET.get('quantity') or 1)
+    except (ValueError, TypeError):
+        qty_to_add = 1
+    if qty_to_add < 1:
+        qty_to_add = 1
+
     current_qty = cart_item.quantity if cart_item else 0
     max_stock = variant_obj.stock if variant_obj else product.stock
 
-    if current_qty + 1 > max_stock:
+    if current_qty + qty_to_add > max_stock:
         var_label = f" ({variant_obj.name})" if variant_obj else ""
         msg = f"Only {max_stock} of {product.title}{var_label} available. You already have {current_qty} in your cart."
         if is_ajax:
@@ -533,7 +543,7 @@ def add_cart(request, product_id):
         return redirect('store:product_detail', pk=product.pk)
 
     if cart_item:
-        cart_item.quantity += 1
+        cart_item.quantity += qty_to_add
         cart_item.save(update_fields=['quantity'])
     else:
         CartItem.objects.create(
@@ -541,7 +551,7 @@ def add_cart(request, product_id):
             cart=cart,
             variant=variant_obj,
             color_name=variant_obj.name if variant_obj else selected_color,
-            quantity=1
+            quantity=qty_to_add
         )
 
     went_to_gifts = _handle_gift_after_add(request, cart, product)
@@ -735,15 +745,22 @@ def buy_now(request, pk):
     else:
         cart_item = CartItem.objects.filter(product=product, cart=cart, variant__isnull=True).first()
 
+    try:
+        qty_to_buy = int(request.POST.get('quantity') or request.GET.get('quantity') or 1)
+    except (ValueError, TypeError):
+        qty_to_buy = 1
+    if qty_to_buy < 1:
+        qty_to_buy = 1
+
     max_stock = variant_obj.stock if variant_obj else product.stock
     current_qty = cart_item.quantity if cart_item else 0
-    if current_qty + 1 > max_stock:
+    if qty_to_buy > max_stock:
         var_label = f" ({variant_obj.name})" if variant_obj else ""
-        messages.error(request, f"Only {max_stock} of {product.title}{var_label} available.")
+        messages.error(request, f"Only {max_stock} of {product.title}{var_label} available in stock.")
         return redirect('store:product_detail', pk=product.pk)
 
     if cart_item:
-        cart_item.quantity += 1
+        cart_item.quantity = max(cart_item.quantity, qty_to_buy)
         cart_item.save(update_fields=['quantity'])
     else:
         CartItem.objects.create(
@@ -751,7 +768,7 @@ def buy_now(request, pk):
             cart=cart,
             variant=variant_obj,
             color_name=variant_obj.name if variant_obj else selected_color,
-            quantity=1
+            quantity=qty_to_buy
         )
 
     went_to_gifts = _handle_gift_after_add(request, cart, product)

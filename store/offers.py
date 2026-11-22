@@ -13,7 +13,38 @@ the server; the browser only says "I want product X as my gift" and we verify th
 from collections import defaultdict
 from decimal import Decimal
 
-from .models import BogoOffer, CartGift, CartItem
+from .models import BogoOffer, CartGift, CartItem, QuantityOffer
+
+
+def live_quantity_offers(now=None):
+    """Return all currently active and unexpired progressive quantity offers."""
+    try:
+        offers = (QuantityOffer.objects.filter(is_active=True)
+                  .prefetch_related('categories', 'products'))
+        return [offer for offer in offers if offer.is_live(now)]
+    except Exception:
+        return []
+
+
+def get_quantity_offer_for_product(product, offers=None):
+    """
+    Find the applicable live progressive tiered discount offer for a product.
+    Checks:
+    1. Direct product match
+    2. Category match
+    3. Global apply_to_all match
+    """
+    if product is None:
+        return None
+    offers = live_quantity_offers() if offers is None else offers
+    for offer in offers:
+        if offer.apply_to_all:
+            return offer
+        if offer.products.filter(pk=product.pk).exists():
+            return offer
+        if product.category_id and offer.categories.filter(pk=product.category_id).exists():
+            return offer
+    return None
 
 
 def live_offers(now=None):
@@ -27,12 +58,14 @@ def offer_by_main(offers):
     return {offer.main_product_id: offer for offer in sorted(offers, key=lambda o: o.pk)}
 
 
-def attach_offers(products, offers=None):
-    """Set product.offer (or None) so cards / detail page can show the badge."""
+def attach_offers(products, offers=None, quantity_offers=None):
+    """Set product.offer and product.quantity_offer (or None) so cards / detail page can show the badges."""
     offers = live_offers() if offers is None else offers
+    q_offers = live_quantity_offers() if quantity_offers is None else quantity_offers
     mapping = offer_by_main(offers)
     for product in products:
         product.offer = mapping.get(product.pk)
+        product.quantity_offer = get_quantity_offer_for_product(product, q_offers)
     return products
 
 
@@ -176,20 +209,26 @@ def sync_gifts(cart, offers=None):
     return notes
 
 
-def calculate(cart_items, gifts=None, offers=None):
+def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
     """
     Price a cart. Returns dict: subtotal, discount, total, applied, gifts.
-      subtotal = paid items + the normal price of the gifts
-      discount = the normal price of the gifts (they are 100% off)
-      total    = what the customer pays (paid items only)
+      subtotal = sum of (undiscounted line totals) + the normal price of the gifts
+      discount = progressive tiered quantity discounts + normal price of free gifts
+      total    = subtotal - discount (what the customer actually pays)
 
-    Sets on each paid cart item: offer, gift_entitled, gift_slots_left, my_gifts, gift_choices,
-                                 line_total
-    Sets on each gift:           original_total (normal price x qty)
+    Sets on each paid cart item:
+      - unit_price: variant price or product price
+      - line_total: payable amount for this item
+      - original_line_total: undiscounted line total
+      - tiered_discount: progressive savings on this item
+      - tiered_offer: applied QuantityOffer (if any)
+      - offer: applied BogoOffer (if any)
+      - gift_entitled, gift_slots_left, my_gifts, gift_choices
     """
     items = list(cart_items)
     gifts = list(gifts or [])
     offers = live_offers() if offers is None else offers
+    q_offers = live_quantity_offers() if quantity_offers is None else quantity_offers
     by_main = offer_by_main(offers)
 
     chosen = defaultdict(list)
@@ -197,10 +236,46 @@ def calculate(cart_items, gifts=None, offers=None):
         chosen[gift.offer_id].append(gift)
 
     subtotal = Decimal('0')
+    discount = Decimal('0')
+    applied = {}
+
     for item in items:
-        unit_price = getattr(item, 'unit_price', item.product.price)
-        item.line_total = unit_price * item.quantity
-        subtotal += item.line_total
+        unit_price = getattr(item, 'unit_price', getattr(item.product, 'price', Decimal('0')))
+        item.original_line_total = unit_price * item.quantity
+        item.tiered_discount = Decimal('0')
+        item.tiered_offer = None
+
+        # Check progressive tiered quantity discount
+        q_offer = get_quantity_offer_for_product(item.product, q_offers)
+        if q_offer and item.quantity >= 2:
+            undisc, tier_disc, pay, breakdown = q_offer.calculate_units(unit_price, item.quantity)
+            item.tiered_offer = q_offer
+            item.tiered_discount = tier_disc
+            item.line_total = pay
+            discount += tier_disc
+
+            entry_key = f"tiered_{q_offer.pk}"
+            if entry_key not in applied:
+                applied[entry_key] = {
+                    'id': entry_key,
+                    'name': q_offer.name,
+                    'type': 'tiered',
+                    'badge': q_offer.badge_text,
+                    'discount': Decimal('0'),
+                    'items': []
+                }
+            applied[entry_key]['discount'] += tier_disc
+            applied[entry_key]['items'].append({
+                'product': item.product.title,
+                'quantity': item.quantity,
+                'discount': str(tier_disc)
+            })
+        else:
+            item.line_total = item.original_line_total
+
+        subtotal += item.original_line_total
+
+        # BOGO offer checks
         offer = by_main.get(item.product_id)
         item.offer = offer
         item.my_gifts, item.gift_entitled, item.gift_slots_left, item.gift_choices = [], 0, 0, []
@@ -212,20 +287,32 @@ def calculate(cart_items, gifts=None, offers=None):
             item.gift_slots_left = max(entitled - sum(g.quantity for g in mine), 0)
             item.gift_choices = [p for p in offer.free_products.all() if p.is_active and p.stock > 0]
 
-    discount = Decimal('0')
-    applied = {}
     for gift in gifts:
         gift.original_total = gift.product.price * gift.quantity
         discount += gift.original_total
         entry = applied.setdefault(gift.offer_id, {
-            'id': gift.offer_id, 'name': gift.offer.name,
-            'main_product': gift.offer.main_product.title, 'gifts': [], 'discount': Decimal('0')})
-        entry['gifts'].append({'product': gift.product.title, 'quantity': gift.quantity,
-                               'value': str(gift.original_total)})
+            'id': gift.offer_id,
+            'name': gift.offer.name,
+            'type': 'bogo',
+            'main_product': gift.offer.main_product.title,
+            'gifts': [],
+            'discount': Decimal('0')
+        })
+        entry['gifts'].append({
+            'product': gift.product.title,
+            'quantity': gift.quantity,
+            'value': str(gift.original_total)
+        })
         entry['discount'] += gift.original_total
+
     for entry in applied.values():
         entry['discount'] = str(entry['discount'])
 
-    subtotal += discount
-    return {'subtotal': subtotal, 'discount': discount, 'total': subtotal - discount,
-            'applied': list(applied.values()), 'gifts': gifts}
+    total = max(subtotal - discount, Decimal('0'))
+    return {
+        'subtotal': subtotal,
+        'discount': discount,
+        'total': total,
+        'applied': list(applied.values()),
+        'gifts': gifts
+    }
