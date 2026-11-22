@@ -81,7 +81,7 @@ def cart_item_count(request):
 
     nav_categories = []
     try:
-        nav_categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('order', 'id'))
+        nav_categories = list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').prefetch_related('subcategories').order_by('order', 'id'))
     except Exception:
         nav_categories = []
 

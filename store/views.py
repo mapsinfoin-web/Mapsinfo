@@ -58,7 +58,7 @@ def all_products(request):
     page_obj = paginator.get_page(page_number)
     
     # Root categories for filter tabs (Earrings, Necklaces, Rings, Bracelets)
-    categories = list(Category.objects.filter(parent__isnull=True).order_by('order', 'id'))
+    categories = list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').order_by('order', 'id'))
 
     # Offer badges ("Buy 1 Get 1 Free") for every card on the page
     offers = live_offers()
@@ -1202,7 +1202,7 @@ def _get_price_ranges(products):
 # ---------------------------------------------------------------------------
 
 def collections(request):
-    main_categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('order', 'id'))
+    main_categories = list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').prefetch_related('subcategories').order_by('order', 'id'))
 
     active_cat_slug = request.GET.get('cat', '').strip().lower()
     active_sub_slug = request.GET.get('sub', '').strip().lower()
@@ -1615,7 +1615,7 @@ def search_products(request):
     if request.user.is_authenticated:
         user_wishlist = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
-    categories = list(Category.objects.filter(parent__isnull=True).order_by('order', 'id'))
+    categories = list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').order_by('order', 'id'))
     color_filters = _get_collection_color_filters(product_list)
     style_filters = _get_collection_style_filters(None, product_list)
     price_summary = _get_price_ranges(product_list)

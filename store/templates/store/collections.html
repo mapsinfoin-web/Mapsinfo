@@ -144,7 +144,7 @@
             margin: 0 auto 32px;
             padding: 0 24px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 18px;
         }
         .cat-card-item {
@@ -160,6 +160,7 @@
             flex-direction: column;
             justify-content: space-between;
             min-height: 140px;
+            min-width: 0;
         }
         .cat-card-item::before {
             content: '';
@@ -200,6 +201,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-top: 12px;
+        }
+        .cat-card-link .link-text-desktop {
+            display: inline;
+        }
+        .cat-card-link .link-text-mobile {
+            display: none;
         }
         .cat-card-link i {
             transition: transform .25s ease;
@@ -509,13 +516,66 @@
             .search { max-width: none; }
         }
         @media (max-width: 900px) {
+            .cat-cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 14px;
+                padding: 0 20px;
+            }
             .footer-top { grid-template-columns: 1fr 1fr; }
             .filter-toolbar { flex-direction: column; align-items: stretch; }
             .filter-toolbar-right { justify-content: space-between; }
         }
         @media (max-width: 640px) {
-            .page-header { padding: 36px 16px 18px; }
-            .page-header h1 { font-size: 32px; }
+            .page-header { padding: 30px 16px 14px; }
+            .page-header h1 { font-size: 28px; }
+            .page-header p { font-size: 11px; letter-spacing: 1px; }
+
+            .main-cat-section { padding: 0 14px; margin-bottom: 12px; }
+            .main-cat-tabs { gap: 8px; }
+            .main-cat-tab { padding: 8px 14px; font-size: 12.5px; gap: 6px; }
+
+            .cat-cards-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
+                padding: 0 14px !important;
+                margin-bottom: 20px !important;
+            }
+            .cat-card-item {
+                min-width: 0 !important;
+                padding: 14px 12px !important;
+                border-radius: 14px !important;
+                min-height: 112px !important;
+            }
+            .cat-card-item::before {
+                inset: 6px !important;
+                border-radius: 10px !important;
+            }
+            .cat-card-title {
+                font-size: 15px !important;
+                margin: 0 0 3px !important;
+                line-height: 1.25 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .cat-card-sub {
+                font-size: 10.5px !important;
+                line-height: 1.35 !important;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .cat-card-link {
+                font-size: 10.5px !important;
+                gap: 4px !important;
+                margin-top: 8px !important;
+                letter-spacing: 0.5px !important;
+            }
+            .cat-card-link .link-text-desktop { display: none !important; }
+            .cat-card-link .link-text-mobile { display: inline !important; }
+
             .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px; padding: 10px 14px 60px; align-items: stretch; }
             .body { padding: 12px; }
             .body h3 { font-size: 14px; min-height: 38px; }
@@ -614,7 +674,11 @@
                     {% endif %}
                 </div>
             </div>
-            <span class="cat-card-link">Explore Collection <i class="fas fa-arrow-right"></i></span>
+            <span class="cat-card-link">
+                <span class="link-text-desktop">Explore Collection</span>
+                <span class="link-text-mobile">Explore</span>
+                <i class="fas fa-arrow-right"></i>
+            </span>
         </a>
         {% endfor %}
     </div>
