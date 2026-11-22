@@ -29,8 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-lpy=so(759tzfz))(_6c)sek8oeh3awyhc#t8qu&q(h$qjnq!g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Set DEBUG=True in the environment for local development when needed.
-DEBUG = os.environ.get('DEBUG', 'False').strip().lower() in {'1', 'true', 'yes', 'on'}
+# In production on Vercel, DEBUG defaults to False; in local development, it defaults to True.
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+DEBUG = os.environ.get('DEBUG', 'False' if IS_VERCEL else 'True').strip().lower() in {'1', 'true', 'yes', 'on'}
 
 ALLOWED_HOSTS = ['.vercel.app', '*']
 
@@ -98,10 +99,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': dj_database_url.parse(
         os.environ.get('DATABASE_URL', 'postgresql://neondb_owner:npg_ynLF6dJ1MoVh@ep-old-heart-aewlu2n2-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'),
-        conn_max_age=600,
+        conn_max_age=0 if IS_VERCEL else 300,
         ssl_require=True
     )
 }
+DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
 
 # Password validation
