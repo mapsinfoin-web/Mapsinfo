@@ -2928,9 +2928,9 @@
         <!-- Left: gallery -->
         <div class="gallery animate-up">
             <div class="main-image" id="main-wrap" {% if selected_color_obj.image %}style="--bg: url('{{ selected_color_obj.image.url }}')"{% elif product.image %}style="--bg: url('{{ product.image.url }}')"{% endif %} role="button" tabindex="0" aria-label="Click to zoom the photo">
-                {% if product.video %}
+                {% if product.video or selected_color_obj.video or product.available_colors %}
                 <div id="main-video-wrap" style="display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: #0b192c; border-radius: inherit; overflow: hidden; z-index: 3;">
-                    <video id="product-video-player" src="{{ product.video.url }}" controls loop playsinline preload="metadata" style="width: 100%; height: 100%; object-fit: contain;"></video>
+                    <video id="product-video-player" src="{% if selected_color_obj.video %}{{ selected_color_obj.video.url }}{% elif product.video %}{{ product.video.url }}{% endif %}" controls loop playsinline preload="metadata" style="width: 100%; height: 100%; object-fit: contain;"></video>
                 </div>
                 {% endif %}
                 {% if selected_color_obj.image %}
@@ -2959,9 +2959,9 @@
                     {% endif %}
                     {% endfor %}
                 {% endif %}
-                {% if product.video %}
-                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
-                    <img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                {% if selected_color_obj.video or product.video %}
+                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Video Clip" aria-label="Watch Video Clip">
+                    <img id="videoThumbImg" src="{% if selected_color_obj.video %}{{ selected_color_obj.video_thumbnail_url|default:selected_color_obj.image.url }}{% else %}{{ product.video_thumbnail_url|default:product.image.url }}{% endif %}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
                     <span class="video-thumb-overlay"></span>
                     <span class="video-thumb-play"><i class="fas fa-play"></i></span>
                     <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
@@ -2977,9 +2977,9 @@
                 <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                 {% endif %}
                 {% endfor %}
-                {% if product.video %}
-                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">
-                    <img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                {% if selected_color_obj.video or product.video %}
+                <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Video Clip" aria-label="Watch Video Clip">
+                    <img id="videoThumbImg" src="{% if selected_color_obj.video %}{{ selected_color_obj.video_thumbnail_url|default:selected_color_obj.image.url }}{% else %}{{ product.video_thumbnail_url|default:product.image.url }}{% endif %}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
                     <span class="video-thumb-overlay"></span>
                     <span class="video-thumb-play"><i class="fas fa-play"></i></span>
                     <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
@@ -3076,6 +3076,8 @@
                             data-stock="{{ c.stock }}"
                             data-in-stock="{% if c.in_stock %}1{% else %}0{% endif %}"
                             data-gallery="{% for img_url in c.all_images %}{{ img_url }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+                            data-video="{{ c.video_url }}"
+                            data-video-thumb="{{ c.video_thumbnail_url }}"
                             onclick="selectColor(this)"
                             title="{{ c.name }}{% if not c.in_stock %} (Out of Stock){% elif c.is_low_stock %} (Only {{ c.stock }} left!){% endif %}"
                             aria-label="{{ c.name }}">
@@ -4405,6 +4407,25 @@
                 });
             }
 
+            // Video for this colour variant or base product
+            var colorVideo = btn.getAttribute('data-video') || '';
+            var colorVideoThumb = btn.getAttribute('data-video-thumb') || '';
+            var baseVideo = '{{ product.video.url|default:""|escapejs }}';
+            var baseVideoThumb = '{{ product.video_thumbnail_url|default:""|escapejs }}';
+            var activeVideo = colorVideo || baseVideo;
+            var activeVideoThumb = colorVideoThumb || baseVideoThumb;
+
+            var videoPlayer = document.getElementById('product-video-player');
+            var videoWrap = document.getElementById('main-video-wrap');
+            if (videoPlayer && activeVideo) {
+                if (videoPlayer.getAttribute('src') !== activeVideo) {
+                    videoPlayer.src = activeVideo;
+                    videoPlayer.load();
+                }
+            } else if (videoWrap) {
+                videoWrap.style.display = 'none';
+            }
+
             var thumbsContainer = document.getElementById('productThumbsContainer');
             if (thumbsContainer && combinedImages.length > 0) {
                 var thumbsHtml = '';
@@ -4413,14 +4434,15 @@
                     var activeCls = (k === 0) ? 'thumb active' : 'thumb';
                     thumbsHtml += '<img src="' + item.url + '" class="' + activeCls + '" onclick="swapImage(this)" alt="' + item.alt + '" loading="lazy" />';
                 }
-                {% if product.video %}
-                thumbsHtml += '<button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Product Video Clip" aria-label="Watch Product Video Clip">' +
-                    '<img src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />' +
-                    '<span class="video-thumb-overlay"></span>' +
-                    '<span class="video-thumb-play"><i class="fas fa-play"></i></span>' +
-                    '<span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>' +
-                '</button>';
-                {% endif %}
+                if (activeVideo) {
+                    var vImgSrc = activeVideoThumb || (combinedImages.length > 0 ? combinedImages[0].url : '');
+                    thumbsHtml += '<button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Video Clip" aria-label="Watch Video Clip">' +
+                        '<img id="videoThumbImg" src="' + vImgSrc + '" alt="Video Preview" class="video-thumb-img" loading="lazy" />' +
+                        '<span class="video-thumb-overlay"></span>' +
+                        '<span class="video-thumb-play"><i class="fas fa-play"></i></span>' +
+                        '<span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>' +
+                    '</button>';
+                }
                 thumbsContainer.innerHTML = thumbsHtml;
             }
 
@@ -4654,6 +4676,10 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             updateTierCalculations();
+            var activeSwatch = document.querySelector('.color-swatch-item.active');
+            if (activeSwatch) {
+                selectColor(activeSwatch);
+            }
         });
 
         // ===== Photo viewer with zoom =====

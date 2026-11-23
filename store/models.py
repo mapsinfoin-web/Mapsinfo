@@ -1009,6 +1009,14 @@ class ProductColor(models.Model):
     )
     hex_code = models.CharField(max_length=20, default="#D4AF37", help_text="Hex color code for swatch dot (e.g. #D4AF37 for Gold, #C0C0C0 for Silver, #B76E79 for Rose Gold)")
     image = models.ImageField(upload_to='images/colors/', blank=True, null=True, help_text="Main / cover photo for this color variant (switches main image when selected)")
+    video = models.FileField(
+        storage=video_storage,
+        upload_to='videos/colors/',
+        blank=True,
+        null=True,
+        verbose_name="Colour Video Clip",
+        help_text="Optional video clip for this specific colour variant."
+    )
     is_available = models.BooleanField(default=True, help_text="Tick if this color is in stock")
 
     class Meta:
@@ -1069,6 +1077,39 @@ class ProductColor(models.Model):
     def original_price(self):
         """Alias for effective_mrp (MRP for this colour variant)."""
         return self.effective_mrp
+
+    @property
+    def video_url(self):
+        """Returns the URL of this colour's video clip, if any."""
+        if self.video:
+            try:
+                return self.video.url
+            except Exception:
+                return ''
+        return ''
+
+    @property
+    def video_thumbnail_url(self):
+        """
+        Returns a thumbnail image URL for this colour's video clip.
+        If hosted on Cloudinary, generates an auto-extracted video frame thumbnail.
+        Falls back to the colour's image if available.
+        """
+        if self.video:
+            try:
+                v_url = self.video.url
+                if 'res.cloudinary.com' in v_url:
+                    base_url = re.sub(r'\.(mp4|webm|mov|mkv|ogv)$', '', v_url, flags=re.IGNORECASE)
+                    return f"{base_url}.jpg"
+                return v_url
+            except Exception:
+                pass
+        if self.image:
+            try:
+                return self.image.url
+            except Exception:
+                pass
+        return ''
 
     @property
     def all_images(self):

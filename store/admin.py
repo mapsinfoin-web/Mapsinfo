@@ -50,7 +50,7 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductColorInline(admin.TabularInline):
     model = ProductColor
     extra = 1
-    fields = ['order', 'name', 'sku', 'price', 'mrp', 'stock', 'hex_code', 'image', 'is_available']
+    fields = ['order', 'name', 'sku', 'price', 'mrp', 'stock', 'hex_code', 'image', 'video', 'is_available']
     ordering = ['order', 'id']
 
 
@@ -64,12 +64,13 @@ class ColorGalleryInline(admin.TabularInline):
 
 @admin.register(ProductColor)
 class ProductColorAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'name', 'color_preview', 'sku', 'price', 'mrp', 'stock', 'stock_status', 'is_available']
+    list_display = ['product', 'order', 'name', 'color_preview', 'sku', 'price', 'mrp', 'stock', 'stock_status', 'video_preview', 'is_available']
     list_editable = ['order', 'sku', 'price', 'mrp', 'stock', 'is_available']
     list_filter = ['is_available', 'product__category']
     search_fields = ['name', 'sku', 'product__title', 'product__sku']
     ordering = ['product', 'order', 'id']
     inlines = [ColorGalleryInline]
+    fields = ['product', 'order', 'name', 'hex_code', 'sku', 'price', 'mrp', 'special_offer_price', 'stock', 'image', 'video', 'is_available']
 
     class Media:
         js = ('store/js/admin_prevent_double_submit.js',)
@@ -81,6 +82,15 @@ class ProductColorAdmin(admin.ModelAdmin):
             '<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:{};border:1px solid rgba(0,0,0,0.25);vertical-align:middle;margin-right:8px;"></span><code>{}</code>',
             hex_val, hex_val
         )
+
+    @admin.display(description='Video')
+    def video_preview(self, obj):
+        if obj and obj.video:
+            return format_html(
+                '<video src="{}" style="max-height: 40px; max-width: 70px; border-radius: 4px;" controls></video>',
+                obj.video.url
+            )
+        return '—'
 
     @admin.display(description='Stock Status', ordering='stock')
     def stock_status(self, obj):
@@ -475,12 +485,107 @@ class ProductAdmin(admin.ModelAdmin):
                 name='store_product_cloudinary_video_signature'
             ),
             path(
+                '<int:product_id>/save-video/',
+                self.admin_site.admin_view(self.save_product_video),
+                name='store_product_save_video'
+            ),
+            path(
                 '<int:product_id>/delete-video/',
                 self.admin_site.admin_view(self.delete_product_video),
                 name='store_product_delete_video'
             ),
+            path(
+                'color/<int:color_id>/save-video/',
+                self.admin_site.admin_view(self.save_color_video),
+                name='store_color_save_video'
+            ),
+            path(
+                'color/<int:color_id>/delete-video/',
+                self.admin_site.admin_view(self.delete_color_video),
+                name='store_color_delete_video'
+            ),
         ]
         return custom_urls + urls
+
+    def save_product_video(self, request, product_id):
+        if request.method != 'POST':
+            return JsonResponse({'error': 'POST required'}, status=405)
+        product = get_object_or_404(Product, pk=product_id)
+        public_id = ''
+        if request.content_type == 'application/json':
+            try:
+                body = json.loads(request.body.decode('utf-8'))
+                public_id = (body.get('public_id') or '').strip()
+            except Exception:
+                pass
+        if not public_id:
+            public_id = (request.POST.get('public_id') or '').strip()
+        if not public_id:
+            return JsonResponse({'error': 'No public_id provided'}, status=400)
+
+        if product.video and str(product.video) != public_id:
+            try:
+                product.video.delete(save=False)
+            except Exception:
+                pass
+        product.video.name = public_id
+        product.save(update_fields=['video'])
+        return JsonResponse({
+            'success': True,
+            'product_id': product.pk,
+            'video_url': product.video.url,
+            'public_id': public_id,
+            'delete_url': reverse('admin:store_product_delete_video', args=[product.pk]),
+            'message': f'Video clip successfully saved to "{product.title}".'
+        })
+
+    def save_color_video(self, request, color_id):
+        if request.method != 'POST':
+            return JsonResponse({'error': 'POST required'}, status=405)
+        color = get_object_or_404(ProductColor, pk=color_id)
+        public_id = ''
+        if request.content_type == 'application/json':
+            try:
+                body = json.loads(request.body.decode('utf-8'))
+                public_id = (body.get('public_id') or '').strip()
+            except Exception:
+                pass
+        if not public_id:
+            public_id = (request.POST.get('public_id') or '').strip()
+        if not public_id:
+            return JsonResponse({'error': 'No public_id provided'}, status=400)
+
+        if color.video and str(color.video) != public_id:
+            try:
+                color.video.delete(save=False)
+            except Exception:
+                pass
+        color.video.name = public_id
+        color.save(update_fields=['video'])
+        return JsonResponse({
+            'success': True,
+            'color_id': color.pk,
+            'video_url': color.video.url,
+            'public_id': public_id,
+            'message': f'Video clip saved to color "{color.name}".'
+        })
+
+    def delete_color_video(self, request, color_id):
+        if request.method != 'POST':
+            return JsonResponse({'error': 'POST required'}, status=405)
+        color = get_object_or_404(ProductColor, pk=color_id)
+        if color.video:
+            try:
+                color.video.delete(save=False)
+            except Exception as e:
+                logger.warning("Error deleting color video: %s", e)
+            color.video = None
+            color.save(update_fields=['video'])
+        return JsonResponse({
+            'success': True,
+            'color_id': color.pk,
+            'message': f'Video clip removed from color "{color.name}".'
+        })
 
     def get_cloudinary_video_signature(self, request):
         if not request.user.is_staff:
@@ -648,6 +753,8 @@ class ProductAdmin(admin.ModelAdmin):
                         'special_offer_price': str(c.special_offer_price) if c.special_offer_price is not None else '',
                         'stock': c.stock,
                         'is_available': c.is_available,
+                        'video_url': c.video.url if c.video else '',
+                        'video_public_id': str(c.video) if c.video else '',
                         'gallery': gallery_items,
                     })
                 extra_context['existing_variants_json'] = json.dumps(variants_data)
@@ -762,6 +869,25 @@ class ProductAdmin(admin.ModelAdmin):
                     is_available=is_available,
                     order=order,
                 )
+
+            # 0. Handle variant video
+            v_video_pid = (v_data.get('video_public_id') or '').strip()
+            v_video_del = bool(v_data.get('video_deleted', False))
+            if v_video_pid and str(color_obj.video) != v_video_pid:
+                if color_obj.video:
+                    try:
+                        color_obj.video.delete(save=False)
+                    except Exception:
+                        pass
+                color_obj.video.name = v_video_pid
+                color_obj.save(update_fields=['video'])
+            elif v_video_del and color_obj.video:
+                try:
+                    color_obj.video.delete(save=False)
+                except Exception:
+                    pass
+                color_obj.video = None
+                color_obj.save(update_fields=['video'])
 
             # 1. Delete removed gallery images
             deleted_ids = v_data.get('deleted_gallery_ids', [])

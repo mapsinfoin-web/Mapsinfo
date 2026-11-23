@@ -658,6 +658,31 @@
                         '<input type="file" id="vFileInput_' + index + '" name="variant_images_' + index + '" multiple accept="image/*" onchange="handleFileSelect(' + index + ', this)" />' +
                     '</div>' +
                     '<div class="v-previews-grid" id="vPreviewsGrid_' + index + '"></div>' +
+                    '<div class="v-video-section" style="margin-top:16px; padding:14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">' +
+                        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                            '<label style="font-weight:700; font-size:13px; color:#1e293b; display:flex; align-items:center; gap:8px;">' +
+                                '<i class="fas fa-video" style="color:#2563eb;"></i> ' + nameVal + ' Colour Video Clip (MP4)' +
+                            '</label>' +
+                            '<span style="font-size:11.5px; color:#64748b;">Shows when customer selects this colour</span>' +
+                        '</div>' +
+                        '<div id="vVideoDisplay_' + index + '">' +
+                            (v.video_url ? (
+                                '<div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">' +
+                                    '<video src="' + v.video_url + '" style="max-height:80px; max-width:140px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.1);" controls playsinline></video>' +
+                                    '<button type="button" onclick="deleteVariantVideo(' + index + ')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700;">🗑️ Delete Colour Video</button>' +
+                                '</div>'
+                            ) : '<span style="font-size:12px; color:#94a3b8; display:block; margin-bottom:8px;">No video clip uploaded for this colour.</span>') +
+                        '</div>' +
+                        '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">' +
+                            '<input type="file" id="vVideoFileInput_' + index + '" accept="video/mp4,video/*" onchange="handleVariantVideoSelect(' + index + ', this)" style="font-size:12px;" />' +
+                            '<span id="vVideoUploadStatus_' + index + '" style="font-size:12px; color:#475569;"></span>' +
+                        '</div>' +
+                        '<div id="vVideoProgressWrap_' + index + '" style="display:none; margin-top:8px;">' +
+                            '<div style="background:#e2e8f0; border-radius:999px; height:6px; overflow:hidden;">' +
+                                '<div id="vVideoProgressBar_' + index + '" style="background:#2563eb; width:0%; height:100%; transition:width 0.15s ease;"></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>' +
             '</div>';
 
@@ -1076,6 +1101,161 @@
         renderCardPreviews(index);
     };
 
+    function getCsrfToken() {
+        var inp = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (inp && inp.value) return inp.value;
+        var match = document.cookie.match(/csrftoken=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    window.handleVariantVideoSelect = function(index, input) {
+        var v = variantsList[index];
+        if (!v) return;
+        var file = input.files && input.files[0];
+        if (!file) return;
+
+        var progWrap = document.getElementById('vVideoProgressWrap_' + index);
+        var progBar = document.getElementById('vVideoProgressBar_' + index);
+        var statusEl = document.getElementById('vVideoUploadStatus_' + index);
+        var displayEl = document.getElementById('vVideoDisplay_' + index);
+
+        if (progWrap) progWrap.style.display = 'block';
+        if (progBar) {
+            progBar.style.width = '0%';
+            progBar.style.background = '#2563eb';
+        }
+        if (statusEl) statusEl.innerHTML = '<span style="color:#2563eb;">☁️ Preparing direct upload...</span>';
+
+        var submitButtons = document.querySelectorAll('input[type="submit"], button[type="submit"]');
+        submitButtons.forEach(function(b) { b.disabled = true; });
+
+        fetch('{% url "admin:store_product_cloudinary_video_signature" %}')
+            .then(function(res) {
+                if (!res.ok) throw new Error('Signature endpoint returned ' + res.status);
+                return res.json();
+            })
+            .then(function(sigData) {
+                if (statusEl) statusEl.innerHTML = '<span style="color:#2563eb;">☁️ Uploading ' + (file.size / (1024*1024)).toFixed(1) + ' MB...</span>';
+                var xhr = new XMLHttpRequest();
+                var uploadUrl = 'https://api.cloudinary.com/v1_1/' + sigData.cloud_name + '/video/upload';
+                xhr.open('POST', uploadUrl, true);
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        var pct = Math.round((e.loaded / e.total) * 100);
+                        if (progBar) progBar.style.width = pct + '%';
+                        if (statusEl) statusEl.innerText = '☁️ ' + pct + '% uploaded';
+                    }
+                };
+
+                xhr.onload = function() {
+                    submitButtons.forEach(function(b) { b.disabled = false; });
+                    if (xhr.status === 200) {
+                        var resp = JSON.parse(xhr.responseText);
+                        if (progBar) {
+                            progBar.style.width = '100%';
+                            progBar.style.background = '#16a34a';
+                        }
+                        v.video_url = resp.secure_url;
+                        v.video_public_id = resp.public_id;
+                        v.video_deleted = false;
+                        input.value = '';
+
+                        if (v.id) {
+                            if (statusEl) statusEl.innerHTML = '<b style="color:#2563eb;">💾 Auto-saving to database...</b>';
+                            fetch('/admin/store/product/color/' + v.id + '/save-video/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCsrfToken()
+                                },
+                                body: JSON.stringify({ public_id: resp.public_id })
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                if (statusEl) {
+                                    statusEl.innerHTML = '<b style="color:#15803d;">✓ Video saved to database! Live on storefront.</b>';
+                                }
+                            })
+                            .catch(function() {
+                                if (statusEl) {
+                                    statusEl.innerHTML = '<b style="color:#15803d;">✓ Video uploaded. Click "Save" below to finish.</b>';
+                                }
+                            });
+                        } else {
+                            if (statusEl) {
+                                statusEl.innerHTML = '<b style="color:#15803d;">✓ Video uploaded! Will save when you submit this product.</b>';
+                            }
+                        }
+
+                        if (displayEl) {
+                            displayEl.innerHTML =
+                                '<div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">' +
+                                    '<video src="' + resp.secure_url + '" style="max-height:80px; max-width:140px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.1);" controls playsinline></video>' +
+                                    '<button type="button" onclick="deleteVariantVideo(' + index + ')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700;">🗑️ Delete Colour Video</button>' +
+                                '</div>';
+                        }
+                    } else {
+                        if (statusEl) statusEl.innerHTML = '<b style="color:#dc2626;">❌ Upload failed: ' + xhr.status + '</b>';
+                    }
+                };
+
+                xhr.onerror = function() {
+                    submitButtons.forEach(function(b) { b.disabled = false; });
+                    if (statusEl) statusEl.innerHTML = '<b style="color:#dc2626;">❌ Network error.</b>';
+                };
+
+                var fd = new FormData();
+                fd.append('file', file);
+                fd.append('api_key', sigData.api_key);
+                fd.append('timestamp', sigData.timestamp);
+                fd.append('signature', sigData.signature);
+                fd.append('folder', sigData.folder);
+                xhr.send(fd);
+            })
+            .catch(function(err) {
+                submitButtons.forEach(function(b) { b.disabled = false; });
+                if (statusEl) statusEl.innerHTML = '<b style="color:#dc2626;">❌ ' + err.message + '</b>';
+            });
+    };
+
+    window.deleteVariantVideo = function(index) {
+        var v = variantsList[index];
+        if (!v) return;
+        if (!confirm('Are you sure you want to remove this video clip from this colour variant?')) return;
+        v.video_deleted = true;
+        v.video_url = '';
+        v.video_public_id = '';
+
+        var displayEl = document.getElementById('vVideoDisplay_' + index);
+        var statusEl = document.getElementById('vVideoUploadStatus_' + index);
+        var progWrap = document.getElementById('vVideoProgressWrap_' + index);
+        if (progWrap) progWrap.style.display = 'none';
+
+        if (displayEl) {
+            displayEl.innerHTML = '<span style="font-size:12px; color:#94a3b8; display:block; margin-bottom:8px;">No video clip uploaded for this colour.</span>';
+        }
+
+        if (v.id) {
+            if (statusEl) statusEl.innerHTML = '<span style="color:#64748b;">Deleting from database...</span>';
+            fetch('/admin/store/product/color/' + v.id + '/delete-video/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (statusEl) statusEl.innerHTML = '<span style="color:#15803d;">✓ Colour video deleted.</span>';
+            })
+            .catch(function() {
+                if (statusEl) statusEl.innerHTML = '<span style="color:#dc2626;">Error deleting video.</span>';
+            });
+        } else {
+            if (statusEl) statusEl.innerHTML = '<span style="color:#64748b;">Video removed.</span>';
+        }
+    };
+
     window.addNewVariantCard = function(data) {
         var idx = variantsList.length;
         var newV = data || {
@@ -1088,6 +1268,9 @@
             special_offer_price: '',
             stock: 10,
             is_available: true,
+            video_url: '',
+            video_public_id: '',
+            video_deleted: false,
             gallery: [],
             pendingFiles: []
         };
@@ -1180,6 +1363,8 @@
                     primary_image_choice: primaryChoice,
                     gallery_order: galleryOrder,
                     deleted_gallery_ids: v.deleted_gallery_ids || [],
+                    video_public_id: v.video_public_id || null,
+                    video_deleted: !!v.video_deleted,
                     delete: isDel
                 });
             });
@@ -1301,6 +1486,40 @@
                                 if (btn.tagName === 'INPUT') btn.value = orig;
                                 else btn.innerText = orig;
                             });
+
+                            {% if original and original.pk %}
+                            // Auto-save immediately to database so refresh (F5) will preserve it!
+                            if (sText) sText.innerHTML = '<b style="color:#2563eb;">💾 Auto-saving video to database...</b>';
+                            fetch('{% url "admin:store_product_save_video" original.pk %}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCsrfToken()
+                                },
+                                body: JSON.stringify({ public_id: resp.public_id })
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                if (data.success) {
+                                    if (sText) {
+                                        sText.innerHTML = '<b style="color:#15803d;">✓ Video uploaded & auto-saved to database! It will stay even on refresh (F5).</b>';
+                                    }
+                                } else {
+                                    if (sText) {
+                                        sText.innerHTML = '<b style="color:#15803d;">✓ Video uploaded to Cloudinary. Click "Save" below to finish saving.</b>';
+                                    }
+                                }
+                            })
+                            .catch(function(e) {
+                                if (sText) {
+                                    sText.innerHTML = '<b style="color:#15803d;">✓ Video uploaded to Cloudinary. Click "Save" below to finish saving.</b>';
+                                }
+                            });
+                            {% else %}
+                            if (sText) {
+                                sText.innerHTML = '<b style="color:#15803d;">✓ Video uploaded directly to Cloudinary! Click "Save" below to finish creating this product.</b>';
+                            }
+                            {% endif %}
                         } else {
                             throw new Error('Cloudinary returned ' + xhr.status + ': ' + xhr.responseText);
                         }
