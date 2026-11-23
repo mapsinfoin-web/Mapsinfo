@@ -549,7 +549,7 @@
         }
         .tiered-bundle-cards {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
             margin-bottom: 12px;
         }
@@ -3143,6 +3143,7 @@
                                     <div class="tier-tag save">Save {{ quantity_offer.tier_2_discount|floatformat:0 }}% on 2nd</div>
                                 </div>
                             </div>
+                            {% if quantity_offer.tier_3_discount > 0 %}
                             <!-- 3 Pieces -->
                             <div class="tier-card" data-tier="3" onclick="selectTier(3)">
                                 <div class="tier-radio-circle"><i class="fas fa-check"></i></div>
@@ -3152,6 +3153,8 @@
                                     <div class="tier-tag save">Save {{ quantity_offer.tier_3_discount|floatformat:0 }}% on 3rd</div>
                                 </div>
                             </div>
+                            {% endif %}
+                            {% if quantity_offer.tier_4_discount > 0 %}
                             <!-- 4 Pieces -->
                             <div class="tier-card popular" data-tier="4" onclick="selectTier(4)">
                                 <div class="tier-popular-pill">Best Value</div>
@@ -3162,6 +3165,7 @@
                                     <div class="tier-tag mega">🔥 {{ quantity_offer.tier_4_discount|floatformat:0 }}% OFF 4th!</div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="tiered-summary-row" id="tieredSummaryRow">
                             <div class="tiered-summary-text">Total for <b id="tierSelectedQtyText">1 item</b>:</div>

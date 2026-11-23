@@ -37,12 +37,20 @@ def get_quantity_offer_for_product(product, offers=None):
     if product is None:
         return None
     offers = live_quantity_offers() if offers is None else offers
+    # 1. Direct product match first (most specific)
+    for offer in offers:
+        if not offer.apply_to_all and offer.products.filter(pk=product.pk).exists():
+            return offer
+
+    # 2. Category match second
+    if product.category_id:
+        for offer in offers:
+            if not offer.apply_to_all and offer.categories.filter(pk=product.category_id).exists():
+                return offer
+
+    # 3. Global apply_to_all fallback
     for offer in offers:
         if offer.apply_to_all:
-            return offer
-        if offer.products.filter(pk=product.pk).exists():
-            return offer
-        if product.category_id and offer.categories.filter(pk=product.category_id).exists():
             return offer
     return None
 
