@@ -1,7 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib import admin, messages
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import path, reverse
 from django.db import transaction
 from django.db.models import Q
 from django.utils.html import format_html, format_html_join
@@ -356,6 +357,11 @@ class ProductAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'video' in self.fields:
+            self.fields['video'].help_text = (
+                "Upload a product video clip (MP4). To delete/remove the current video, tick the <b>Clear</b> checkbox above and save, "
+                "or click the red <b>Delete Video Clip</b> button below."
+            )
         if self.instance and self.instance.pk:
             if self.instance.occasions:
                 self.fields['occasions_list'].initial = [
@@ -370,6 +376,16 @@ class ProductAdminForm(forms.ModelForm):
         instance = super().save(commit=False)
         instance.occasions = ','.join(self.cleaned_data.get('occasions_list') or [])
         instance.metal_finish = ','.join(self.cleaned_data.get('metal_finish_list') or [])
+
+        # If user checked "Clear" for video
+        if self.cleaned_data.get('video') is False:
+            if instance.video:
+                try:
+                    instance.video.delete(save=False)
+                except Exception:
+                    pass
+            instance.video = None
+
         if commit:
             instance.save()
             self.save_m2m()
@@ -387,6 +403,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['title', 'sku', 'brand', 'product_type']
     filter_horizontal = ['sub_categories', 'pair_with']
     inlines = [ProductGalleryInline]
+    actions = ['remove_video_action']
 
     class Media:
         js = ('store/js/admin_prevent_double_submit.js',)
@@ -409,14 +426,64 @@ class ProductAdmin(admin.ModelAdmin):
     )
     readonly_fields = ['video_player_preview']
 
-    @admin.display(description='Video Preview (2nd Cloudinary)')
+    @admin.display(description='Video Preview & Management')
     def video_player_preview(self, obj):
         if obj and obj.video:
+            delete_url = reverse('admin:store_product_delete_video', args=[obj.pk])
             return format_html(
-                '<video src="{}" style="max-height: 220px; max-width: 320px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" controls playsinline></video>',
-                obj.video.url
+                '<div style="display:flex; flex-direction:column; gap:10px; max-width:340px;">'
+                '<video src="{}" style="max-height: 220px; max-width: 320px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" controls playsinline></video>'
+                '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">'
+                '<a href="{}" class="button" onclick="return confirm(\'Are you sure you want to delete this video clip from this product?\');" '
+                'style="background:#dc2626 !important; color:#ffffff !important; font-weight:700; padding:8px 16px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:13px; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(220,38,38,0.3);">'
+                '🗑️ Delete Video Clip</a>'
+                '<span style="font-size:12px; color:#6b7280;">Click to remove this video from Cloudinary & product</span>'
+                '</div>'
+                '</div>',
+                obj.video.url,
+                delete_url
             )
-        return "No video uploaded yet."
+        return format_html(
+            '<span style="color:#6b7280; font-size:13px;">No video uploaded yet. Choose an MP4 / video file above and save to add one.</span>'
+        )
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:product_id>/delete-video/',
+                self.admin_site.admin_view(self.delete_product_video),
+                name='store_product_delete_video'
+            ),
+        ]
+        return custom_urls + urls
+
+    def delete_product_video(self, request, product_id):
+        product = get_object_or_404(Product, pk=product_id)
+        if product.video:
+            try:
+                product.video.delete(save=False)
+            except Exception as e:
+                logger.warning("Error deleting video from storage: %s", e)
+            product.video = None
+            product.save(update_fields=['video'])
+            self.message_user(request, f'Video clip successfully deleted from "{product.title}".', messages.SUCCESS)
+        else:
+            self.message_user(request, f'"{product.title}" has no video clip to delete.', messages.INFO)
+        return redirect('admin:store_product_change', product_id)
+
+    @admin.action(description='🗑️ Remove video clip from selected products')
+    def remove_video_action(self, request, queryset):
+        count = 0
+        for product in queryset.filter(video__isnull=False).exclude(video=''):
+            try:
+                product.video.delete(save=False)
+            except Exception:
+                pass
+            product.video = None
+            product.save(update_fields=['video'])
+            count += 1
+        self.message_user(request, f'Video clip successfully removed from {count} product(s).', messages.SUCCESS)
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('bogo_offers')
