@@ -1,0 +1,84 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block form_top %}
+{{ block.super }}
+<div style="margin: 0 0 20px 0; padding: 18px 22px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 14px; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.12); border: 1px solid #334155;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="background: #3b82f6; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; font-size: 16px;">⚡</span>
+            <div>
+                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #ffffff;">1-Click Offer Presets & Visual Helper</h3>
+                <p style="margin: 2px 0 0; font-size: 12.5px; color: #94a3b8;">Click any preset button below to auto-fill this form instantly:</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 1-Click Preset Buttons -->
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button type="button" onclick="applyOfferPreset('buy1get10')" style="background: #2563eb; color: #fff; border: 1px solid #3b82f6; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            🎯 Buy 1, Get 2nd at 10% Off
+        </button>
+        <button type="button" onclick="applyOfferPreset('buy1get50')" style="background: #059669; color: #fff; border: 1px solid #10b981; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            🔥 Buy 1, Get 2nd at 50% Off (Half Price)
+        </button>
+        <button type="button" onclick="applyOfferPreset('progressive4')" style="background: #7c3aed; color: #fff; border: 1px solid #8b5cf6; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            🚀 4-Tier Deal (10%, 25%, 80%)
+        </button>
+    </div>
+
+    <!-- Live Preview Box -->
+    <div id="presetFeedback" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(30, 41, 59, 0.7); border-radius: 8px; border: 1px solid #475569; font-size: 12.5px; color: #38bdf8;"></div>
+</div>
+
+<script>
+function applyOfferPreset(type) {
+    var nameInput = document.getElementById('id_name');
+    var badgeInput = document.getElementById('id_badge_text');
+    var headlineInput = document.getElementById('id_headline');
+    var t1Input = document.getElementById('id_tier_1_discount');
+    var t2Input = document.getElementById('id_tier_2_discount');
+    var t3Input = document.getElementById('id_tier_3_discount');
+    var t4Input = document.getElementById('id_tier_4_discount');
+    var fb = document.getElementById('presetFeedback');
+
+    if (type === 'buy1get10') {
+        if (nameInput) nameInput.value = 'Buy 1, Get 2nd at 10% Off';
+        if (badgeInput) badgeInput.value = 'Buy 2 Get 10% Off';
+        if (headlineInput) headlineInput.value = 'Buy 1 at standard price & get the 2nd piece at 10% off!';
+        if (t1Input) t1Input.value = '0.00';
+        if (t2Input) t2Input.value = '10.00';
+        if (t3Input) t3Input.value = '0.00';
+        if (t4Input) t4Input.value = '0.00';
+        if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = '✓ <b>Applied Preset:</b> 1st item: ₹1,000 (0% off) • 2nd item: ₹900 (10% off) • Total for 2 pieces: <b>₹1,900</b> (Save ₹100). Untick "Apply to all products" below to select specific products.';
+        }
+    } else if (type === 'buy1get50') {
+        if (nameInput) nameInput.value = 'Buy 1, Get 2nd at 50% Off';
+        if (badgeInput) badgeInput.value = 'Buy 2 Get 50% Off 2nd';
+        if (headlineInput) headlineInput.value = 'Buy 1 item & get 50% off on your second piece!';
+        if (t1Input) t1Input.value = '0.00';
+        if (t2Input) t2Input.value = '50.00';
+        if (t3Input) t3Input.value = '0.00';
+        if (t4Input) t4Input.value = '0.00';
+        if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = '✓ <b>Applied Preset:</b> 1st item: ₹1,000 (0% off) • 2nd item: ₹500 (50% off) • Total for 2 pieces: <b>₹1,500</b> (Save ₹500).';
+        }
+    } else if (type === 'progressive4') {
+        if (nameInput) nameInput.value = 'Festive 4-Tier Deal (10%, 25%, 80%)';
+        if (badgeInput) badgeInput.value = 'Buy More, Save More';
+        if (headlineInput) headlineInput.value = 'Buy 2 & Get 10% Off 2nd • Buy 3 & Get 25% Off 3rd • Buy 4 & Get 80% Off 4th';
+        if (t1Input) t1Input.value = '0.00';
+        if (t2Input) t2Input.value = '10.00';
+        if (t3Input) t3Input.value = '25.00';
+        if (t4Input) t4Input.value = '80.00';
+        if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = '✓ <b>Applied Preset:</b> Buy 1: ₹1,000 • Buy 2: ₹1,900 • Buy 3: ₹2,650 • Buy 4: ₹2,850.';
+        }
+    }
+}
+</script>
+{% endblock %}
