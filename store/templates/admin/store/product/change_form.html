@@ -1190,4 +1190,164 @@
 
 })();
 </script>
+
+<script>
+/* ===== DIRECT-TO-CLOUDINARY VIDEO UPLOADER (BYPASS VERCEL 4.5MB LIMIT) ===== */
+(function() {
+    function initVideoDirectUploader() {
+        var videoInput = document.getElementById('id_video');
+        var directInput = document.getElementById('id_direct_video_public_id');
+        if (!videoInput) return;
+
+        if (document.getElementById('direct_video_uploader_box')) return;
+
+        var container = document.createElement('div');
+        container.id = 'direct_video_uploader_box';
+        container.style.cssText = 'margin-top: 10px; padding: 14px 18px; background: #f8fafc; border: 1.5px dashed #94a3b8; border-radius: 12px; max-width: 480px; display: none; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.03);';
+
+        videoInput.parentNode.insertBefore(container, videoInput.nextSibling);
+
+        videoInput.addEventListener('change', function() {
+            var file = this.files && this.files[0];
+            if (!file) return;
+
+            var fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            container.style.display = 'block';
+            container.style.background = '#f8fafc';
+            container.style.borderColor = '#94a3b8';
+
+            container.innerHTML =
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                    '<span style="font-weight:700; color:#0f172a; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📹 ' + file.name + '</span>' +
+                    '<span style="font-size:12px; font-weight:700; color:#475569; background:#e2e8f0; padding:2px 8px; border-radius:10px;">' + fileSizeMB + ' MB</span>' +
+                '</div>' +
+                '<div style="background:#e2e8f0; border-radius:999px; height:8px; overflow:hidden; margin-bottom:8px;">' +
+                    '<div id="dvu_progress_bar" style="background:#2563eb; width:0%; height:100%; transition:width 0.15s ease;"></div>' +
+                '</div>' +
+                '<div id="dvu_status_row" style="display:flex; justify-content:space-between; font-size:12px; color:#475569;">' +
+                    '<span id="dvu_status_text">⚡ Preparing direct upload to Cloudinary (Bypassing Vercel 4.5MB limit)...</span>' +
+                    '<span id="dvu_pct_text" style="font-weight:700;">0%</span>' +
+                '</div>' +
+                '<div id="dvu_preview_box" style="margin-top:12px; display:none;"></div>';
+
+            var pBar = document.getElementById('dvu_progress_bar');
+            var sText = document.getElementById('dvu_status_text');
+            var pctText = document.getElementById('dvu_pct_text');
+            var prevBox = document.getElementById('dvu_preview_box');
+
+            var submitButtons = document.querySelectorAll('input[type="submit"], button[type="submit"]');
+            submitButtons.forEach(function(btn) {
+                btn.disabled = true;
+                if (!btn.hasAttribute('data-orig-label')) {
+                    btn.setAttribute('data-orig-label', btn.value || btn.innerText);
+                }
+                if (btn.tagName === 'INPUT') btn.value = '⏳ Video uploading to Cloudinary...';
+                else btn.innerText = '⏳ Video uploading to Cloudinary...';
+            });
+
+            // 1. Fetch Cloudinary signature from Django backend
+            fetch('{% url "admin:store_product_cloudinary_video_signature" %}')
+                .then(function(res) {
+                    if (!res.ok) throw new Error('Signature endpoint returned ' + res.status);
+                    return res.json();
+                })
+                .then(function(sigData) {
+                    if (sText) sText.innerText = '☁️ Uploading directly to Cloudinary CDN (Bypassing Vercel)...';
+
+                    // 2. Direct upload to Cloudinary via XMLHttpRequest
+                    var xhr = new XMLHttpRequest();
+                    var uploadUrl = 'https://api.cloudinary.com/v1_1/' + sigData.cloud_name + '/video/upload';
+                    xhr.open('POST', uploadUrl, true);
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            var pct = Math.round((e.loaded / e.total) * 100);
+                            if (pBar) pBar.style.width = pct + '%';
+                            if (pctText) pctText.innerText = pct + '%';
+                            if (sText) sText.innerText = '☁️ Uploading: ' + (e.loaded / (1024*1024)).toFixed(1) + ' / ' + fileSizeMB + ' MB';
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            var resp = JSON.parse(xhr.responseText);
+                            if (pBar) {
+                                pBar.style.width = '100%';
+                                pBar.style.background = '#16a34a';
+                            }
+                            container.style.background = '#f0fdf4';
+                            container.style.borderColor = '#86efac';
+
+                            if (sText) {
+                                sText.innerHTML = '<b style="color:#15803d;">✓ Uploaded directly to Cloudinary! Click "Save" below to finish.</b>';
+                            }
+                            if (pctText) pctText.innerText = '100%';
+
+                            if (prevBox && resp.secure_url) {
+                                prevBox.style.display = 'block';
+                                prevBox.innerHTML = '<video src="' + resp.secure_url + '" style="max-height:160px; max-width:260px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" controls playsinline></video>';
+                            }
+
+                            if (directInput) {
+                                directInput.value = resp.public_id;
+                            }
+
+                            // CRITICAL: Clear file input so browser NEVER sends the 5MB payload to Vercel!
+                            videoInput.value = '';
+
+                            submitButtons.forEach(function(btn) {
+                                btn.disabled = false;
+                                var orig = btn.getAttribute('data-orig-label');
+                                if (btn.tagName === 'INPUT') btn.value = orig;
+                                else btn.innerText = orig;
+                            });
+                        } else {
+                            throw new Error('Cloudinary returned ' + xhr.status + ': ' + xhr.responseText);
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        throw new Error('Network error connecting to Cloudinary.');
+                    };
+
+                    var fd = new FormData();
+                    fd.append('file', file);
+                    fd.append('api_key', sigData.api_key);
+                    fd.append('timestamp', sigData.timestamp);
+                    fd.append('signature', sigData.signature);
+                    fd.append('folder', sigData.folder);
+
+                    xhr.send(fd);
+                })
+                .catch(function(err) {
+                    console.error('Direct video upload failed:', err);
+                    container.style.background = '#fef2f2';
+                    container.style.borderColor = '#fca5a5';
+                    container.innerHTML =
+                        '<div style="color:#b91c1c; font-size:12.5px; font-weight:600;">' +
+                            '❌ Direct video upload failed: ' + (err.message || err) +
+                            '<div style="font-size:11.5px; color:#6b7280; margin-top:4px; font-weight:normal;">' +
+                                'Please re-select the video to try again.' +
+                            '</div>' +
+                        '</div>';
+
+                    submitButtons.forEach(function(btn) {
+                        btn.disabled = false;
+                        var orig = btn.getAttribute('data-orig-label');
+                        if (orig) {
+                            if (btn.tagName === 'INPUT') btn.value = orig;
+                            else btn.innerText = orig;
+                        }
+                    });
+                });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initVideoDirectUploader);
+    } else {
+        initVideoDirectUploader();
+    }
+})();
+</script>
 {% endblock %}

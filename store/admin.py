@@ -10,7 +10,12 @@ from django.utils.safestring import mark_safe
 from urllib.parse import quote
 import json
 import logging
+import time
 from decimal import Decimal
+from django.http import JsonResponse
+import cloudinary.utils
+
+from .storages import video_storage
 
 logger = logging.getLogger(__name__)
 
@@ -346,11 +351,16 @@ class ProductAdminForm(forms.ModelForm):
         help_text='Select one or more metal/finish types. Leave blank for smart auto-matching.'
     )
 
+    direct_video_public_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+
     class Meta:
         model = Product
         fields = [
             'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
-            'mrp', 'price', 'stock', 'image', 'video', 'is_active',
+            'mrp', 'price', 'stock', 'image', 'video', 'direct_video_public_id', 'is_active',
             'weight_grams', 'dimensions', 'closure_type', 'pair_with',
             'occasions_list', 'metal_finish_list',
         ]
@@ -377,8 +387,17 @@ class ProductAdminForm(forms.ModelForm):
         instance.occasions = ','.join(self.cleaned_data.get('occasions_list') or [])
         instance.metal_finish = ','.join(self.cleaned_data.get('metal_finish_list') or [])
 
+        # Direct Cloudinary upload (bypasses Vercel 4.5MB limit)
+        direct_public_id = (self.cleaned_data.get('direct_video_public_id') or '').strip()
+        if direct_public_id:
+            if instance.video and str(instance.video) != direct_public_id:
+                try:
+                    instance.video.delete(save=False)
+                except Exception:
+                    pass
+            instance.video.name = direct_public_id
         # If user checked "Clear" for video
-        if self.cleaned_data.get('video') is False:
+        elif self.cleaned_data.get('video') is False:
             if instance.video:
                 try:
                     instance.video.delete(save=False)
@@ -412,7 +431,7 @@ class ProductAdmin(admin.ModelAdmin):
         ('Basic Details', {
             'fields': (
                 'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
-                'mrp', 'price', 'stock', 'image', 'video', 'video_player_preview', 'is_active'
+                'mrp', 'price', 'stock', 'image', 'video', 'direct_video_public_id', 'video_player_preview', 'is_active'
             )
         }),
         ('Occasion & Style Facets (Kushal\'s / Rubans Discovery)', {
@@ -451,12 +470,42 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path(
+                'cloudinary-video-signature/',
+                self.admin_site.admin_view(self.get_cloudinary_video_signature),
+                name='store_product_cloudinary_video_signature'
+            ),
+            path(
                 '<int:product_id>/delete-video/',
                 self.admin_site.admin_view(self.delete_product_video),
                 name='store_product_delete_video'
             ),
         ]
         return custom_urls + urls
+
+    def get_cloudinary_video_signature(self, request):
+        if not request.user.is_staff:
+            return JsonResponse({'error': 'Unauthorized'}, status=403)
+        creds = video_storage.get_credentials()
+        cloud_name = creds.get('cloud_name')
+        api_key = creds.get('api_key')
+        api_secret = creds.get('api_secret')
+
+        if not cloud_name or not api_key or not api_secret:
+            return JsonResponse({'error': 'Cloudinary video credentials not configured'}, status=500)
+
+        timestamp = int(time.time())
+        params = {
+            'folder': 'videos',
+            'timestamp': timestamp,
+        }
+        signature = cloudinary.utils.api_sign_request(params, api_secret)
+        return JsonResponse({
+            'cloud_name': cloud_name,
+            'api_key': api_key,
+            'timestamp': timestamp,
+            'folder': 'videos',
+            'signature': signature,
+        })
 
     def delete_product_video(self, request, product_id):
         product = get_object_or_404(Product, pk=product_id)
