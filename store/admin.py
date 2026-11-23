@@ -443,7 +443,7 @@ class ProductAdmin(admin.ModelAdmin):
                 obj.video.url,
                 delete_url
             )
-        return format_html(
+        return mark_safe(
             '<span style="color:#6b7280; font-size:13px;">No video uploaded yet. Choose an MP4 / video file above and save to add one.</span>'
         )
 
