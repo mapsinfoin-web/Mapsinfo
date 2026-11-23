@@ -85,10 +85,11 @@ class ProductColorAdmin(admin.ModelAdmin):
 
     @admin.display(description='Video')
     def video_preview(self, obj):
-        if obj and obj.video:
+        v_url = obj.video_url if obj else ''
+        if v_url:
             return format_html(
                 '<video src="{}" style="max-height: 40px; max-width: 70px; border-radius: 4px;" controls></video>',
-                obj.video.url
+                v_url
             )
         return '—'
 
@@ -457,7 +458,8 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description='Video Preview & Management')
     def video_player_preview(self, obj):
-        if obj and obj.video:
+        v_url = obj.video_url if obj else ''
+        if obj and v_url:
             delete_url = reverse('admin:store_product_delete_video', args=[obj.pk])
             return format_html(
                 '<div style="display:flex; flex-direction:column; gap:10px; max-width:340px;">'
@@ -469,7 +471,7 @@ class ProductAdmin(admin.ModelAdmin):
                 '<span style="font-size:12px; color:#6b7280;">Click to remove this video from Cloudinary & product</span>'
                 '</div>'
                 '</div>',
-                obj.video.url,
+                v_url,
                 delete_url
             )
         return mark_safe(

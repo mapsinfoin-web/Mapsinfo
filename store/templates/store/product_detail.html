@@ -2928,9 +2928,9 @@
         <!-- Left: gallery -->
         <div class="gallery animate-up">
             <div class="main-image" id="main-wrap" {% if selected_color_obj.image %}style="--bg: url('{{ selected_color_obj.image.url }}')"{% elif product.image %}style="--bg: url('{{ product.image.url }}')"{% endif %} role="button" tabindex="0" aria-label="Click to zoom the photo">
-                {% if product.video or selected_color_obj.video or product.available_colors %}
+                {% if product.video_url or selected_color_obj.video_url or product.available_colors %}
                 <div id="main-video-wrap" style="display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: #0b192c; border-radius: inherit; overflow: hidden; z-index: 3;">
-                    <video id="product-video-player" src="{% if selected_color_obj.video %}{{ selected_color_obj.video.url }}{% elif product.video %}{{ product.video.url }}{% endif %}" controls loop playsinline preload="metadata" style="width: 100%; height: 100%; object-fit: contain;"></video>
+                    <video id="product-video-player" src="{% if selected_color_obj.video_url %}{{ selected_color_obj.video_url }}{% elif product.video_url %}{{ product.video_url }}{% endif %}" controls loop playsinline preload="metadata" style="width: 100%; height: 100%; object-fit: contain;"></video>
                 </div>
                 {% endif %}
                 {% if selected_color_obj.image %}
@@ -2943,7 +2943,7 @@
                 <div class="no-image">No image available</div>
                 {% endif %}
             </div>
-            {% if product.image or product.gallery_images.all or product.available_colors or product.video %}
+            {% if product.image or product.gallery_images.all or product.available_colors or product.video_url %}
             <div class="thumbs" id="productThumbsContainer">
                 {% if selected_color_obj and selected_color_obj.all_images %}
                     {% for img_url in selected_color_obj.all_images %}
@@ -2959,9 +2959,9 @@
                     {% endif %}
                     {% endfor %}
                 {% endif %}
-                {% if selected_color_obj.video or product.video %}
+                {% if selected_color_obj.video_url or product.video_url %}
                 <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Video Clip" aria-label="Watch Video Clip">
-                    <img id="videoThumbImg" src="{% if selected_color_obj.video %}{{ selected_color_obj.video_thumbnail_url|default:selected_color_obj.image.url }}{% else %}{{ product.video_thumbnail_url|default:product.image.url }}{% endif %}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                    <img id="videoThumbImg" src="{% if selected_color_obj.video_url %}{{ selected_color_obj.video_thumbnail_url|default:selected_color_obj.image.url }}{% else %}{{ product.video_thumbnail_url|default:product.image.url }}{% endif %}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
                     <span class="video-thumb-overlay"></span>
                     <span class="video-thumb-play"><i class="fas fa-play"></i></span>
                     <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
@@ -2977,9 +2977,9 @@
                 <img src="{{ gallery_img.image.url }}" class="thumb" onclick="swapImage(this)" alt="Gallery view {{ forloop.counter }}" loading="lazy" />
                 {% endif %}
                 {% endfor %}
-                {% if selected_color_obj.video or product.video %}
+                {% if product.video_url %}
                 <button type="button" class="video-thumb-btn" id="videoThumbBtn" onclick="toggleProductVideo(true)" title="Watch Video Clip" aria-label="Watch Video Clip">
-                    <img id="videoThumbImg" src="{% if selected_color_obj.video %}{{ selected_color_obj.video_thumbnail_url|default:selected_color_obj.image.url }}{% else %}{{ product.video_thumbnail_url|default:product.image.url }}{% endif %}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
+                    <img id="videoThumbImg" src="{{ product.video_thumbnail_url|default:product.image.url }}" alt="Video Preview" class="video-thumb-img" loading="lazy" />
                     <span class="video-thumb-overlay"></span>
                     <span class="video-thumb-play"><i class="fas fa-play"></i></span>
                     <span class="video-thumb-tag"><i class="fas fa-play"></i> Video</span>
@@ -4410,7 +4410,7 @@
             // Video for this colour variant or base product
             var colorVideo = btn.getAttribute('data-video') || '';
             var colorVideoThumb = btn.getAttribute('data-video-thumb') || '';
-            var baseVideo = '{{ product.video.url|default:""|escapejs }}';
+            var baseVideo = '{{ product.video_url|escapejs }}';
             var baseVideoThumb = '{{ product.video_thumbnail_url|default:""|escapejs }}';
             var activeVideo = colorVideo || baseVideo;
             var activeVideoThumb = colorVideoThumb || baseVideoThumb;

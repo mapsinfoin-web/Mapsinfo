@@ -164,6 +164,16 @@ class Product(models.Model):
         return None
 
     @property
+    def video_url(self):
+        """Returns the safe URL of this product's video clip, if any, or empty string."""
+        if self.video:
+            try:
+                return self.video.url
+            except Exception:
+                return ''
+        return ''
+
+    @property
     def video_thumbnail_url(self):
         """
         Returns a thumbnail image URL for the video clip.
