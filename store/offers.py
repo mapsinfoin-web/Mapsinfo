@@ -141,7 +141,10 @@ def auto_fill_single_gift(cart, offer):
     """
     If the offer has exactly ONE possible gift there is nothing to choose, so add it automatically.
     Returns the gift product when something was added, otherwise None.
+    Only applies to 100% free gifts (not percentage discount bundles).
     """
+    if offer.discount_percentage and offer.discount_percentage < 100:
+        return None
     choices = eligible_gifts(offer)
     if len(choices) != 1:
         return None
@@ -252,6 +255,8 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
         item.original_line_total = unit_price * item.quantity
         item.tiered_discount = Decimal('0')
         item.tiered_offer = None
+        item.bundle_discount = Decimal('0')
+        item.bundle_offer = None
 
         # Check progressive tiered quantity discount
         q_offer = get_quantity_offer_for_product(item.product, q_offers)
@@ -283,17 +288,60 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
 
         subtotal += item.original_line_total
 
-        # BOGO offer checks
+        # BOGO offer checks (100% free gift offers)
         offer = by_main.get(item.product_id)
         item.offer = offer
         item.my_gifts, item.gift_entitled, item.gift_slots_left, item.gift_choices = [], 0, 0, []
-        if offer:
+        if offer and (not offer.discount_percentage or offer.discount_percentage >= 100):
             entitled = entitlement(offer, item.quantity)
             mine = chosen.get(offer.pk, [])
             item.my_gifts = mine
             item.gift_entitled = entitled
             item.gift_slots_left = max(entitled - sum(g.quantity for g in mine), 0)
             item.gift_choices = [p for p in offer.free_products.all() if p.is_active and p.stock > 0]
+
+    # Cross-product percentage bundle discounts (e.g. Buy Testing1, get ABC at 10% off)
+    for main_item in items:
+        offer = by_main.get(main_item.product_id)
+        if not offer or not offer.discount_percentage or offer.discount_percentage >= 100:
+            continue
+
+        bundle_target_ids = set(offer.free_products.values_list('pk', flat=True))
+        if not bundle_target_ids:
+            continue
+
+        allowed_bundle_units = entitlement(offer, main_item.quantity)
+        for target_item in items:
+            if target_item.product_id in bundle_target_ids and target_item.product_id != main_item.product_id:
+                eligible_qty = min(target_item.quantity, allowed_bundle_units)
+                if eligible_qty > 0:
+                    unit_p = getattr(target_item, 'unit_price', getattr(target_item.product, 'price', Decimal('0')))
+                    pct = offer.discount_percentage / Decimal('100')
+                    bundle_saving = (unit_p * pct * eligible_qty).quantize(Decimal('0.01'))
+                    target_item.bundle_discount += bundle_saving
+                    target_item.bundle_offer = offer
+                    target_item.line_total = max(target_item.line_total - bundle_saving, Decimal('0'))
+                    discount += bundle_saving
+
+                    entry_key = f"bundle_{offer.pk}_{target_item.product_id}"
+                    if entry_key not in applied:
+                        applied[entry_key] = {
+                            'id': entry_key,
+                            'name': offer.name or f"Bundle Deal: Buy {main_item.product.title} & Get {int(offer.discount_percentage)}% Off {target_item.product.title}",
+                            'type': 'bundle',
+                            'badge': f"Bundle: {int(offer.discount_percentage)}% Off",
+                            'discount': Decimal('0'),
+                            'items': []
+                        }
+                    applied[entry_key]['discount'] += bundle_saving
+                    applied[entry_key]['items'].append({
+                        'product': target_item.product.title,
+                        'quantity': eligible_qty,
+                        'discount': str(bundle_saving)
+                    })
+                    allowed_bundle_units -= eligible_qty
+                    if allowed_bundle_units <= 0:
+                        break
 
     for gift in gifts:
         gift.original_total = gift.product.price * gift.quantity

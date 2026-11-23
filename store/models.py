@@ -561,32 +561,40 @@ class Product(models.Model):
 
 class BogoOffer(models.Model):
     """
-    Buy One Get One Free, controlled by the admin.
-    The admin picks ONE paid "main" product and the exact free gifts the customer may choose from.
-    Nothing becomes free unless it is listed here.
+    Buy X, Get Y Free or at a Discount % (BOGO & Bundle Offers).
+    The admin picks ONE paid "main" product and the bundle / gift products the customer gets.
+    If discount_percentage = 100%, the second item is 100% FREE.
+    If discount_percentage < 100% (e.g. 10%), the customer gets 10% off the second product!
     """
-    name = models.CharField(max_length=120, blank=True,
+    name = models.CharField(max_length=150, blank=True,
                             help_text="Optional. Leave empty and it is named automatically.")
     is_active = models.BooleanField(default=True, help_text="Master switch. Untick to turn the offer off immediately.")
     main_product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='bogo_offers', verbose_name='Main product (paid)',
         help_text="The product the customer must buy to qualify.")
     free_products = models.ManyToManyField(
-        Product, related_name='free_gift_offers', verbose_name='Free products (gift choices)',
-        help_text="The customer picks from these. Only the products you select here can ever be free.")
+        Product, related_name='free_gift_offers', verbose_name='Second / Bundle products (discounted or free)',
+        help_text="The customer gets this product at a discount or free when buying the main product.")
+    discount_percentage = models.DecimalField(
+        max_digits=5, decimal_places=2, default=100.0,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        verbose_name='Discount % on Second Product',
+        help_text='100% = Free Gift (Buy 1 Get 1 Free). Less than 100% = percentage discount (e.g. 10 for 10% off the second product).'
+    )
     free_per_main = models.PositiveIntegerField(
-        default=1, validators=[MinValueValidator(1)], verbose_name='Free gifts per main product',
-        help_text="Buying 2 units of the main product gives 2 gifts when this is 1.")
+        default=1, validators=[MinValueValidator(1)], verbose_name='Discounted units per main product',
+        help_text="Buying 1 unit of the main product gives discount on this many second products (usually 1).")
     max_free_per_order = models.PositiveIntegerField(
-        null=True, blank=True, help_text="Most free gifts one order can get from this offer. Empty = no limit.")
+        null=True, blank=True, verbose_name='Max discounted units per order',
+        help_text="Most discounted items one order can get from this offer. Empty = no limit.")
     start_date = models.DateTimeField(null=True, blank=True, help_text="Leave empty to start immediately.")
     end_date = models.DateTimeField(null=True, blank=True, help_text="Leave empty for no end date.")
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
-        verbose_name = 'BOGO Offer'
-        verbose_name_plural = 'BOGO Offers'
+        verbose_name = 'BOGO & Bundle Offer'
+        verbose_name_plural = 'BOGO & Bundle Offers'
 
     def clean(self):
         if self.start_date and self.end_date and self.end_date <= self.start_date:
@@ -599,15 +607,22 @@ class BogoOffer(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name:
-            self.name = f"{self.main_product.title} + free gift"
+            if self.discount_percentage and self.discount_percentage < 100:
+                self.name = f"Buy {self.main_product.title} + get {int(self.discount_percentage)}% off 2nd product"
+            else:
+                self.name = f"{self.main_product.title} + free gift"
         super().save(*args, **kwargs)
 
     @property
     def badge_text(self):
+        if self.discount_percentage and self.discount_percentage < 100:
+            return f"Buy 1, Get {int(self.discount_percentage)}% Off"
         return "Buy 1 Get 1 Free"
 
     @property
     def headline(self):
+        if self.discount_percentage and self.discount_percentage < 100:
+            return f"Buy this {self.main_product.title} & get {int(self.discount_percentage)}% off second piece!"
         return f"Buy this {self.main_product.title} & get a free gift!"
 
     def status(self, now=None):

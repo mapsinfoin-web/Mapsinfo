@@ -990,9 +990,9 @@ class BogoOfferForm(forms.ModelForm):
 
 @admin.register(BogoOffer)
 class BogoOfferAdmin(admin.ModelAdmin):
-    """Pick the paid product and exactly which products the customer may choose for free."""
+    """Pick the paid product and which products the customer gets free or at a discount (e.g. Buy Testing1, get ABC 10% off)."""
     form = BogoOfferForm
-    list_display = ['name', 'main_product_price', 'gift_choices', 'offer_status', 'start_date', 'end_date',
+    list_display = ['name', 'main_product_price', 'gift_choices', 'discount_summary', 'offer_status', 'start_date', 'end_date',
                     'orders_using_offer', 'is_active']
     list_editable = ['is_active']
     list_filter = ['is_active']
@@ -1003,10 +1003,10 @@ class BogoOfferAdmin(admin.ModelAdmin):
     actions = ['enable_offers', 'disable_offers']
     fieldsets = (
         (None, {
-            'fields': ('main_product', 'free_products', 'is_active'),
-            'description': '<b>Step 1:</b> choose the product the customer BUYS. '
-                           '<b>Step 2:</b> choose the product(s) they can pick as a FREE gift. '
-                           '<b>Step 3:</b> Save. That is all.',
+            'fields': ('main_product', 'free_products', 'discount_percentage', 'is_active'),
+            'description': '<b>Step 1:</b> Choose the main product the customer BUYS.<br>'
+                           '<b>Step 2:</b> Choose the second/bundle product(s) that get discounted or free.<br>'
+                           '<b>Step 3:</b> Set discount % (100% = Free Gift, 10% = 10% off second product, etc.).',
         }),
         ('More options (optional)', {
             'fields': ('name', 'free_per_main', 'max_free_per_order', 'start_date', 'end_date'),
@@ -1022,9 +1022,16 @@ class BogoOfferAdmin(admin.ModelAdmin):
     def main_product_price(self, obj):
         return f"{obj.main_product.title} - \u20b9{obj.main_product.price}"
 
-    @admin.display(description='Free gift choices (price)')
+    @admin.display(description='Second / Bundle product(s)')
     def gift_choices(self, obj):
         return ', '.join(f"{p.title} (\u20b9{p.price})" for p in obj.free_products.all()) or '-'
+
+    @admin.display(description='Discount on 2nd Item')
+    def discount_summary(self, obj):
+        pct = float(obj.discount_percentage or 100.0)
+        if pct >= 100.0:
+            return format_html('<span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:6px;font-weight:700;">🎁 100% FREE</span>')
+        return format_html('<span style="background:#dbeafe;color:#1e40af;padding:3px 8px;border-radius:6px;font-weight:700;">🔥 {}% OFF</span>', int(pct) if pct.is_integer() else pct)
 
     @admin.display(description='Status')
     def offer_status(self, obj):

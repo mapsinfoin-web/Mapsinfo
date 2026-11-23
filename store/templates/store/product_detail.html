@@ -3178,7 +3178,7 @@
                     </div>
                     {% endif %}
 
-                    {% if offer and gift_choices %}
+                    {% if offer and gift_choices and offer.discount_percentage >= 100 %}
                     <!-- Buy 1 Get 1 Free: customer picks gift, one click adds both -->
                     <div class="gift-offer">
                         <div class="gift-offer-head"><i class="fas fa-gift"></i> {{ offer.headline }}</div>
@@ -3206,6 +3206,27 @@
                         </form>
                     </div>
                     {% else %}
+                    {% if offer and offer.discount_percentage < 100 and offer.free_products.exists %}
+                    <!-- Cross-Product Bundle Deal -->
+                    <div class="gift-offer" style="background:#f0fdf4; border: 2px dashed #16a34a; margin-bottom:16px;">
+                        <div class="gift-offer-head" style="color:#166534;"><i class="fas fa-layer-group"></i> {{ offer.headline }}</div>
+                        <p class="gift-offer-sub" style="color:#15803d; margin-bottom:10px;">Pair this with any matching piece below to unlock <b>{{ offer.discount_percentage|floatformat:0 }}% OFF</b> in your cart:</p>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            {% for p in offer.free_products.all %}
+                            <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; padding:8px 12px; border-radius:10px; border:1px solid #bbf7d0;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    {% if p.image %}<img src="{{ p.image.url }}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;" />{% endif %}
+                                    <div>
+                                        <div style="font-size:13.5px;font-weight:600;color:var(--ink);">{{ p.title }}</div>
+                                        <div style="font-size:12px;color:var(--muted);"><s>₹{{ p.price }}</s> <b style="color:#16a34a;">Save {{ offer.discount_percentage|floatformat:0 }}%</b></div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'store:add_cart' p.id %}" style="background:#16a34a;color:#fff;text-decoration:none;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;">+ Add Piece</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="gallery-actions-btns">
                         <form action="{% url 'store:add_cart' product.id %}" method="POST" class="action-form action-form-add" {% if selected_color_obj and not selected_color_obj.in_stock %}style="display:none;"{% endif %}>
                             {% csrf_token %}

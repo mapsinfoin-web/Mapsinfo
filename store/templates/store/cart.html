@@ -250,6 +250,11 @@
                             <i class="fas fa-tags"></i> Quantity Deal: -₹{{ item.tiered_discount }}
                         </div>
                         {% endif %}
+                        {% if item.bundle_discount and item.bundle_discount > 0 %}
+                        <div style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; margin-bottom:8px; width:fit-content;">
+                            <i class="fas fa-layer-group"></i> Bundle Deal: -₹{{ item.bundle_discount }} ({{ item.bundle_offer.discount_percentage|floatformat:0 }}% Off with {{ item.bundle_offer.main_product.title }})
+                        </div>
+                        {% endif %}
                         
                         <div class="qty-box">
                             <a href="{% url 'store:remove_cart' item.product.id %}?item_id={{ item.id }}" class="qty-btn" aria-label="Decrease quantity"><i class="fas fa-minus"></i></a>
@@ -261,7 +266,7 @@
                     <a href="{% url 'store:remove_cart_item' item.product.id %}?item_id={{ item.id }}" class="remove-btn" aria-label="Remove item"><i class="far fa-trash-alt"></i></a>
                 </div>
 
-                {% if item.offer %}
+                {% if item.offer and item.offer.discount_percentage >= 100 %}
                 <div class="gift-box" {% if item.product.id == gift_anchor_id %}id="gifts"{% endif %}>
                     <h4><i class="fas fa-gift"></i> Choose Your Free Gift</h4>
 
@@ -308,6 +313,20 @@
                     <p class="gift-hint">You've picked all {{ item.gift_entitled }} of your free gifts. Add more {{ item.product.title }} to get more.</p>
                     {% endif %}
                 </div>
+                {% elif item.offer and item.offer.discount_percentage < 100 %}
+                <div style="background: #f0fdf4; border: 1.5px dashed #16a34a; border-radius: 14px; padding: 12px 16px; margin-top: -10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #166534;"><i class="fas fa-tags"></i> Special Bundle Deal Available!</div>
+                        <div style="font-size: 12px; color: #15803d;">Add a matching product to get <b>{{ item.offer.discount_percentage|floatformat:0 }}% OFF</b>:</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        {% for choice in item.offer.free_products.all %}
+                        <a href="{% url 'store:add_cart' choice.id %}" style="display: inline-flex; align-items: center; gap: 6px; background: #16a34a; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">
+                            + Add {{ choice.title }} (Save {{ item.offer.discount_percentage|floatformat:0 }}%)
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
                 {% endfor %}
             </div>
@@ -322,7 +341,7 @@
                 
                 {% for offer in applied_offers %}
                 <div class="summary-line savings">
-                    <span>{% if offer.type == 'tiered' %}<i class="fas fa-tags"></i> {{ offer.badge|default:offer.name }}{% else %}<i class="fas fa-gift"></i> Free gift ({{ offer.name }}){% endif %}</span>
+                    <span>{% if offer.type == 'tiered' %}<i class="fas fa-tags"></i> {{ offer.badge|default:offer.name }}{% elif offer.type == 'bundle' %}<i class="fas fa-layer-group"></i> {{ offer.badge|default:offer.name }}{% else %}<i class="fas fa-gift"></i> Free gift ({{ offer.name }}){% endif %}</span>
                     <span>-₹{{ offer.discount }}</span>
                 </div>
                 {% endfor %}
