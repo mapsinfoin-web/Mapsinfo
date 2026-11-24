@@ -64,9 +64,9 @@
         .qr-badge-secure { background: #e0f2fe; color: #075985; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .3px; }
         .qr-box { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 14px; margin: 0 auto 12px; max-width: 280px; box-shadow: 0 4px 16px rgba(19, 38, 57, .06); }
         .qr-box img { width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto; }
-        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; margin: 0 auto; overflow: hidden; }
-        .dynamic-qr-canvas canvas { display: none !important; }
-        .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; width: 220px !important; height: 220px !important; }
+        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; min-height: 220px; margin: 0 auto; overflow: hidden; position: relative; }
+        .dynamic-qr-canvas canvas,
+        .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; width: 220px !important; height: 220px !important; max-width: 100%; object-fit: contain; }
         .qr-missing { padding: 40px 10px; color: var(--muted); font-size: 14px; }
         .amount { font-size: 34px; font-weight: 800; color: var(--ink); margin: 6px 0 2px; }
         .upi-app-strip { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
@@ -221,13 +221,26 @@
                 </div>
 
                 <div class="qr-box" id="dynamicQrWrapper">
-                    <div id="dynamicUpiQr" class="dynamic-qr-canvas"></div>
+                    <div id="dynamicUpiQr" class="dynamic-qr-canvas">
+                        <!-- Instant Barcode / QR Code Image (Guaranteed to show on mobile instantly, even before JS loads) -->
+                        <img id="qrBarcodeImg"
+                             src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data={{ upi_intent_url|urlencode }}&margin=4"
+                             alt="Scan to Pay ₹{{ order.amount_paid }}"
+                             width="220"
+                             height="220"
+                             loading="eager"
+                             decoding="async"
+                             style="display: block; width: 220px; height: 220px; border-radius: 8px; margin: 0 auto; object-fit: contain;"
+                             onerror="this.onerror=null; this.src='{% if shop and shop.paytm_qr %}{{ shop.paytm_qr.url }}{% else %}https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png{% endif %}';" />
+                    </div>
                     <noscript>
-                        {% if shop and shop.paytm_qr %}
-                        <img src="{{ shop.paytm_qr.url }}" alt="Paytm QR code" />
-                        {% else %}
-                        <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png" alt="Paytm QR code" />
-                        {% endif %}
+                        <div style="margin-top: 8px;">
+                            {% if shop and shop.paytm_qr %}
+                            <img src="{{ shop.paytm_qr.url }}" alt="Paytm QR code" style="width:220px; height:220px;" />
+                            {% else %}
+                            <img src="https://res.cloudinary.com/dddvvn0s/image/upload/v1793683866/paytm.png" alt="Paytm QR code" style="width:220px; height:220px;" />
+                            {% endif %}
+                        </div>
                     </noscript>
                 </div>
 
@@ -388,15 +401,30 @@
     </script>
     <script src="{% static 'store/js/qrcode.min.js' %}"></script>
     <script>
+        // Check for CDN fallback if local qrcode script fails or is blocked on mobile
+        function ensureQrLib(callback) {
+            if (typeof QRCode !== 'undefined') {
+                callback();
+            } else {
+                var cdnScript = document.createElement('script');
+                cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+                cdnScript.onload = callback;
+                document.head.appendChild(cdnScript);
+            }
+        }
+
         // Initialize Dynamic UPI Payment QR Code
-        document.addEventListener('DOMContentLoaded', function() {
+        function initDynamicQr() {
             var qrContainer = document.getElementById('dynamicUpiQr');
             var upiUrl = "{{ upi_intent_url|escapejs }}";
-            if (qrContainer && upiUrl && typeof QRCode !== 'undefined') {
-                if (qrContainer.dataset.rendered === 'true') return;
-                qrContainer.innerHTML = '';
+            if (!qrContainer || !upiUrl) return;
+            if (qrContainer.dataset.rendered === 'true') return;
+
+            ensureQrLib(function() {
+                if (typeof QRCode === 'undefined') return;
                 try {
-                    new QRCode(qrContainer, {
+                    var temp = document.createElement('div');
+                    new QRCode(temp, {
                         text: upiUrl,
                         width: 220,
                         height: 220,
@@ -404,12 +432,32 @@
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.M
                     });
-                    qrContainer.dataset.rendered = 'true';
+
+                    // Once QRCode produces output, smoothly place it inside the container
+                    setTimeout(function() {
+                        var canvas = temp.querySelector('canvas');
+                        var img = temp.querySelector('img');
+                        if (canvas || (img && img.src)) {
+                            qrContainer.innerHTML = '';
+                            if (canvas) {
+                                canvas.style.display = 'block';
+                                qrContainer.appendChild(canvas);
+                            }
+                            if (img && img.src) {
+                                img.style.display = 'block';
+                                qrContainer.appendChild(img);
+                            }
+                            qrContainer.dataset.rendered = 'true';
+                        }
+                    }, 50);
                 } catch (e) {
-                    console.error("Dynamic UPI QR generation error:", e);
+                    console.warn("Client QRCode fallback to instant image:", e);
                 }
-            }
-        });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initDynamicQr);
+        window.addEventListener('load', initDynamicQr);
     </script>
     {% include 'store/includes/floating_whatsapp.html' %}
 </body>
