@@ -345,6 +345,7 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
 
     for gift in gifts:
         gift.original_total = gift.product.price * gift.quantity
+        subtotal += gift.original_total
         discount += gift.original_total
         entry = applied.setdefault(gift.offer_id, {
             'id': gift.offer_id,

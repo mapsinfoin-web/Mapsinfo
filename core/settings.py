@@ -33,7 +33,26 @@ SECRET_KEY = 'django-insecure-lpy=so(759tzfz))(_6c)sek8oeh3awyhc#t8qu&q(h$qjnq!g
 IS_VERCEL = os.environ.get('VERCEL') == '1'
 DEBUG = os.environ.get('DEBUG', 'False' if IS_VERCEL else 'True').strip().lower() in {'1', 'true', 'yes', 'on'}
 
-ALLOWED_HOSTS = ['.vercel.app', '*']
+ALLOWED_HOSTS = [
+    '.vercel.app',
+    'mapscart.com',
+    'www.mapscart.com',
+    'mapscart.info.in',
+    'www.mapscart.info.in',
+    '127.0.0.1',
+    'localhost',
+    '*',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://mapscart.com',
+    'https://www.mapscart.com',
+    'https://*.vercel.app',
+    'https://mapscart.info.in',
+    'https://www.mapscart.info.in',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
 
 
 # Application definition
