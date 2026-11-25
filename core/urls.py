@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from django.templatetags.static import static as static_url
 from django.http import HttpResponse
+from allauth.socialaccount.providers.google.views import oauth2_callback as google_oauth2_callback
 
 
 def robots_txt(request):
@@ -71,6 +72,7 @@ def bing_site_auth(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('store.urls')),
+    path('auth/google/callback', google_oauth2_callback, name='google_callback'),
     path('accounts/', include('allauth.urls')),
     path('favicon.ico', RedirectView.as_view(url=static_url('1.png'), permanent=True)),
     path('robots.txt', robots_txt, name='robots_txt'),
