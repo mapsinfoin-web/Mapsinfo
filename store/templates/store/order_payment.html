@@ -181,8 +181,21 @@
                 <div class="card">
                     <h2>Send Your Order To Us</h2>
                     {% if whatsapp_url %}
-                    <a href="{{ whatsapp_url }}" target="_blank" rel="noopener" class="btn btn-wa"><i class="fab fa-whatsapp"></i> Share order &amp; payment on WhatsApp</a>
+                    <a href="{{ whatsapp_url }}" target="_blank" rel="noopener" class="btn btn-wa" id="wa-share-btn"><i class="fab fa-whatsapp"></i> Share order &amp; payment on WhatsApp</a>
                     <p class="hint">This opens WhatsApp with your name, phone number, address, the products you bought, the amount and the link to your payment screenshot already typed. Just press Send.</p>
+                    <script>
+                        document.getElementById('wa-share-btn').addEventListener('click', function() {
+                            // When user returns from WhatsApp, redirect to My Orders
+                            setTimeout(function() {
+                                document.addEventListener('visibilitychange', function onVisible() {
+                                    if (document.visibilityState === 'visible') {
+                                        document.removeEventListener('visibilitychange', onVisible);
+                                        window.location.href = "{% url 'store:my_orders' %}";
+                                    }
+                                });
+                            }, 2000); // wait 2s so WhatsApp has time to open first
+                        });
+                    </script>
                     {% else %}
                     <button type="button" class="btn btn-off" disabled><i class="fab fa-whatsapp"></i> Share order &amp; payment on WhatsApp</button>
                     <p class="hint">
