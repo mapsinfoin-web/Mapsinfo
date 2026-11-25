@@ -3344,15 +3344,15 @@
                 <div class="cert-velvet-highlight">
                     <div class="cert-velvet-icon"><i class="fas fa-box-open"></i></div>
                     <div class="cert-velvet-text">
-                        <strong>Signature Velvet Box Packaging Included</strong>
-                        Every piece is hand-inspected and sealed inside our Signature MAPSCART Velvet Box Packaging — gift-ready and ideal for dust-free heirloom care.
+                        <strong>Signature Velvet Packaging Included</strong>
+                        {% if product.packaging_text %}{{ product.packaging_text }}{% elif product.category and 'earring' in product.category.slug|lower or 'earring' in product.title|lower %}Every pair of earrings is hand-inspected and sealed inside our Signature MAPSCART Velvet Jewellery Box — gift-ready and ideal for dust-free care.{% else %}Every necklace &amp; set is hand-inspected and sealed inside our Signature MAPSCART Velvet Jewellery Pouch — gift-ready and ideal for dust-free care.{% endif %}
                     </div>
                 </div>
 
                 <div class="cert-care-strip">
                     <div class="cert-care-tips">
                         <span><i class="fas fa-droplet-slash"></i> Apply perfume before wearing</span>
-                        <span><i class="fas fa-box"></i> Store in velvet box after wear</span>
+                        <span><i class="fas fa-box"></i> {% if product.category and 'earring' in product.category.slug|lower or 'earring' in product.title|lower %}Store in velvet box after wear{% else %}Store in velvet pouch after wear{% endif %}</span>
                         <span><i class="fas fa-wand-magic-sparkles"></i> Wipe with soft dry cloth</span>
                     </div>
                     <span class="cert-stamp"><i class="fas fa-check-circle"></i> Quality Assured</span>
@@ -3698,12 +3698,12 @@
                 <!-- FAQ 2 -->
                 <div class="pdp-faq-item">
                     <button class="pdp-faq-btn" type="button" aria-expanded="false">
-                        <span class="pdp-faq-title">Will it arrive in the signature velvet jewellery box?</span>
+                        <span class="pdp-faq-title">How is my jewellery packaged (box or pouch)?</span>
                         <span class="pdp-faq-icon"><i class="fas fa-chevron-down"></i></span>
                     </button>
                     <div class="pdp-faq-ans">
                         <div class="pdp-faq-ans-inner">
-                            Yes, 100%! Every order arrives in our deep-blue luxury velvet box with cushioned lining, accompanied by our branded Anti-Tarnish Guarantee certificate seal and an airtight protective pouch.
+                            Yes, 100% gift-ready! Earrings arrive in our signature deep-blue luxury velvet jewellery box, and necklaces &amp; sets arrive in our luxury velvet jewellery pouch, accompanied by our branded Anti-Tarnish Guarantee certificate seal.
                         </div>
                     </div>
                 </div>
