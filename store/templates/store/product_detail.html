@@ -3393,7 +3393,7 @@
                         <div class="spec-content">
                             <span class="spec-label">Gross Weight</span>
                             <strong class="spec-value">{{ product.display_weight }}</strong>
-                            <small class="spec-hint">Lightweight &amp; comfort fit</small>
+                            <small class="spec-hint">{{ product.weight_hint|default:"Lightweight & comfort fit" }}</small>
                         </div>
                     </div>
                     <div class="spec-item">
@@ -3401,7 +3401,7 @@
                         <div class="spec-content">
                             <span class="spec-label">Dimensions</span>
                             <strong class="spec-value">{{ product.display_dimensions }}</strong>
-                            <small class="spec-hint">Precision artisan crafted</small>
+                            <small class="spec-hint">{{ product.dimensions_hint|default:"Precision artisan crafted" }}</small>
                         </div>
                     </div>
                     <div class="spec-item">
@@ -3409,15 +3409,15 @@
                         <div class="spec-content">
                             <span class="spec-label">Lock / Closure</span>
                             <strong class="spec-value">{{ product.display_closure }}</strong>
-                            <small class="spec-hint">Secure hold</small>
+                            <small class="spec-hint">{{ product.closure_hint|default:"Secure hold" }}</small>
                         </div>
                     </div>
                     <div class="spec-item">
                         <div class="spec-icon"><i class="fas fa-shield-halved"></i></div>
                         <div class="spec-content">
                             <span class="spec-label">Finish &amp; Plating</span>
-                            <strong class="spec-value">Anti-Tarnish Plating</strong>
-                            <small class="spec-hint">Lead &amp; nickel-free alloy</small>
+                            <strong class="spec-value">{{ product.finish_plating|default:"Anti-Tarnish Plating" }}</strong>
+                            <small class="spec-hint">{{ product.finish_hint|default:"Lead & nickel-free alloy" }}</small>
                         </div>
                     </div>
                 </div>

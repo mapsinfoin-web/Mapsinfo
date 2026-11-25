@@ -73,15 +73,40 @@ class Product(models.Model):
     # Jewellery Specifications
     weight_grams = models.DecimalField(
         max_digits=6, decimal_places=2, null=True, blank=True,
-        help_text="Weight in grams (e.g. 12.50). Critical for customer confidence with earrings and chokers."
+        help_text="Weight in grams (e.g. 12.50). Leave blank for smart category default."
+    )
+    weight_hint = models.CharField(
+        max_length=120, blank=True, default='',
+        verbose_name='Gross Weight Subtitle',
+        help_text="Optional custom subtitle under Gross Weight (default: 'Lightweight & comfort fit')."
     )
     dimensions = models.CharField(
         max_length=150, blank=True, default='',
-        help_text="Dimensions string (e.g. 'Length: 5.2 cm | Width: 2.1 cm' or 'Drop: 45 cm (Adjustable)')"
+        help_text="Dimensions string (e.g. 'Length: 5.2 cm | Width: 2.1 cm' or 'Drop: 45 cm (Adjustable)')."
+    )
+    dimensions_hint = models.CharField(
+        max_length=120, blank=True, default='',
+        verbose_name='Dimensions Subtitle',
+        help_text="Optional custom subtitle under Dimensions (default: 'Precision artisan crafted')."
     )
     closure_type = models.CharField(
         max_length=100, blank=True, default='',
-        help_text="Fastening type (e.g. 'Push-back stud', 'Lobster clasp', 'Adjustable cord / Dori', 'Openable cuff')"
+        help_text="Fastening type (e.g. 'Push-back stud', 'Lobster clasp', 'Adjustable cord / Dori', 'Openable cuff')."
+    )
+    closure_hint = models.CharField(
+        max_length=120, blank=True, default='',
+        verbose_name='Lock / Closure Subtitle',
+        help_text="Optional custom subtitle under Lock / Closure (default: 'Secure hold')."
+    )
+    finish_plating = models.CharField(
+        max_length=120, blank=True, default='',
+        verbose_name='Finish & Plating',
+        help_text="Custom Finish & Plating value (default: 'Anti-Tarnish Plating')."
+    )
+    finish_hint = models.CharField(
+        max_length=120, blank=True, default='',
+        verbose_name='Finish & Plating Subtitle',
+        help_text="Optional custom subtitle under Finish & Plating (default: 'Lead & nickel-free alloy')."
     )
     pair_with = models.ManyToManyField(
         'self', blank=True, symmetrical=False, related_name='paired_by',

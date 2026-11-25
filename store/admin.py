@@ -373,7 +373,8 @@ class ProductAdminForm(forms.ModelForm):
             'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
             'mrp', 'price', 'stock', 'image', 'video', 'direct_video_public_id', 'is_active',
             'offer_type', 'offer_partner_product',
-            'weight_grams', 'dimensions', 'closure_type', 'pair_with',
+            'weight_grams', 'weight_hint', 'dimensions', 'dimensions_hint',
+            'closure_type', 'closure_hint', 'finish_plating', 'finish_hint', 'pair_with',
             'occasions_list', 'metal_finish_list',
         ]
 
@@ -463,8 +464,14 @@ class ProductAdmin(admin.ModelAdmin):
             'description': 'Tag products for faceted filtering by Occasion and Metal / Finish. Leave unticked to use smart auto-matching.'
         }),
         ('Jewellery Specifications & Cross-Sell', {
-            'fields': ('weight_grams', 'dimensions', 'closure_type', 'pair_with'),
-            'classes': ('collapse',),
+            'fields': (
+                ('weight_grams', 'weight_hint'),
+                ('dimensions', 'dimensions_hint'),
+                ('closure_type', 'closure_hint'),
+                ('finish_plating', 'finish_hint'),
+                'pair_with',
+            ),
+            'description': 'Customize the Jewellery Specifications box shown on the product page. Leave blank to use smart category defaults.',
         }),
     )
     readonly_fields = ['video_player_preview']
