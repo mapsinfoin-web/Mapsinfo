@@ -858,9 +858,19 @@ def checkout(request):
         full_name = (request.POST.get('full_name') or '').strip()
         email = (request.POST.get('email') or '').strip()
         mobile_number = (request.POST.get('mobile_number') or '').strip()
-        shipping_address = (request.POST.get('shipping_address') or '').strip()
+        # Build structured shipping address from individual fields
+        flat_no     = (request.POST.get('flat_no') or '').strip()
+        street_area = (request.POST.get('street_area') or '').strip()
+        landmark    = (request.POST.get('landmark') or '').strip()
+        state       = (request.POST.get('state') or '').strip()
+        # Combine into one address string (stored in existing TextField)
+        addr_parts = [p for p in [flat_no, street_area, landmark] if p]
+        shipping_address = ', '.join(addr_parts) if addr_parts else (request.POST.get('shipping_address') or '').strip()
         city = (request.POST.get('city') or '').strip()
         postal_code = (request.POST.get('postal_code') or '').strip()
+        # Append state to city for display
+        if state and state not in city:
+            city = f"{city}, {state}"
         payment_method = 'PAYTM'   # the only payment method: Paytm QR (never trust the browser for this)
 
         context['form_data'] = request.POST
@@ -876,9 +886,9 @@ def checkout(request):
             cart.save(update_fields=['customer_name', 'customer_email', 'customer_phone', 'updated_at'])
 
         # 1. Validate the form
-        required = [full_name, email, mobile_number, shipping_address, city, postal_code]
+        required = [full_name, email, mobile_number, flat_no, street_area, city, state, postal_code]
         if not all(required):
-            messages.error(request, "Please fill in all the delivery details.")
+            messages.error(request, "Please fill in all required delivery fields (marked with *).") 
             return render(request, 'store/checkout.html', context)
 
         # 2. Quick stock check so the customer gets a clear message
