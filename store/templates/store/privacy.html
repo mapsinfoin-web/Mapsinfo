@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy | MAPSCART Handcrafted Jewellery</title>
+    <meta name="description" content="Read MAPSCART's Privacy Policy to understand how we collect, use, and protect your personal information when you shop our anti-tarnish jewellery." />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <link rel="icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
+    <link rel="apple-touch-icon" href="{% static '1.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --navy: #1F3A66; --navy-2: #132639; --blue: #295CA3; --accent: #B3E0FF; --secondary: #C2D6E8;
+            --ink: #132639; --text: #2B3F57; --muted: #52637A; --bg: #F5F8FC; --soft: #E1E9F0;
+            --line: #D1DEE8; --radius: 18px;
+            --shadow: 0 10px 30px rgba(19, 38, 57, .08); --shadow-lg: 0 20px 50px rgba(19, 38, 57, .16);
+            --container: 1280px;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+        .announce { background: var(--navy); color: #fff; font-size: 12.5px; letter-spacing: .4px; overflow: hidden; white-space: nowrap; }
+        .announce-track { display: inline-flex; gap: 48px; padding: 9px 0; animation: marquee 28s linear infinite; }
+        .announce-track span { display: inline-flex; align-items: center; gap: 8px; }
+        .announce-track i { color: var(--accent); }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .policy-hero {
+            background: linear-gradient(135deg, #132639 0%, #1F3A66 55%, #295CA3 100%);
+            color: #fff;
+            padding: 64px 24px;
+            text-align: center;
+        }
+        .policy-eyebrow {
+            display: inline-block;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 2.2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(179, 224, 255, 0.14);
+            border: 1px solid rgba(179, 224, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+        .policy-hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(30px, 4vw, 46px);
+            margin: 0 0 12px;
+            font-weight: 700;
+        }
+        .policy-hero p {
+            color: #D7E6F5;
+            max-width: 620px;
+            margin: 0 auto;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        .policy-wrap {
+            max-width: 920px;
+            margin: -32px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .policy-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 40px 44px;
+        }
+        .policy-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--line);
+            font-size: 13.5px;
+            color: var(--muted);
+        }
+        .policy-section { margin-bottom: 28px; }
+        .policy-section:last-child { margin-bottom: 0; }
+        .policy-section h2 {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .policy-section h2 i { color: var(--blue); font-size: 16px; }
+        .policy-section p, .policy-section li {
+            font-size: 15px;
+            line-height: 1.78;
+            color: var(--text);
+        }
+        .policy-section ul {
+            margin: 8px 0 0;
+            padding-left: 20px;
+        }
+        .policy-section li { margin-bottom: 6px; }
+        .policy-contact-box {
+            background: #F4F8FD;
+            border: 1px solid #C9DCF0;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-top: 28px;
+        }
+        .policy-contact-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--ink); }
+        .policy-contact-box a { color: var(--blue); font-weight: 600; text-decoration: underline; }
+
+        .footer {
+            margin-top: 80px;
+            background: #87ceeb;
+            color: #1a3a5c;
+            border-top: 1px solid rgba(100, 160, 210, 0.30);
+            position: relative;
+        }
+        .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 50px; padding: 70px 0 50px; }
+        .footer-brand .brand-logo { display: inline-flex; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
+        .brand-logo img { display: block; height: 58px; width: auto; max-width: 100%; object-fit: contain; }
+        .brand-logo-text { height: 58px !important; }
+        .footer-brand p { font-size: 14.5px; line-height: 1.8; max-width: 300px; font-weight: 300; margin: 0 0 22px; }
+        .socials { display: flex; gap: 10px; }
+        .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(30, 58, 95, 0.30); display: grid; place-items: center; transition: all .3s; }
+        .socials a:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); transform: translateY(-3px); }
+        .fcol h4 { color: #0f2a4a; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 20px; font-weight: 600; }
+        .fcol a { display: block; margin-bottom: 12px; font-size: 14.5px; font-weight: 300; transition: color .2s, padding .2s; }
+        .fcol a:hover { color: var(--accent); padding-left: 5px; }
+        .footer-bottom { border-top: 1px solid rgba(100, 160, 210, 0.25); padding: 26px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+        .legal { display: flex; gap: 22px; }
+        .legal a:hover { color: var(--accent); }
+        @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 640px) {
+            .policy-card { padding: 26px 20px; }
+            .footer-top { grid-template-columns: 1fr; gap: 30px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="announce" aria-label="Offers">
+        <div class="announce-track">
+            {% for notif in store_announcements %}
+            <span>
+                {% if notif.notification_type == 'restock' %}<i class="fas fa-rotate"></i>
+                {% elif notif.notification_type == 'collection' %}<i class="fas fa-gem"></i>
+                {% elif notif.notification_type == 'alert' %}<i class="fas fa-circle-info"></i>
+                {% else %}<i class="fas fa-sparkles"></i>{% endif %}
+                {{ notif.message }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include 'store/includes/header.html' %}
+
+    <section class="policy-hero">
+        <span class="policy-eyebrow">Legal &amp; Trust</span>
+        <h1>Privacy Policy</h1>
+        <p>Your privacy matters to us. Here is how MAPSCART collects, uses, and protects your personal details when you browse or order from our store.</p>
+    </section>
+
+    <main class="policy-wrap">
+        <div class="policy-card">
+            <div class="policy-meta">
+                <span><strong>Brand:</strong> MAPSCART (Curated in Delhi, India)</span>
+                <span><strong>Last Updated:</strong> November 2026</span>
+            </div>
+
+            <div class="policy-section">
+                <h2><i class="fas fa-user-shield"></i> 1. Information We Collect</h2>
+                <p>When you browse MAPSCART, create an account, or place an order, we only collect the details needed to fulfil your order and provide customer support:</p>
+                <ul>
+                    <li><strong>Contact &amp; Delivery Details:</strong> Your full name, email address, mobile number, and shipping address (flat/house number, street/area, landmark, city, state, and PIN code).</li>
+                    <li><strong>Order &amp; Payment Verification Details:</strong> Products ordered, applied offers, and any payment confirmation screenshot you voluntarily upload for UPI/Paytm QR order verification.</li>
+                    <li><strong>Account &amp; Session Data:</strong> Essential cookies and session identifiers used to keep you signed in, preserve your shopping cart, and save your wishlist.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2><i class="fas fa-box-open"></i> 2. How We Use Your Information</h2>
+                <ul>
+                    <li>To process, pack, and ship your jewellery orders accurately across India.</li>
+                    <li>To verify UPI/Paytm QR payments and share order/tracking updates via email or WhatsApp.</li>
+                    <li>To respond to your questions, styling inquiries, or support requests submitted through our Contact page or WhatsApp concierge.</li>
+                    <li>To prevent fraud, protect site security, and comply with applicable Indian laws.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2><i class="fas fa-lock"></i> 3. Data Protection &amp; Third-Party Sharing</h2>
+                <p>We <strong>never sell or rent</strong> your personal information to third parties. We only share necessary delivery information (such as your name, address, and phone number) with trusted courier/logistics partners strictly to deliver your parcel, and use secure cloud infrastructure for hosting and media storage.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2><i class="fas fa-cookie-bite"></i> 4. Cookies &amp; Session Storage</h2>
+                <p>MAPSCART uses essential cookies and browser session storage to remember your cart items, login session, and wishlist preferences. You can clear or disable cookies in your browser settings at any time, though some cart/checkout features require essential cookies to work properly.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2><i class="fas fa-user-check"></i> 5. Your Rights</h2>
+                <p>You may request access to, correction of, or deletion of your account and personal order contact data at any time by contacting our support team.</p>
+            </div>
+
+            <div class="policy-contact-box">
+                <h3>Questions about Privacy?</h3>
+                <p style="margin:0;">Reach out anytime via our <a href="{% url 'store:contact' %}">Contact Support</a> page or WhatsApp Concierge at <a href="https://wa.me/919953595557" target="_blank" rel="noopener">+91 99535 95557</a>.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <img src="{% static 'new-logo.png' %}" alt="MAPSCART" class="brand-logo-text" />
+                    </div>
+                    <p>Considered jewellery for people who choose once and wear often. Handled by small ateliers, curated in Delhi.</p>
+                    <div class="socials">
+                        <a href="https://www.instagram.com/mapscart_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61593981695975" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="https://wa.me/919953595557" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="fcol">
+                    <h4>Shop</h4>
+                    <a href="{% url 'store:collection_detail' 'earrings' %}">Earrings</a>
+                    <a href="{% url 'store:collection_detail' 'necklaces' %}">Necklaces</a>
+                    <a href="{% url 'store:collection_detail' 'rings' %}">Rings</a>
+                    <a href="{% url 'store:collection_detail' 'bracelets' %}">Bracelets</a>
+                </div>
+                <div class="fcol">
+                    <h4>Help</h4>
+                    <a href="{% url 'store:my_orders' %}">Track Order</a>
+                    <a href="{% url 'store:faq' %}">FAQs</a>
+                    <a href="{% url 'store:contact' %}">Contact Support</a>
+                </div>
+                <div class="fcol">
+                    <h4>Company</h4>
+                    <a href="{% url 'store:about' %}">Our Story</a>
+                    <a href="{% url 'store:privacy' %}">Privacy Policy</a>
+                    <a href="{% url 'store:terms' %}">Terms &amp; Conditions</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p style="margin:0">&copy; 2026 MAPSCART. All rights reserved.</p>
+                {% include 'store/includes/footer_payment_strip.html' %}
+                <div class="legal"><a href="{% url 'store:privacy' %}">Privacy</a><a href="{% url 'store:terms' %}">Terms</a><a href="{% url 'store:privacy' %}">Cookies</a></div>
+            </div>
+        </div>
+    </footer>
+
+    {% include 'store/includes/floating_whatsapp.html' %}
+</body>
+</html>

@@ -1440,6 +1440,14 @@ def faq(request):
     return render(request, 'store/faq.html')
 
 
+def privacy_policy(request):
+    return render(request, 'store/privacy.html')
+
+
+def terms_conditions(request):
+    return render(request, 'store/terms.html')
+
+
 def _validate_contact_inquiry(name, email, phone, subject, message):
     """
     Rigorously validates contact form inputs against junk data, fake domains,
