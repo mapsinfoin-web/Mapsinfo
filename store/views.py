@@ -600,7 +600,7 @@ def add_combo_cart(request, product_id, pair_id):
 def _priced_cart(cart, request=None):
     """Drop invalid gifts, then price the cart. Returns (cart_items, pricing, notes)."""
     notes = sync_gifts(cart)
-    cart_items = CartItem.objects.filter(cart=cart, is_active=True).select_related('product', 'variant')
+    cart_items = CartItem.objects.filter(cart=cart, is_active=True).select_related('product', 'product__offer_partner_product', 'variant')
     if request:
         cart_colors = request.session.get('cart_colors', {})
         for item in cart_items:
@@ -965,6 +965,16 @@ def checkout(request):
                         raise OutOfStock(gift.product.title)
                     OrderItem.objects.create(order=order, product=gift.product, price=0, quantity=gift.quantity,
                                              is_free_gift=True, bogo_offer_id=gift.offer_id)
+
+                for auto_free in pricing.get('auto_free_items', []):
+                    free_p = auto_free['product']
+                    free_q = auto_free['quantity']
+                    updated = Product.objects.filter(
+                        pk=free_p.pk, stock__gte=free_q
+                    ).update(stock=F('stock') - free_q)
+                    if not updated:
+                        raise OutOfStock(free_p.title)
+                    OrderItem.objects.create(order=order, product=free_p, price=0, quantity=free_q, is_free_gift=True)
         except OutOfStock as exc:
             messages.error(request, f"Sorry, {exc} just sold out. Please update your cart.")
             return redirect('store:cart_detail')

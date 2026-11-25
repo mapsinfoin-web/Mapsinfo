@@ -249,6 +249,12 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
     subtotal = Decimal('0')
     discount = Decimal('0')
     applied = {}
+    auto_free_items = []
+    paid_qty_by_product = defaultdict(int)
+    items_by_product = {}
+    for it in items:
+        paid_qty_by_product[it.product_id] += it.quantity
+        items_by_product.setdefault(it.product_id, []).append(it)
 
     for item in items:
         unit_price = getattr(item, 'unit_price', getattr(item.product, 'price', Decimal('0')))
@@ -257,9 +263,15 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
         item.tiered_offer = None
         item.bundle_discount = Decimal('0')
         item.bundle_offer = None
+        item.product_offer_discount = Decimal('0')
+        item.product_offer_label = ''
+        item.product_offer_nudge = ''
+        item.product_offer_partner_cta = None
+        item.auto_free_items = []
 
-        # Check progressive tiered quantity discount
-        q_offer = get_quantity_offer_for_product(item.product, q_offers)
+        # Check progressive tiered quantity discount (skip if product has its own Offer 2 or Offer 3)
+        prod_offer_type = getattr(item.product, 'offer_type', 'NONE')
+        q_offer = None if prod_offer_type in ('BOGO', 'SECOND_10_OFF', 'BUY_2_10_OFF') else get_quantity_offer_for_product(item.product, q_offers)
         if q_offer and item.quantity >= 2:
             undisc, tier_disc, pay, breakdown = q_offer.calculate_units(unit_price, item.quantity)
             item.tiered_offer = q_offer
@@ -343,6 +355,116 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
                     if allowed_bundle_units <= 0:
                         break
 
+    # Product-level Offers (Offers 1-4 configured directly on Product in Admin)
+    reserved_free = defaultdict(int)
+    for item in items:
+        prod = item.product
+        otype = getattr(prod, 'offer_type', 'NONE')
+        unit_price = getattr(item, 'unit_price', getattr(prod, 'price', Decimal('0')))
+
+        if otype == 'BOGO':
+            free_prod = prod.offer_partner_product if (prod.offer_partner_product_id and prod.offer_partner_product.is_active) else prod
+            room = max(free_prod.stock - paid_qty_by_product.get(free_prod.pk, 0) - reserved_free[free_prod.pk], 0)
+            free_qty = min(item.quantity, room)
+            if free_qty > 0:
+                reserved_free[free_prod.pk] += free_qty
+                free_unit_price = getattr(free_prod, 'price', Decimal('0'))
+                free_total = free_unit_price * free_qty
+                subtotal += free_total
+                discount += free_total
+                free_entry = {
+                    'product': free_prod,
+                    'quantity': free_qty,
+                    'unit_price': free_unit_price,
+                    'original_total': free_total,
+                    'main_product': prod,
+                }
+                item.auto_free_items.append(free_entry)
+                auto_free_items.append(free_entry)
+                key = f"prod_bogo_{prod.pk}"
+                if key not in applied:
+                    applied[key] = {
+                        'id': key,
+                        'name': f"Buy 1 Get 1 Free ({free_prod.title})",
+                        'type': 'product_bogo',
+                        'badge': "Buy 1 Get 1 FREE",
+                        'discount': Decimal('0'),
+                    }
+                applied[key]['discount'] += free_total
+            else:
+                item.product_offer_nudge = f"Free item ({free_prod.title}) is currently out of stock for additional free units."
+
+        elif otype == 'SECOND_10_OFF':
+            if item.quantity >= 2:
+                pairs = item.quantity // 2
+                saving = (unit_price * Decimal('0.10') * pairs).quantize(Decimal('0.01'))
+                if saving > 0:
+                    item.product_offer_discount += saving
+                    item.product_offer_label = "Offer 2: 10% Off 2nd Item"
+                    item.line_total = max(item.line_total - saving, Decimal('0'))
+                    discount += saving
+                    key = f"prod_sec10_{prod.pk}"
+                    applied[key] = {
+                        'id': key,
+                        'name': f"Buy 1 Get 10% Off 2nd Item ({prod.title})",
+                        'type': 'product_offer',
+                        'badge': "Buy 1 Get 10% Off 2nd Item",
+                        'discount': saving,
+                    }
+            else:
+                item.product_offer_nudge = "Add 1 more to get 10% OFF on the 2nd item!"
+
+        elif otype == 'BUY_2_10_OFF':
+            if item.quantity >= 2:
+                saving = (item.original_line_total * Decimal('0.10')).quantize(Decimal('0.01'))
+                if saving > 0:
+                    item.product_offer_discount += saving
+                    item.product_offer_label = "Offer 3: Buy 2 Get 10% Off"
+                    item.line_total = max(item.line_total - saving, Decimal('0'))
+                    discount += saving
+                    key = f"prod_buy2_{prod.pk}"
+                    applied[key] = {
+                        'id': key,
+                        'name': f"Buy 2 Get 10% Off ({prod.title})",
+                        'type': 'product_offer',
+                        'badge': "Buy 2 Get 10% Off",
+                        'discount': saving,
+                    }
+            else:
+                item.product_offer_nudge = "Add 1 more to get 10% OFF on both!"
+
+        elif otype == 'CROSS_10_OFF' and prod.offer_partner_product_id:
+            partner = prod.offer_partner_product
+            partner_items = items_by_product.get(partner.pk, [])
+            if partner_items:
+                partner_item = partner_items[0]
+                pair_qty = min(item.quantity, partner_item.quantity)
+                if pair_qty > 0:
+                    p_unit_price = getattr(partner_item, 'unit_price', getattr(partner, 'price', Decimal('0')))
+                    saving_x = (unit_price * Decimal('0.10') * pair_qty).quantize(Decimal('0.01'))
+                    saving_y = (p_unit_price * Decimal('0.10') * pair_qty).quantize(Decimal('0.01'))
+                    total_pair_saving = saving_x + saving_y
+                    if saving_x > 0:
+                        item.product_offer_discount += saving_x
+                        item.product_offer_label = f"Combo 10% Off (with {partner.title})"
+                        item.line_total = max(item.line_total - saving_x, Decimal('0'))
+                    if saving_y > 0:
+                        partner_item.product_offer_discount += saving_y
+                        partner_item.product_offer_label = f"Combo 10% Off (with {prod.title})"
+                        partner_item.line_total = max(partner_item.line_total - saving_y, Decimal('0'))
+                    discount += total_pair_saving
+                    key = f"prod_cross_{prod.pk}_{partner.pk}"
+                    applied[key] = {
+                        'id': key,
+                        'name': f"Buy {prod.title} + {partner.title} — 10% Off Both",
+                        'type': 'product_offer',
+                        'badge': "Combo Deal: 10% Off Both",
+                        'discount': total_pair_saving,
+                    }
+            else:
+                item.product_offer_nudge = f"Add {partner.title} to get 10% OFF on BOTH products!"
+                item.product_offer_partner_cta = partner
+
     for gift in gifts:
         gift.original_total = gift.product.price * gift.quantity
         subtotal += gift.original_total
@@ -371,5 +493,6 @@ def calculate(cart_items, gifts=None, offers=None, quantity_offers=None):
         'discount': discount,
         'total': total,
         'applied': list(applied.values()),
-        'gifts': gifts
+        'gifts': gifts,
+        'auto_free_items': auto_free_items,
     }

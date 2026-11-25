@@ -3110,6 +3110,28 @@
                         {% endif %}
                     </p>
 
+                    {% if product.offer_type and product.offer_type != 'NONE' %}
+                    <div style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1.5px solid #86efac;border-radius:14px;padding:12px 16px;margin:0 0 16px;display:flex;align-items:center;gap:12px;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:#16a34a;color:#fff;display:grid;place-items:center;flex-shrink:0;font-size:16px;">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:13.5px;font-weight:800;color:#14532d;">{{ product.product_offer_badge }}</div>
+                            <div style="font-size:12px;color:#166534;margin-top:2px;">
+                                {% if product.offer_type == 'BOGO' %}
+                                    Buy 1 &amp; get the 2nd item absolutely FREE — automatically shown in your cart!
+                                {% elif product.offer_type == 'SECOND_10_OFF' %}
+                                    1st item at full price, 2nd item gets 10% OFF automatically in cart.
+                                {% elif product.offer_type == 'BUY_2_10_OFF' %}
+                                    Buy 2 quantities &amp; get 10% OFF on the total of both items automatically.
+                                {% elif product.offer_type == 'CROSS_10_OFF' and product.offer_partner_product %}
+                                    Add both this &amp; <a href="{% url 'store:product_detail' product.offer_partner_product.id %}" style="color:#15803d;font-weight:700;text-decoration:underline;">{{ product.offer_partner_product.title }}</a> to cart to get 10% OFF on BOTH!
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {% if quantity_offer %}
                     <!-- Progressive Tiered Quantity Discount Selector -->
                     <div class="tiered-bundle-container" id="tieredBundleContainer"

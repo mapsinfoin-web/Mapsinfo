@@ -372,12 +372,15 @@ class ProductAdminForm(forms.ModelForm):
         fields = [
             'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
             'mrp', 'price', 'stock', 'image', 'video', 'direct_video_public_id', 'is_active',
+            'offer_type', 'offer_partner_product',
             'weight_grams', 'dimensions', 'closure_type', 'pair_with',
             'occasions_list', 'metal_finish_list',
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'offer_partner_product' in self.fields and self.instance and self.instance.pk:
+            self.fields['offer_partner_product'].queryset = Product.objects.exclude(pk=self.instance.pk)
         if 'video' in self.fields:
             self.fields['video'].help_text = (
                 "Upload a product video clip (MP4). To delete/remove the current video, tick the <b>Clear</b> checkbox above and save, "
@@ -444,6 +447,16 @@ class ProductAdmin(admin.ModelAdmin):
                 'category', 'sub_categories', 'title', 'brand', 'product_type', 'sku', 'description',
                 'mrp', 'price', 'stock', 'image', 'video', 'direct_video_public_id', 'video_player_preview', 'is_active'
             )
+        }),
+        ('Product Offer (Select One Offer for This Product)', {
+            'fields': ('offer_type', 'offer_partner_product'),
+            'description': (
+                'Choose one offer for this product:<br>'
+                '• <b>Offer 1 (Buy 1 Get 1 Free)</b>: Customer purchases 1, gets the 2nd item FREE (same product, or Partner Product Y if chosen).<br>'
+                '• <b>Offer 2 (Buy 1 Get 10% Off on 2nd Item)</b>: 1st item full price, 2nd item 10% off.<br>'
+                '• <b>Offer 3 (Buy 2 Get 10% Off)</b>: Buying 2+ quantities applies 10% off the total price of both.<br>'
+                '• <b>Offer 4 (Cross-Product Purchase Offer)</b>: When both this product (X) and Partner Product (Y) are in cart, 10% off BOTH!'
+            ),
         }),
         ('Occasion & Style Facets (Kushal\'s / Rubans Discovery)', {
             'fields': ('occasions_list', 'metal_finish_list'),

@@ -118,6 +118,57 @@ class Product(models.Model):
     updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True, help_text="Uncheck to hide this product from the store.")
 
+    # Single-Product Admin Offer Selector (Offers 1-4)
+    PRODUCT_OFFER_CHOICES = [
+        ('NONE', 'No Special Product Offer'),
+        ('BOGO', 'Offer 1: Buy 1 Get 1 Free (BOGO)'),
+        ('SECOND_10_OFF', 'Offer 2: Buy 1 Get 10% Off on the Second Item'),
+        ('BUY_2_10_OFF', 'Offer 3: Buy 2 Get 10% Off (Total of Both)'),
+        ('CROSS_10_OFF', 'Offer 4: Cross-Product Purchase Offer (Buy X, Get Y — 10% Off Both)'),
+    ]
+    offer_type = models.CharField(
+        max_length=20,
+        choices=PRODUCT_OFFER_CHOICES,
+        default='NONE',
+        verbose_name='Product Offer',
+        help_text='Choose which one offer applies to this product.'
+    )
+    offer_partner_product = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='partner_offer_products',
+        verbose_name='Partner Product Y (for Offer 4 or optional BOGO)',
+        help_text='Required for Offer 4 (Product Y): customer gets 10% off BOTH when both are in cart. Optional for Offer 1 (leave blank for same-product BOGO).'
+    )
+
+    def clean(self):
+        super().clean()
+        if self.offer_type == 'CROSS_10_OFF':
+            if not self.offer_partner_product_id:
+                raise ValidationError({
+                    'offer_partner_product': 'Please select Partner Product Y for Offer 4 (Cross-Product Purchase Offer).'
+                })
+            if self.pk and self.offer_partner_product_id == self.pk:
+                raise ValidationError({
+                    'offer_partner_product': 'Partner Product Y must be a different product from this one.'
+                })
+
+    @property
+    def product_offer_badge(self):
+        if self.offer_type == 'BOGO':
+            if self.offer_partner_product_id:
+                return f"Buy 1 Get {self.offer_partner_product.title} FREE"
+            return "Buy 1 Get 1 FREE"
+        if self.offer_type == 'SECOND_10_OFF':
+            return "Buy 1 Get 10% Off on 2nd Item"
+        if self.offer_type == 'BUY_2_10_OFF':
+            return "Buy 2 Get 10% Off"
+        if self.offer_type == 'CROSS_10_OFF' and self.offer_partner_product_id:
+            return f"Buy with {self.offer_partner_product.title} & Get 10% Off Both"
+        return ""
+
     # ADD THE META CLASS HERE:
     class Meta:
         ordering = ['-created']
