@@ -208,6 +208,15 @@ class Product(models.Model):
             return []
 
     @property
+    def all_colors(self):
+        """Returns ALL colour variants (in-stock and out-of-stock) so they always
+        appear in the colour picker — OOS ones are shown with a strikethrough badge."""
+        try:
+            return list(self.colors.order_by('order', 'id'))
+        except Exception:
+            return []
+
+    @property
     def has_variants(self):
         """Returns True if this product has at least one colour variant."""
         if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:

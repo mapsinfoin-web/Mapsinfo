@@ -3060,7 +3060,7 @@
                     <strong class="color-picker-name" id="selectedColorName">{% if selected_color_obj %}{{ selected_color_obj.name }}{% else %}Choose a colour{% endif %}</strong>
                 </div>
                 <div class="color-swatches" role="radiogroup" aria-label="Product Colours">
-                    {% for c in product.available_colors %}
+                    {% for c in product.all_colors %}
                     <button type="button"
                             class="color-swatch-item {% if selected_color_obj and c.id == selected_color_obj.id %}active{% endif %} {% if not c.in_stock %}out-of-stock{% endif %}"
                             data-variant-id="{{ c.id }}"
