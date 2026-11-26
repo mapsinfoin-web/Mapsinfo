@@ -2597,7 +2597,7 @@
                     <p>Join our list for early access to limited drops and private sales. No spam, ever.</p>
                     <form class="news-form" action="#" method="post">
                         {% csrf_token %}
-                        <input type="email" name="email" placeholder="Your email address" required aria-label="Email address" />
+                        <input type="email" name="email" placeholder="Your email address" required aria-label="Email address" autocomplete="email" />
                         <button type="submit" class="btn btn-dark">Subscribe</button>
                     </form>
                 </div>
