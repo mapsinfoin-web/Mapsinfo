@@ -993,6 +993,10 @@ def checkout(request):
         request.session.pop('cart_id', None)
         request.session['last_order_id'] = order.id
 
+        # Send Resend order placed email (non-blocking / fails safely if key missing)
+        from .emails import send_order_placed_email
+        send_order_placed_email(order)
+
         # Next: the Paytm QR page, where the customer pays and uploads the screenshot
         return redirect('store:order_payment', order_id=order.id)
 
@@ -1073,6 +1077,8 @@ def order_payment(request, order_id):
             order.payment_screenshot = form.cleaned_data['screenshot']
             order.payment_submitted_at = timezone.now()
             order.save(update_fields=['payment_screenshot', 'payment_submitted_at'])
+            from .emails import send_payment_submitted_email
+            send_payment_submitted_email(order)
             messages.success(request, "Screenshot uploaded. Now tap the green button to share your order with us on WhatsApp.")
             return redirect('store:order_payment', order_id=order.pk)
 
@@ -1609,13 +1615,15 @@ def contact(request):
             })
 
         # 4. Save validated and sanitized inquiry to DB
-        ContactInquiry.objects.create(
+        inquiry = ContactInquiry.objects.create(
             name=cleaned['name'],
             email=cleaned['email'],
             phone=cleaned['phone'],
             subject=cleaned['subject'],
             message=cleaned['message']
         )
+        from .emails import send_contact_inquiry_email
+        send_contact_inquiry_email(inquiry)
         request.session['last_contact_ts'] = now
         messages.success(request, "Thank you! Your inquiry has been received. Our advisors will contact you shortly.")
         return redirect('store:contact')

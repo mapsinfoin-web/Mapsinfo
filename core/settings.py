@@ -234,3 +234,9 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+# Resend Transactional Email API
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
+RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', 'MAPSCART <onboarding@resend.dev>').strip()
+ADMIN_NOTIFICATION_EMAIL = os.environ.get('ADMIN_NOTIFICATION_EMAIL', '').strip()
+SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'https://mapscart.com').strip()

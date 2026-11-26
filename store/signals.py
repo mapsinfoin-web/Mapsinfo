@@ -1,5 +1,5 @@
 import logging
-from django.db.models.signals import pre_delete, post_delete, pre_save
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
@@ -179,3 +179,39 @@ def cleanup_review_image_on_delete(sender, instance, **kwargs):
     """When a review with a customer photo is deleted, delete its file from Cloudinary."""
     if instance.image:
         safe_delete_file(instance.image, exclude_instance=instance)
+
+
+# ---------------------------------------------------------------------------
+# ORDER EMAIL NOTIFICATIONS (RESEND API)
+# ---------------------------------------------------------------------------
+@receiver(pre_save, sender='store.Order')
+def capture_order_previous_state(sender, instance, **kwargs):
+    """Remember previous is_paid and status before saving so post_save can trigger Resend emails."""
+    if not instance.pk:
+        instance._prev_is_paid = False
+        instance._prev_status = None
+        return
+    try:
+        prev = sender.objects.only('is_paid', 'status').get(pk=instance.pk)
+        instance._prev_is_paid = prev.is_paid
+        instance._prev_status = prev.status
+    except sender.DoesNotExist:
+        instance._prev_is_paid = False
+        instance._prev_status = None
+
+
+@receiver(post_save, sender='store.Order')
+def send_order_update_emails(sender, instance, created, **kwargs):
+    """Send Resend emails when admin verifies payment (Order Confirmed) or updates order status."""
+    if created:
+        return
+    from store.emails import send_order_confirmed_email, send_order_status_email
+
+    was_paid = getattr(instance, '_prev_is_paid', False)
+    prev_status = getattr(instance, '_prev_status', None)
+
+    if not was_paid and instance.is_paid:
+        send_order_confirmed_email(instance)
+
+    if prev_status and instance.status != prev_status and instance.status in ('PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'):
+        send_order_status_email(instance)
