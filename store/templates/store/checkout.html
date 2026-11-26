@@ -207,15 +207,15 @@
                         <div class="form-row">
                             <div class="form-group full">
                                 <label for="full_name">Full Name</label>
-                                <input type="text" id="full_name" name="full_name" value="{{ user.get_full_name|default:user.username }}" required />
+                                <input type="text" id="full_name" name="full_name" value="{{ user.get_full_name|default:user.username }}" required autocomplete="name" />
                             </div>
                             <div class="form-group">
                                 <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" value="{{ user.email }}" required />
+                                <input type="email" id="email" name="email" value="{{ user.email }}" required autocomplete="email" />
                             </div>
                             <div class="form-group">
                                 <label for="mobile_number">Phone Number</label>
-                                <input type="tel" id="mobile_number" name="mobile_number" value="{{ form_data.mobile_number }}" required />
+                                <input type="tel" id="mobile_number" name="mobile_number" value="{{ form_data.mobile_number }}" required autocomplete="tel" />
                             </div>
                             <div class="form-group full">
                                 <label for="flat_no">Flat / House No. &amp; Building Name <span style="color:var(--red)">*</span></label>
