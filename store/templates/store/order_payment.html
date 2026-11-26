@@ -64,7 +64,7 @@
         .qr-badge-secure { background: #e0f2fe; color: #075985; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .3px; }
         .qr-box { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 14px; margin: 0 auto 12px; max-width: 280px; box-shadow: 0 4px 16px rgba(19, 38, 57, .06); }
         .qr-box img { width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto; }
-        .dynamic-qr-canvas { display: flex; align-items: center; justify-content: center; width: 220px; height: 220px; min-height: 220px; margin: 0 auto; overflow: hidden; position: relative; }
+        .dynamic-qr-canvas { display: block; width: 220px; height: 220px; min-height: 220px; margin: 0 auto; position: relative; }
         .dynamic-qr-canvas canvas,
         .dynamic-qr-canvas img { display: block !important; margin: 0 auto !important; border-radius: 8px; width: 220px !important; height: 220px !important; max-width: 100%; object-fit: contain; }
         .qr-missing { padding: 40px 10px; color: var(--muted); font-size: 14px; }
@@ -446,20 +446,19 @@
                         correctLevel: QRCode.CorrectLevel.M
                     });
 
-                    // Once QRCode produces output, smoothly place it inside the container
+                    // Once QRCode produces output, place ONLY ONE element (never both canvas + img)
                     setTimeout(function() {
                         var canvas = temp.querySelector('canvas');
                         var img = temp.querySelector('img');
-                        if (canvas || (img && img.src)) {
+                        if (canvas) {
                             qrContainer.innerHTML = '';
-                            if (canvas) {
-                                canvas.style.display = 'block';
-                                qrContainer.appendChild(canvas);
-                            }
-                            if (img && img.src) {
-                                img.style.display = 'block';
-                                qrContainer.appendChild(img);
-                            }
+                            canvas.style.display = 'block';
+                            qrContainer.appendChild(canvas);
+                            qrContainer.dataset.rendered = 'true';
+                        } else if (img && img.src) {
+                            qrContainer.innerHTML = '';
+                            img.style.display = 'block';
+                            qrContainer.appendChild(img);
                             qrContainer.dataset.rendered = 'true';
                         }
                     }, 50);
