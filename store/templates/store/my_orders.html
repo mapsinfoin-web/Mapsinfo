@@ -267,6 +267,7 @@
     <script>
         (function () {
             /* Mobile menu handled by header.html */
+var h = document.getElementById('header');
 if (h) {
                 window.addEventListener('scroll', function () { h.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
             }
