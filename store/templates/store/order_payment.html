@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pay for Order #{{ order.id }} | MAPSCART</title>
+    <title>Pay for Order ID {{ order.id }} | MAPSCART</title>
     <link rel="icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="shortcut icon" type="image/png" href="{% static '1.png' %}" />
     <link rel="apple-touch-icon" href="{% static '1.png' %}" />
@@ -115,7 +115,7 @@
     </header>
 
     <main class="container">
-        <h1>Order #{{ order.id }} Placed</h1>
+        <h1>Order ID {{ order.id }} Placed</h1>
         <p class="sub">
             Status:
             {% if order.status == 'CANCELLED' %}<span class="badge cancel">CANCELLED</span>
