@@ -17,7 +17,7 @@ RESEND_API_URL = 'https://api.resend.com/emails'
 def send_resend_email(to_email, subject, html_body, text_body=None, reply_to=None):
     """Send a single email via Resend REST API. Returns True on 2xx, False otherwise."""
     api_key = getattr(settings, 'RESEND_API_KEY', '').strip()
-    from_email = getattr(settings, 'RESEND_FROM_EMAIL', 'MAPSCART <onboarding@resend.dev>').strip()
+    from_email = getattr(settings, 'RESEND_FROM_EMAIL', 'MAPSCART <support@mapscart.com>').strip()
 
     if not api_key:
         logger.warning("RESEND_API_KEY not configured; skipping email '%s' to %s", subject, to_email)
