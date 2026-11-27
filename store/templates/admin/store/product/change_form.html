@@ -1012,6 +1012,83 @@
         }
     };
 
+    var activeImageUploads = 0;
+
+    function compressVariantImage(file) {
+        return new Promise(function(resolve) {
+            if (!file || file.size <= 350 * 1024) {
+                resolve(file);
+                return;
+            }
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function() {
+                URL.revokeObjectURL(url);
+                var maxSide = 1600;
+                var w = img.naturalWidth || img.width;
+                var h = img.naturalHeight || img.height;
+                var scale = Math.min(1, maxSide / Math.max(w, h));
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(w * scale));
+                canvas.height = Math.max(1, Math.round(h * scale));
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(function(blob) {
+                    if (blob && blob.size < file.size) {
+                        resolve(new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'variant') + '.jpg', { type: 'image/jpeg' }));
+                    } else {
+                        resolve(file);
+                    }
+                }, 'image/jpeg', 0.85);
+            };
+            img.onerror = function() {
+                URL.revokeObjectURL(url);
+                resolve(file);
+            };
+            img.src = url;
+        });
+    }
+
+    function directUploadVariantImage(index, pendingItem) {
+        activeImageUploads++;
+        compressVariantImage(pendingItem.file).then(function(uploadFile) {
+            return fetch('{% url "admin:store_product_cloudinary_image_signature" %}')
+                .then(function(r) {
+                    if (!r.ok) throw new Error('Signature error ' + r.status);
+                    return r.json();
+                })
+                .then(function(sig) {
+                    var fd = new FormData();
+                    fd.append('file', uploadFile);
+                    fd.append('api_key', sig.api_key);
+                    fd.append('timestamp', sig.timestamp);
+                    fd.append('folder', sig.folder);
+                    fd.append('signature', sig.signature);
+                    return fetch('https://api.cloudinary.com/v1_1/' + sig.cloud_name + '/image/upload', {
+                        method: 'POST',
+                        body: fd
+                    });
+                })
+                .then(function(r) {
+                    if (!r.ok) throw new Error('Cloudinary upload failed ' + r.status);
+                    return r.json();
+                })
+                .then(function(resp) {
+                    if (resp && resp.public_id) {
+                        pendingItem.uploadedPublicId = resp.public_id;
+                        pendingItem.file = null; // Bypass Vercel 4.5MB form payload limit
+                        syncFileInput(index);
+                    }
+                });
+        }).catch(function(err) {
+            console.warn('Direct image upload fallback to form file:', err);
+        }).finally(function() {
+            activeImageUploads = Math.max(0, activeImageUploads - 1);
+        });
+    }
+
     function addFilesToVariant(index, files) {
         if (!files || !files.length) return;
         var v = variantsList[index];
@@ -1034,12 +1111,15 @@
             var reader = new FileReader();
             reader.onload = function(e) {
                 var isPrimary = (!hasAnyPrimary && fIdx === 0 && v.pendingFiles.length === 0);
-                v.pendingFiles.push({
+                var pendingItem = {
                     file: file,
                     previewUrl: e.target.result,
-                    is_primary: isPrimary
-                });
+                    is_primary: isPrimary,
+                    uploadedPublicId: null
+                };
+                v.pendingFiles.push(pendingItem);
                 if (isPrimary) hasAnyPrimary = true;
+                directUploadVariantImage(index, pendingItem);
                 loaded++;
                 if (loaded === validFiles.length) {
                     syncFileInput(index);
@@ -1325,58 +1405,86 @@
     }
 
     // Before main form submit, compile JSON payload
+    function compileVariantsPayload() {
+        var payload = [];
+        variantsList.forEach(function(v, idx) {
+            var isDel = !!v.is_deleted;
+            var name = document.getElementById('vName_' + idx) ? document.getElementById('vName_' + idx).value.trim() : (v.name || '');
+            var sku = document.getElementById('vSku_' + idx) ? document.getElementById('vSku_' + idx).value.trim() : (v.sku || '');
+            var hex = document.getElementById('vHexText_' + idx) ? document.getElementById('vHexText_' + idx).value.trim() : (v.hex_code || '#D4AF37');
+            var price = document.getElementById('vPrice_' + idx) ? document.getElementById('vPrice_' + idx).value.trim() : (v.price || '');
+            var mrp = document.getElementById('vMrp_' + idx) ? document.getElementById('vMrp_' + idx).value.trim() : (v.mrp || '');
+            var specialPrice = document.getElementById('vSpecialPrice_' + idx) ? document.getElementById('vSpecialPrice_' + idx).value.trim() : (v.special_offer_price || '');
+            var stock = document.getElementById('vStock_' + idx) ? parseInt(document.getElementById('vStock_' + idx).value || '0', 10) : (v.stock || 0);
+            var isAvail = document.getElementById('vAvail_' + idx) ? document.getElementById('vAvail_' + idx).checked : (v.is_available !== false);
+
+            var primaryChoice = null;
+            if (v.gallery) {
+                v.gallery.forEach(function(g) {
+                    if (g.is_primary && !g.is_deleted && g.id) {
+                        primaryChoice = 'existing:' + g.id;
+                    }
+                });
+            }
+            var uploadedPublicIds = [];
+            var orderedPending = [];
+            if (v.pendingFiles) {
+                v.pendingFiles.forEach(function(f) {
+                    if (f.uploadedPublicId) {
+                        orderedPending.push(f);
+                        uploadedPublicIds.push(f.uploadedPublicId);
+                    }
+                });
+                v.pendingFiles.forEach(function(f) {
+                    if (!f.uploadedPublicId && f.file) orderedPending.push(f);
+                });
+            }
+            if (!primaryChoice && orderedPending.length) {
+                orderedPending.forEach(function(f, fIdx) {
+                    if (f.is_primary) primaryChoice = 'new:' + fIdx;
+                });
+            }
+
+            var galleryOrder = (v.gallery || []).filter(function(g) { return !g.is_deleted && g.id; }).map(function(g) { return g.id; });
+
+            payload.push({
+                id: v.id || null,
+                name: name,
+                sku: sku,
+                hex_code: hex,
+                price: price,
+                mrp: mrp,
+                special_offer_price: specialPrice,
+                stock: stock,
+                is_available: isAvail,
+                order: idx + 1,
+                primary_image_choice: primaryChoice,
+                gallery_order: galleryOrder,
+                deleted_gallery_ids: v.deleted_gallery_ids || [],
+                uploaded_public_ids: uploadedPublicIds,
+                video_public_id: v.video_public_id || null,
+                video_deleted: !!v.video_deleted,
+                delete: isDel
+            });
+        });
+
+        document.getElementById('product_variants_payload').value = JSON.stringify(payload);
+    }
+
     var mainForm = document.getElementById('product_form') || document.querySelector('form[method="post"]');
     if (mainForm) {
         mainForm.addEventListener('submit', function(e) {
-            var payload = [];
-            variantsList.forEach(function(v, idx) {
-                var isDel = !!v.is_deleted;
-                var name = document.getElementById('vName_' + idx) ? document.getElementById('vName_' + idx).value.trim() : (v.name || '');
-                var sku = document.getElementById('vSku_' + idx) ? document.getElementById('vSku_' + idx).value.trim() : (v.sku || '');
-                var hex = document.getElementById('vHexText_' + idx) ? document.getElementById('vHexText_' + idx).value.trim() : (v.hex_code || '#D4AF37');
-                var price = document.getElementById('vPrice_' + idx) ? document.getElementById('vPrice_' + idx).value.trim() : (v.price || '');
-                var mrp = document.getElementById('vMrp_' + idx) ? document.getElementById('vMrp_' + idx).value.trim() : (v.mrp || '');
-                var specialPrice = document.getElementById('vSpecialPrice_' + idx) ? document.getElementById('vSpecialPrice_' + idx).value.trim() : (v.special_offer_price || '');
-                var stock = document.getElementById('vStock_' + idx) ? parseInt(document.getElementById('vStock_' + idx).value || '0', 10) : (v.stock || 0);
-                var isAvail = document.getElementById('vAvail_' + idx) ? document.getElementById('vAvail_' + idx).checked : (v.is_available !== false);
-
-                var primaryChoice = null;
-                if (v.gallery) {
-                    v.gallery.forEach(function(g) {
-                        if (g.is_primary && !g.is_deleted && g.id) {
-                            primaryChoice = 'existing:' + g.id;
-                        }
-                    });
-                }
-                if (!primaryChoice && v.pendingFiles) {
-                    v.pendingFiles.forEach(function(f, fIdx) {
-                        if (f.is_primary) primaryChoice = 'new:' + fIdx;
-                    });
-                }
-
-                var galleryOrder = (v.gallery || []).filter(function(g) { return !g.is_deleted && g.id; }).map(function(g) { return g.id; });
-
-                payload.push({
-                    id: v.id || null,
-                    name: name,
-                    sku: sku,
-                    hex_code: hex,
-                    price: price,
-                    mrp: mrp,
-                    special_offer_price: specialPrice,
-                    stock: stock,
-                    is_available: isAvail,
-                    order: idx + 1,
-                    primary_image_choice: primaryChoice,
-                    gallery_order: galleryOrder,
-                    deleted_gallery_ids: v.deleted_gallery_ids || [],
-                    video_public_id: v.video_public_id || null,
-                    video_deleted: !!v.video_deleted,
-                    delete: isDel
-                });
-            });
-
-            document.getElementById('product_variants_payload').value = JSON.stringify(payload);
+            compileVariantsPayload();
+            if (activeImageUploads > 0) {
+                e.preventDefault();
+                var waitTimer = setInterval(function() {
+                    if (activeImageUploads <= 0) {
+                        clearInterval(waitTimer);
+                        compileVariantsPayload();
+                        mainForm.submit();
+                    }
+                }, 250);
+            }
         });
     }
 

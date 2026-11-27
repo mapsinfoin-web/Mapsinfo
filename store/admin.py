@@ -548,6 +548,11 @@ class ProductAdmin(admin.ModelAdmin):
                 name='store_product_cloudinary_video_signature'
             ),
             path(
+                'cloudinary-image-signature/',
+                self.admin_site.admin_view(self.get_cloudinary_image_signature),
+                name='store_product_cloudinary_image_signature'
+            ),
+            path(
                 '<int:product_id>/save-video/',
                 self.admin_site.admin_view(self.save_product_video),
                 name='store_product_save_video'
@@ -672,6 +677,32 @@ class ProductAdmin(admin.ModelAdmin):
             'api_key': api_key,
             'timestamp': timestamp,
             'folder': 'videos',
+            'signature': signature,
+        })
+
+    def get_cloudinary_image_signature(self, request):
+        if not request.user.is_staff:
+            return JsonResponse({'error': 'Unauthorized'}, status=403)
+        from django.conf import settings
+        creds = getattr(settings, 'CLOUDINARY_STORAGE', {}) or {}
+        cloud_name = creds.get('CLOUD_NAME')
+        api_key = creds.get('API_KEY')
+        api_secret = creds.get('API_SECRET')
+        if not cloud_name or not api_key or not api_secret:
+            return JsonResponse({'error': 'Cloudinary image credentials not configured'}, status=500)
+
+        timestamp = int(time.time())
+        folder = 'products/variants'
+        params = {
+            'folder': folder,
+            'timestamp': timestamp,
+        }
+        signature = cloudinary.utils.api_sign_request(params, api_secret)
+        return JsonResponse({
+            'cloud_name': cloud_name,
+            'api_key': api_key,
+            'timestamp': timestamp,
+            'folder': folder,
             'signature': signature,
         })
 
@@ -966,9 +997,24 @@ class ProductAdmin(admin.ModelAdmin):
                     except Exception:
                         pass
 
-            # 2. Save newly uploaded gallery images
-            new_files = request.FILES.getlist(f'variant_images_{idx}')
+            # 2. Save newly uploaded gallery images (direct Cloudinary public_ids first, then fallback FILES)
             created_new_galleries = []
+            uploaded_pids = v_data.get('uploaded_public_ids') or []
+            for pid in uploaded_pids:
+                pid_str = str(pid or '').strip()
+                if not pid_str:
+                    continue
+                pg = ProductGallery(
+                    product=product,
+                    color=color_obj,
+                    is_primary=False,
+                    order=10 + len(created_new_galleries),
+                )
+                pg.image.name = pid_str
+                pg.save()
+                created_new_galleries.append(pg)
+
+            new_files = request.FILES.getlist(f'variant_images_{idx}')
             for file_obj in new_files:
                 pg = ProductGallery.objects.create(
                     product=product,
