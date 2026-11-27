@@ -23,9 +23,30 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import (
-    BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, Notification, Order, OrderItem, PaymentSettings,
+    BogoOffer, Cart, CartGift, CartItem, Category, ContactInquiry, FilterOption, Notification, Order, OrderItem, PaymentSettings,
     Product, ProductColor, ProductGallery, ProductReview, Profile, QuantityOffer,
 )
+
+
+@admin.register(FilterOption)
+class FilterOptionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'filter_type', 'slug', 'icon', 'order', 'is_active']
+    list_filter = ['filter_type', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ('name',)}
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        from django.core.cache import cache
+        cache.delete('store_filter_options_occasion')
+        cache.delete('store_filter_options_metal')
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        from django.core.cache import cache
+        cache.delete('store_filter_options_occasion')
+        cache.delete('store_filter_options_metal')
 
 
 # --- PRODUCT GALLERY & COLORS ---
@@ -380,6 +401,20 @@ class ProductAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Dynamically load filter options created in Admin -> Product Filters
+        try:
+            occ_qs = list(FilterOption.objects.filter(filter_type='occasion', is_active=True).values_list('slug', 'name'))
+            if occ_qs:
+                self.fields['occasions_list'].choices = occ_qs
+            met_qs = list(FilterOption.objects.filter(filter_type='metal', is_active=True).values_list('slug', 'name'))
+            if met_qs:
+                self.fields['metal_finish_list'].choices = met_qs
+        except Exception:
+            pass
+        if 'sub_categories' in self.fields:
+            self.fields['sub_categories'].widget = forms.CheckboxSelectMultiple()
+            self.fields['sub_categories'].queryset = Category.objects.filter(parent__isnull=False).select_related('parent').order_by('parent__order', 'order', 'name')
+            self.fields['sub_categories'].help_text = 'Tick all sub-categories / styles this product belongs to.'
         if 'offer_partner_product' in self.fields and self.instance and self.instance.pk:
             self.fields['offer_partner_product'].queryset = Product.objects.exclude(pk=self.instance.pk)
         if 'video' in self.fields:
@@ -436,7 +471,7 @@ class ProductAdmin(admin.ModelAdmin):
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku', 'brand', 'product_type']
-    filter_horizontal = ['sub_categories', 'pair_with']
+    filter_horizontal = ['pair_with']
     inlines = [ProductGalleryInline]
     actions = ['remove_video_action']
 
@@ -460,9 +495,14 @@ class ProductAdmin(admin.ModelAdmin):
                 '• <b>Offer 4 (Cross-Product Purchase Offer)</b>: When both this product (X) and Partner Product (Y) are in cart, 10% off BOTH!'
             ),
         }),
-        ('Occasion & Style Facets (Kushal\'s / Rubans Discovery)', {
+        ('Occasion & Style Facets (Storefront Filters)', {
             'fields': ('occasions_list', 'metal_finish_list'),
-            'description': 'Tag products for faceted filtering by Occasion and Metal / Finish. Leave unticked to use smart auto-matching.'
+            'description': (
+                'Tick which filters this product belongs to (leave unticked for smart auto-matching). '
+                '<a href="/admin/store/filteroption/add/" target="_blank" '
+                'style="display:inline-block;margin-left:8px;padding:3px 10px;background:#2563EB;color:#fff;border-radius:6px;font-weight:600;text-decoration:none;">'
+                '+ Add New Filter</a>'
+            ),
         }),
         ('Jewellery Specifications & Cross-Sell', {
             'fields': (

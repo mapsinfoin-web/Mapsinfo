@@ -25,7 +25,7 @@ from django.http import JsonResponse
 
 from .forms import CustomRegistrationForm
 from .models import (
-    Cart, CartGift, CartItem, Category, ContactInquiry, Order, OrderItem, PaymentSettings, Product, ProductColor, ProductVariant, ProductReview, Wishlist
+    Cart, CartGift, CartItem, Category, ContactInquiry, FilterOption, Order, OrderItem, PaymentSettings, Product, ProductColor, ProductVariant, ProductReview, Wishlist
 )
 from .offers import (
     add_gift, attach_offers, auto_fill_single_gift, calculate as calculate_offers, eligible_gifts,
@@ -1187,13 +1187,34 @@ def _get_collection_style_filters(category, products):
 
 
 def _get_occasion_filters(products):
-    """Computes occasion facet counts for Kushal's / Rubans style discovery."""
-    specs = [
-        {'slug': 'wedding-bridal', 'name': 'Wedding & Bridal', 'icon': 'fa-crown', 'color': '#DC2626'},
-        {'slug': 'daily-office', 'name': 'Daily Office Wear', 'icon': 'fa-briefcase', 'color': '#2563EB'},
-        {'slug': 'cocktail-party', 'name': 'Cocktail & Party', 'icon': 'fa-glass-cheers', 'color': '#7C3AED'},
-        {'slug': 'haldi-mehendi', 'name': 'Haldi & Mehendi', 'icon': 'fa-sun', 'color': '#D97706'},
-    ]
+    """Computes occasion facet counts from Admin-configured FilterOption rows (with smart fallback)."""
+    from django.core.cache import cache
+    specs = None
+    try:
+        rows = cache.get_or_set(
+            'store_filter_options_occasion',
+            lambda: list(FilterOption.objects.filter(filter_type='occasion', is_active=True).order_by('order', 'id')),
+            60,
+        )
+        if rows:
+            specs = [
+                {
+                    'slug': r.slug,
+                    'name': r.name,
+                    'icon': r.icon or 'fa-tag',
+                    'color': r.color_or_swatch or '#1F3A66',
+                }
+                for r in rows
+            ]
+    except Exception:
+        specs = None
+    if not specs:
+        specs = [
+            {'slug': 'wedding-bridal', 'name': 'Wedding & Bridal', 'icon': 'fa-crown', 'color': '#DC2626'},
+            {'slug': 'daily-office', 'name': 'Daily Office Wear', 'icon': 'fa-briefcase', 'color': '#2563EB'},
+            {'slug': 'cocktail-party', 'name': 'Cocktail & Party', 'icon': 'fa-glass-cheers', 'color': '#7C3AED'},
+            {'slug': 'haldi-mehendi', 'name': 'Haldi & Mehendi', 'icon': 'fa-sun', 'color': '#D97706'},
+        ]
     results = []
     for item in specs:
         count = sum(1 for p in products if item['slug'] in p.occasion_tags)
@@ -1202,24 +1223,44 @@ def _get_occasion_filters(products):
 
 
 def _get_metal_finish_filters(products):
-    """Computes metal/finish facet counts with metallic swatch gradients."""
-    specs = [
-        {
-            'slug': 'anti-tarnish-gold',
-            'name': 'Anti-Tarnish Gold',
-            'swatch': 'linear-gradient(135deg, #FDE68A 0%, #D97706 60%, #92400E 100%)',
-        },
-        {
-            'slug': 'crystal-zircon',
-            'name': 'Sparkling Crystal / Zircon',
-            'swatch': 'linear-gradient(135deg, #FFFFFF 0%, #BAE6FD 55%, #38BDF8 100%)',
-        },
-        {
-            'slug': 'oxidised-silver',
-            'name': 'Oxidised Silver',
-            'swatch': 'linear-gradient(135deg, #E2E8F0 0%, #94A3B8 55%, #334155 100%)',
-        },
-    ]
+    """Computes metal/finish facet counts from Admin-configured FilterOption rows (with smart fallback)."""
+    from django.core.cache import cache
+    specs = None
+    try:
+        rows = cache.get_or_set(
+            'store_filter_options_metal',
+            lambda: list(FilterOption.objects.filter(filter_type='metal', is_active=True).order_by('order', 'id')),
+            60,
+        )
+        if rows:
+            specs = [
+                {
+                    'slug': r.slug,
+                    'name': r.name,
+                    'swatch': r.color_or_swatch or '#D4AF37',
+                }
+                for r in rows
+            ]
+    except Exception:
+        specs = None
+    if not specs:
+        specs = [
+            {
+                'slug': 'anti-tarnish-gold',
+                'name': 'Anti-Tarnish Gold',
+                'swatch': 'linear-gradient(135deg, #FDE68A 0%, #D97706 60%, #92400E 100%)',
+            },
+            {
+                'slug': 'crystal-zircon',
+                'name': 'Sparkling Crystal / Zircon',
+                'swatch': 'linear-gradient(135deg, #FFFFFF 0%, #BAE6FD 55%, #38BDF8 100%)',
+            },
+            {
+                'slug': 'oxidised-silver',
+                'name': 'Oxidised Silver',
+                'swatch': 'linear-gradient(135deg, #E2E8F0 0%, #94A3B8 55%, #334155 100%)',
+            },
+        ]
     results = []
     for item in specs:
         count = sum(1 for p in products if item['slug'] in p.metal_finish_tags)

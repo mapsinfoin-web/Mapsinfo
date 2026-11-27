@@ -480,12 +480,11 @@ class Product(models.Model):
         """Returns normalized occasion slugs for faceted filtering (explicit DB field or smart auto-match)."""
         if hasattr(self, '_cached_occasion_tags'):
             return self._cached_occasion_tags
-        valid_keys = {k for k, _ in self.OCCASION_CHOICES}
         tags = set()
         if self.occasions:
             for item in self.occasions.split(','):
                 s = item.strip().lower()
-                if s in valid_keys:
+                if s:
                     tags.add(s)
         if not tags:
             title_l = (self.title or '').lower()
@@ -551,12 +550,11 @@ class Product(models.Model):
         """Returns normalized metal/finish slugs for faceted filtering (explicit DB field or smart auto-match)."""
         if hasattr(self, '_cached_metal_finish_tags'):
             return self._cached_metal_finish_tags
-        valid_keys = {k for k, _ in self.METAL_FINISH_CHOICES}
         tags = set()
         if self.metal_finish:
             for item in self.metal_finish.split(','):
                 s = item.strip().lower()
-                if s in valid_keys:
+                if s:
                     tags.add(s)
         if not tags:
             title_l = (self.title or '').lower()
@@ -1658,5 +1656,59 @@ class ProductReview(models.Model):
     @property
     def empty_star_range(self):
         return range(max(0, 5 - self.rating))
+
+
+class FilterOption(models.Model):
+    """
+    Admin-configurable storefront filter options (Occasions & Metal / Finish).
+    New options added here appear automatically as checkboxes on Product Add/Edit
+    and as filter pills on Collections pages.
+    """
+    FILTER_TYPE_CHOICES = [
+        ('occasion', 'Occasion Filter'),
+        ('metal', 'Metal / Finish Filter'),
+    ]
+    filter_type = models.CharField(
+        max_length=20,
+        choices=FILTER_TYPE_CHOICES,
+        default='occasion',
+        help_text="Choose which filter group this option belongs to."
+    )
+    name = models.CharField(max_length=80, help_text="Display name (e.g. 'Festive Wear' or 'Kundan & Pearl').")
+    slug = models.SlugField(
+        max_length=90,
+        blank=True,
+        help_text="Auto-generated from name if left blank."
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        default='fa-tag',
+        help_text="Optional FontAwesome icon class for Occasion filters (e.g. 'fa-crown', 'fa-sun', 'fa-gem')."
+    )
+    color_or_swatch = models.CharField(
+        max_length=160,
+        blank=True,
+        default='#1F3A66',
+        verbose_name='Color / Swatch',
+        help_text="Hex color (e.g. '#DC2626') or CSS gradient for Metal/Finish swatch dot."
+    )
+    order = models.PositiveIntegerField(default=0, help_text="Lower numbers appear first.")
+    is_active = models.BooleanField(default=True, help_text="Uncheck to hide this filter option.")
+
+    class Meta:
+        ordering = ['filter_type', 'order', 'id']
+        unique_together = [('filter_type', 'slug')]
+        verbose_name = 'Product Filter'
+        verbose_name_plural = 'Product Filters'
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.get_filter_type_display()}: {self.name}"
+
 
 
