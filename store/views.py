@@ -62,12 +62,13 @@ def all_products(request):
 
     # Offer badges ("Buy 1 Get 1 Free") for every card on the page
     offers = live_offers()
-    attach_offers(page_obj, offers)
-    attach_offers(recent_products, offers)
+    q_offers = live_quantity_offers()
+    attach_offers(page_obj, offers, q_offers)
+    attach_offers(recent_products, offers, q_offers)
 
     # Trending Bestsellers (top pieces with offers)
     trending_products = all_active[:8]
-    attach_offers(trending_products, offers)
+    attach_offers(trending_products, offers, q_offers)
 
     # Featured UGC Reviews for Social Proof Wall
     ugc_reviews = list(ProductReview.objects.filter(is_approved=True).select_related('product').order_by('-helpful_count', '-created_at')[:8])
@@ -141,8 +142,14 @@ def _trust_words(product, extra=3):
 
 def product_detail(request, pk):
     # Prevents users from accessing hidden products via direct URL links
-    product = get_object_or_404(Product, pk=pk, is_active=True)
-    attach_offers([product])
+    product = get_object_or_404(
+        Product.objects.select_related('category', 'offer_partner_product')
+        .prefetch_related('colors__gallery_images', 'gallery_images', 'sub_categories'),
+        pk=pk, is_active=True
+    )
+    all_live_offers = live_offers()
+    all_q_offers = live_quantity_offers()
+    attach_offers([product], all_live_offers, all_q_offers)
     # product.offer / offer: the live offer for this product (or None) - explain it on the page
     gift_choices = eligible_gifts(product.offer) if product.offer else []
 
@@ -168,9 +175,10 @@ def product_detail(request, pk):
     # Curated "You May Also Like" / Related Products Recommendations
     suggested_products = []
     existing_ids = [product.pk]
+    base_suggest_qs = Product.objects.filter(is_active=True, stock__gt=0).select_related('category', 'offer_partner_product').prefetch_related('colors', 'gallery_images')
 
     # 1. First, check explicitly paired pieces via product.pair_with
-    pair_qs = list(product.pair_with.filter(is_active=True, stock__gt=0).exclude(pk=product.pk)[:4])
+    pair_qs = list(product.pair_with.filter(is_active=True, stock__gt=0).select_related('category').prefetch_related('colors', 'gallery_images').exclude(pk=product.pk)[:4])
     suggested_products.extend(pair_qs)
     existing_ids.extend([p.pk for p in pair_qs])
 
@@ -186,7 +194,7 @@ def product_detail(request, pk):
         # Same category + matching color first
         if color_tags:
             matched_color_qs = list(
-                Product.objects.filter(is_active=True, stock__gt=0)
+                base_suggest_qs
                 .filter(cat_filter & color_filter)
                 .exclude(pk__in=existing_ids)[:4]
             )
@@ -196,7 +204,7 @@ def product_detail(request, pk):
         # Same category
         if len(suggested_products) < 4 and product.category:
             same_cat_qs = list(
-                Product.objects.filter(is_active=True, stock__gt=0, category=product.category)
+                base_suggest_qs.filter(category=product.category)
                 .exclude(pk__in=existing_ids)[: 4 - len(suggested_products)]
             )
             suggested_products.extend(same_cat_qs)
@@ -205,23 +213,23 @@ def product_detail(request, pk):
         # Complementary active pieces from other collections
         if len(suggested_products) < 4:
             other_qs = list(
-                Product.objects.filter(is_active=True, stock__gt=0)
+                base_suggest_qs
                 .exclude(pk__in=existing_ids)[: 4 - len(suggested_products)]
             )
             suggested_products.extend(other_qs)
 
-    attach_offers(suggested_products)
+    attach_offers(suggested_products, all_live_offers, all_q_offers)
 
-    # Customer Reviews & Photo UGC
-    reviews_qs = product.reviews.filter(is_approved=True).select_related('user').order_by('-created_at')
-    total_reviews = reviews_qs.count()
+    # Customer Reviews & Photo UGC (single query, aggregated in Python)
+    reviews_qs = list(product.reviews.filter(is_approved=True).select_related('user').order_by('-created_at'))
+    total_reviews = len(reviews_qs)
     if total_reviews > 0:
         avg_rating = round(sum(r.rating for r in reviews_qs) / total_reviews, 1)
-        stars_5 = reviews_qs.filter(rating=5).count()
-        stars_4 = reviews_qs.filter(rating=4).count()
-        stars_3 = reviews_qs.filter(rating=3).count()
-        stars_2 = reviews_qs.filter(rating=2).count()
-        stars_1 = reviews_qs.filter(rating=1).count()
+        stars_5 = sum(1 for r in reviews_qs if r.rating == 5)
+        stars_4 = sum(1 for r in reviews_qs if r.rating == 4)
+        stars_3 = sum(1 for r in reviews_qs if r.rating == 3)
+        stars_2 = sum(1 for r in reviews_qs if r.rating == 2)
+        stars_1 = sum(1 for r in reviews_qs if r.rating == 1)
         pct_5 = round((stars_5 / total_reviews) * 100)
         pct_4 = round((stars_4 / total_reviews) * 100)
         pct_3 = round((stars_3 / total_reviews) * 100)
@@ -251,7 +259,7 @@ def product_detail(request, pk):
         'recommended_pct': 98 if total_reviews == 0 else min(100, round(((stars_5 + stars_4) / max(total_reviews, 1)) * 100)),
     }
 
-    quantity_offer = get_quantity_offer_for_product(product)
+    quantity_offer = getattr(product, 'quantity_offer', None)
 
     return render(request, 'store/product_detail.html', {
         'product': product,

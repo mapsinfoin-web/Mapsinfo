@@ -29,23 +29,20 @@ def live_quantity_offers(now=None):
 def get_quantity_offer_for_product(product, offers=None):
     """
     Find the applicable live progressive tiered discount offer for a product.
-    Checks:
-    1. Direct product match
-    2. Category match
-    3. Global apply_to_all match
+    Uses prefetched .products.all() and .categories.all() in Python to avoid N+1 SQL queries.
     """
     if product is None:
         return None
     offers = live_quantity_offers() if offers is None else offers
     # 1. Direct product match first (most specific)
     for offer in offers:
-        if not offer.apply_to_all and offer.products.filter(pk=product.pk).exists():
+        if not offer.apply_to_all and any(p.pk == product.pk for p in offer.products.all()):
             return offer
 
     # 2. Category match second
     if product.category_id:
         for offer in offers:
-            if not offer.apply_to_all and offer.categories.filter(pk=product.category_id).exists():
+            if not offer.apply_to_all and any(c.pk == product.category_id for c in offer.categories.all()):
                 return offer
 
     # 3. Global apply_to_all fallback

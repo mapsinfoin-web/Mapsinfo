@@ -287,6 +287,8 @@ class Product(models.Model):
     def all_colors(self):
         """Returns ALL colour variants (in-stock and out-of-stock) so they always
         appear in the colour picker — OOS ones are shown with a strikethrough badge."""
+        if hasattr(self, '_prefetched_objects_cache') and 'colors' in self._prefetched_objects_cache:
+            return sorted(self.colors.all(), key=lambda c: (c.order, c.id))
         try:
             return list(self.colors.order_by('order', 'id'))
         except Exception:

@@ -1,4 +1,6 @@
 # store/context_processors.py
+from django.core.cache import cache
+from django.db.models import Sum
 from .models import Cart, CartItem, Wishlist, Notification, Category
 from .views import _cart_id
 
@@ -56,9 +58,7 @@ def cart_item_count(request):
         if not cart and hasattr(request, 'user') and request.user.is_authenticated:
             cart = Cart.objects.filter(user=request.user, is_purchased=False).first()
         if cart:
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-            for cart_item in cart_items:
-                count += cart_item.quantity
+            count = CartItem.objects.filter(cart=cart, is_active=True).aggregate(total=Sum('quantity'))['total'] or 0
     except Exception:
         count = 0
 
@@ -69,11 +69,15 @@ def cart_item_count(request):
     except Exception:
         user_wishlist = []
 
-    # Active Store Notifications & Announcements
+    # Active Store Notifications & Announcements (cached 60s)
     notifications = []
     announcements = []
     try:
-        notifications = list(Notification.objects.filter(is_active=True).select_related('product', 'category')[:10])
+        notifications = cache.get_or_set(
+            'store_active_notifications',
+            lambda: list(Notification.objects.filter(is_active=True).select_related('product', 'category')[:10]),
+            60,
+        )
         announcements = [n for n in notifications if n.show_in_announcement_bar]
     except Exception:
         notifications = []
@@ -81,7 +85,11 @@ def cart_item_count(request):
 
     nav_categories = []
     try:
-        nav_categories = list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').prefetch_related('subcategories').order_by('order', 'id'))
+        nav_categories = cache.get_or_set(
+            'store_nav_categories',
+            lambda: list(Category.objects.filter(parent__isnull=True).exclude(name__icontains='test').exclude(slug__icontains='test').prefetch_related('subcategories').order_by('order', 'id')),
+            60,
+        )
     except Exception:
         nav_categories = []
 
