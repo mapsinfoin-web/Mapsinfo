@@ -534,7 +534,8 @@
         { name: 'Ruby Red', hex: '#DC2626' },
         { name: 'Pink', hex: '#EC4899' },
         { name: 'White / Clear', hex: '#F8FAFC' },
-        { name: 'Yellow', hex: '#EAB308' }
+        { name: 'Yellow', hex: '#EAB308' },
+        { name: 'Multi Colour', hex: '#EC4899', bg: 'linear-gradient(135deg, #FF00E5 0%, #FF2E2E 35%, #FFE600 65%, #00D9FF 100%)' }
     ];
 
     function getBaseSku() {
@@ -571,13 +572,17 @@
         var paletteHtml = '';
         COLOR_PALETTES.forEach(function(cp) {
             paletteHtml += '<span class="palette-chip" onclick="applyColorChip(' + index + ', \'' + cp.name + '\', \'' + cp.hex + '\')">' +
-                '<span class="palette-chip-dot" style="background:' + cp.hex + '"></span>' + cp.name + '</span>';
+                '<span class="palette-chip-dot" style="background:' + (cp.bg || cp.hex) + '"></span>' + cp.name + '</span>';
         });
+
+        var dotBg = (nameVal && nameVal.toLowerCase().indexOf('multi') !== -1)
+            ? 'linear-gradient(135deg, #FF00E5 0%, #FF2E2E 35%, #FFE600 65%, #00D9FF 100%)'
+            : hexVal;
 
         card.innerHTML = 
             '<div class="variant-card-header" onclick="toggleCardCollapse(' + index + ', event)">' +
                 '<div class="variant-card-header-left">' +
-                    '<span class="variant-swatch-dot" id="headerDot_' + index + '" style="background:' + hexVal + '"></span>' +
+                    '<span class="variant-swatch-dot" id="headerDot_' + index + '" style="background:' + dotBg + '"></span>' +
                     '<span class="variant-name-display" id="headerTitle_' + index + '">' + nameVal + '</span>' +
                     '<span class="variant-badge-tag ' + stockBadgeClass + '" id="headerStockBadge_' + index + '">' + stockBadgeText + '</span>' +
                     '<span class="variant-badge-tag variant-badge-sku" id="headerSkuBadge_' + index + '">SKU: ' + (skuVal || 'Pending') + '</span>' +
@@ -853,7 +858,9 @@
         document.getElementById('vName_' + index).value = name;
         document.getElementById('vColorPicker_' + index).value = hex;
         document.getElementById('vHexText_' + index).value = hex;
-        document.getElementById('headerDot_' + index).style.background = hex;
+        document.getElementById('headerDot_' + index).style.background = (name.toLowerCase().indexOf('multi') !== -1)
+            ? 'linear-gradient(135deg, #FF00E5 0%, #FF2E2E 35%, #FFE600 65%, #00D9FF 100%)'
+            : hex;
         document.getElementById('headerTitle_' + index).textContent = name;
         if (!v.sku || v.sku.indexOf('PRD') === 0) {
             var newSku = autoGenSku(name, index);

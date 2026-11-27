@@ -1158,6 +1158,13 @@ class ProductColor(models.Model):
         return resolve_color_hex(self.name, self.hex_code)
 
     @property
+    def display_bg(self):
+        """Returns CSS background (rainbow gradient for Multi Colour, otherwise hex)."""
+        if self.name and 'multi' in self.name.strip().lower():
+            return 'linear-gradient(135deg, #FF00E5 0%, #FF2E2E 35%, #FFE600 65%, #00D9FF 100%)'
+        return self.display_hex or self.hex_code
+
+    @property
     def effective_price(self):
         """Returns variant price if set, otherwise the main product price."""
         if self.price is not None:
