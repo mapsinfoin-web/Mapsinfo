@@ -692,7 +692,7 @@ class ProductAdmin(admin.ModelAdmin):
             return JsonResponse({'error': 'Cloudinary image credentials not configured'}, status=500)
 
         timestamp = int(time.time())
-        folder = 'products/variants'
+        folder = 'media/products/variants'
         params = {
             'folder': folder,
             'timestamp': timestamp,
@@ -1004,6 +1004,8 @@ class ProductAdmin(admin.ModelAdmin):
                 pid_str = str(pid or '').strip()
                 if not pid_str:
                     continue
+                if pid_str.startswith('media/'):
+                    pid_str = pid_str[6:]
                 pg = ProductGallery(
                     product=product,
                     color=color_obj,
