@@ -29,7 +29,7 @@ from .models import (
 )
 from .offers import (
     add_gift, attach_offers, auto_fill_single_gift, calculate as calculate_offers, eligible_gifts,
-    get_quantity_offer_for_product, gift_slots_left, live_offers, offer_by_main, sync_gifts,
+    get_quantity_offer_for_product, gift_slots_left, live_offers, live_quantity_offers, offer_by_main, sync_gifts,
 )
 
 
