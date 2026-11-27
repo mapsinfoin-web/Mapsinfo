@@ -1013,80 +1013,108 @@
     };
 
     var activeImageUploads = 0;
+    var VERCEL_SAFE_LIMIT_BYTES = 4.2 * 1024 * 1024; // 4.2 MB safe threshold under Vercel's 4.5 MB limit
 
-    function compressVariantImage(file) {
-        return new Promise(function(resolve) {
-            if (!file || file.size <= 350 * 1024) {
-                resolve(file);
-                return;
+    function getPendingFormPayloadBytes() {
+        var total = 0;
+        var mainImg = document.getElementById('id_image');
+        if (mainImg && mainImg.files && mainImg.files[0]) {
+            total += mainImg.files[0].size;
+        }
+        variantsList.forEach(function(v) {
+            if (v && v.pendingFiles) {
+                v.pendingFiles.forEach(function(item) {
+                    if (item.file) total += item.file.size;
+                });
             }
-            var img = new Image();
-            var url = URL.createObjectURL(file);
-            img.onload = function() {
-                URL.revokeObjectURL(url);
-                var maxSide = 1600;
-                var w = img.naturalWidth || img.width;
-                var h = img.naturalHeight || img.height;
-                var scale = Math.min(1, maxSide / Math.max(w, h));
-                var canvas = document.createElement('canvas');
-                canvas.width = Math.max(1, Math.round(w * scale));
-                canvas.height = Math.max(1, Math.round(h * scale));
-                var ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(function(blob) {
-                    if (blob && blob.size < file.size) {
-                        resolve(new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'variant') + '.jpg', { type: 'image/jpeg' }));
-                    } else {
-                        resolve(file);
-                    }
-                }, 'image/jpeg', 0.85);
-            };
-            img.onerror = function() {
-                URL.revokeObjectURL(url);
-                resolve(file);
-            };
-            img.src = url;
         });
+        var payloadEl = document.getElementById('product_variants_payload');
+        if (payloadEl && payloadEl.value) {
+            total += payloadEl.value.length;
+        }
+        return total;
+    }
+
+    function updatePayloadLimitMeter() {
+        var bar = document.getElementById('uploadLimitMeter');
+        if (!bar) {
+            var statsBar = document.getElementById('statPriceRange');
+            if (statsBar && statsBar.parentNode) {
+                bar = document.createElement('span');
+                bar.id = 'uploadLimitMeter';
+                bar.className = 'stat-pill';
+                statsBar.parentNode.appendChild(bar);
+            }
+        }
+        if (!bar) return;
+        var bytes = getPendingFormPayloadBytes();
+        var mb = (bytes / (1024 * 1024)).toFixed(2);
+        var limitMb = '4.50';
+        var uploadingTxt = activeImageUploads > 0 ? ' · ☁️ Uploading ' + activeImageUploads + '...' : '';
+        if (bytes >= VERCEL_SAFE_LIMIT_BYTES) {
+            bar.style.background = '#FEE2E2';
+            bar.style.color = '#991B1B';
+            bar.style.border = '1px solid #FCA5A5';
+            bar.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Limit Full: ' + mb + ' MB / ' + limitMb + ' MB — Save first, then add more!' + uploadingTxt;
+        } else if (bytes >= 3.2 * 1024 * 1024) {
+            bar.style.background = '#FEF3C7';
+            bar.style.color = '#92400E';
+            bar.style.border = '1px solid #FCD34D';
+            bar.innerHTML = '<i class="fas fa-gauge-high"></i> Upload: ' + mb + ' MB / ' + limitMb + ' MB' + uploadingTxt;
+        } else {
+            bar.style.background = '#ECFDF5';
+            bar.style.color = '#065F46';
+            bar.style.border = '1px solid #A7F3D0';
+            bar.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Payload: ' + mb + ' MB / ' + limitMb + ' MB' + uploadingTxt;
+        }
+    }
+
+    var mainImgInput = document.getElementById('id_image');
+    if (mainImgInput) {
+        mainImgInput.addEventListener('change', updatePayloadLimitMeter);
     }
 
     function directUploadVariantImage(index, pendingItem) {
         activeImageUploads++;
-        compressVariantImage(pendingItem.file).then(function(uploadFile) {
-            return fetch('{% url "admin:store_product_cloudinary_image_signature" %}')
-                .then(function(r) {
-                    if (!r.ok) throw new Error('Signature error ' + r.status);
-                    return r.json();
-                })
-                .then(function(sig) {
-                    var fd = new FormData();
-                    fd.append('file', uploadFile);
-                    fd.append('api_key', sig.api_key);
-                    fd.append('timestamp', sig.timestamp);
-                    fd.append('folder', sig.folder);
-                    fd.append('signature', sig.signature);
-                    return fetch('https://api.cloudinary.com/v1_1/' + sig.cloud_name + '/image/upload', {
-                        method: 'POST',
-                        body: fd
-                    });
-                })
-                .then(function(r) {
-                    if (!r.ok) throw new Error('Cloudinary upload failed ' + r.status);
-                    return r.json();
-                })
-                .then(function(resp) {
-                    if (resp && resp.public_id) {
-                        pendingItem.uploadedPublicId = resp.public_id;
-                        pendingItem.file = null; // Bypass Vercel 4.5MB form payload limit
-                        syncFileInput(index);
-                    }
+        updatePayloadLimitMeter();
+        fetch('{% url "admin:store_product_cloudinary_image_signature" %}')
+            .then(function(r) {
+                if (!r.ok) throw new Error('Signature error ' + r.status);
+                return r.json();
+            })
+            .then(function(sig) {
+                var fd = new FormData();
+                fd.append('file', pendingItem.file);
+                fd.append('api_key', sig.api_key);
+                fd.append('timestamp', sig.timestamp);
+                fd.append('folder', sig.folder);
+                fd.append('signature', sig.signature);
+                return fetch('https://api.cloudinary.com/v1_1/' + sig.cloud_name + '/image/upload', {
+                    method: 'POST',
+                    body: fd
                 });
-        }).catch(function(err) {
-            console.warn('Direct image upload fallback to form file:', err);
-        }).finally(function() {
-            activeImageUploads = Math.max(0, activeImageUploads - 1);
-        });
+            })
+            .then(function(r) {
+                if (!r.ok) throw new Error('Cloudinary upload failed ' + r.status);
+                return r.json();
+            })
+            .then(function(resp) {
+                if (resp && resp.public_id) {
+                    pendingItem.uploadedPublicId = resp.public_id;
+                    pendingItem.file = null; // Original quality uploaded straight to Cloudinary; keep Save POST tiny
+                    syncFileInput(index);
+                }
+            })
+            .catch(function(err) {
+                console.warn('Direct image upload fallback to form file:', err);
+            })
+            .finally(function() {
+                activeImageUploads = Math.max(0, activeImageUploads - 1);
+                updatePayloadLimitMeter();
+                if (getPendingFormPayloadBytes() >= VERCEL_SAFE_LIMIT_BYTES) {
+                    alert('Upload limit is full (' + (getPendingFormPayloadBytes() / (1024 * 1024)).toFixed(2) + ' MB / 4.50 MB max). Please click Save now, then add more photos/colours after saving.');
+                }
+            });
     }
 
     function addFilesToVariant(index, files) {
@@ -1481,9 +1509,18 @@
                     if (activeImageUploads <= 0) {
                         clearInterval(waitTimer);
                         compileVariantsPayload();
+                        if (getPendingFormPayloadBytes() >= VERCEL_SAFE_LIMIT_BYTES) {
+                            alert('Upload limit is full (' + (getPendingFormPayloadBytes() / (1024 * 1024)).toFixed(2) + ' MB / 4.50 MB max). Please remove a few pending files, save first, then add the rest.');
+                            return;
+                        }
                         mainForm.submit();
                     }
                 }, 250);
+                return;
+            }
+            if (getPendingFormPayloadBytes() >= VERCEL_SAFE_LIMIT_BYTES) {
+                e.preventDefault();
+                alert('Upload limit is full (' + (getPendingFormPayloadBytes() / (1024 * 1024)).toFixed(2) + ' MB / 4.50 MB max). Please remove a few pending files, save first, then add the rest.');
             }
         });
     }
