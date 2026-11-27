@@ -454,8 +454,47 @@
         (function () {
             /* Mobile menu handled by header.html */
 var h = document.getElementById('header');
-if (h) {
+            if (h) {
                 window.addEventListener('scroll', function () { h.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            }
+
+            // Smooth AJAX quantity & item removal (no full page refresh)
+            var cartSection = document.querySelector('main.cart-section');
+            var updating = false;
+            if (cartSection) {
+                cartSection.addEventListener('click', function (e) {
+                    var btn = e.target.closest('a.qty-btn, a.remove-btn');
+                    if (!btn || !btn.href) return;
+                    e.preventDefault();
+                    if (updating) return;
+                    updating = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.pointerEvents = 'none';
+
+                    fetch(btn.href, { credentials: 'same-origin' })
+                        .then(function (resp) {
+                            if (!resp.ok) throw new Error('Network error');
+                            return resp.text();
+                        })
+                        .then(function (html) {
+                            var doc = new DOMParser().parseFromString(html, 'text/html');
+                            var nextCart = doc.querySelector('main.cart-section');
+                            if (nextCart) {
+                                cartSection.innerHTML = nextCart.innerHTML;
+                            }
+                            var curCartIcon = document.querySelector('a[aria-label="Cart"]');
+                            var nextCartIcon = doc.querySelector('a[aria-label="Cart"]');
+                            if (curCartIcon && nextCartIcon) {
+                                curCartIcon.innerHTML = nextCartIcon.innerHTML;
+                            }
+                        })
+                        .catch(function () {
+                            window.location.href = btn.href;
+                        })
+                        .finally(function () {
+                            updating = false;
+                        });
+                });
             }
         })();
     </script>
