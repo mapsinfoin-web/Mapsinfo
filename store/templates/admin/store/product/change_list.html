@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block result_list %}
+  {% if cl.formset and cl.result_count %}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin:0 0 10px; padding:8px 12px; background:var(--darkened-bg, rgba(0,0,0,0.04)); border:1px solid var(--border-color, #ccc); border-radius:6px;">
+    <span style="font-size:13px; color:var(--body-quiet-color, #666);">
+      {{ cl.result_count }} {% if cl.result_count == 1 %}{{ cl.opts.verbose_name }}{% else %}{{ cl.opts.verbose_name_plural }}{% endif %}
+    </span>
+    <input type="submit" name="_save" class="default" value="{% translate 'Save' %}" style="margin:0; cursor:pointer;" />
+  </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

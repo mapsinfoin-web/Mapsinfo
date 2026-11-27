@@ -430,6 +430,7 @@ class ProductAdminForm(forms.ModelForm):
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
     change_form_template = 'admin/store/product/change_form.html'
+    save_on_top = True
     list_display = ['title', 'sku', 'category', 'brand', 'product_type', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
     list_filter = [StockStatusFilter, 'category', 'brand', 'product_type', 'is_active']
     # Quick-edit prices and stock straight from the list page
