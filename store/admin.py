@@ -367,6 +367,27 @@ class StockStatusFilter(admin.SimpleListFilter):
         return queryset
 
 
+class MainCollectionFilter(admin.SimpleListFilter):
+    """Sidebar filter: All Earrings, All Necklaces, All Rings, All Bracelets (includes sub-categories)."""
+    title = 'collection (all)'
+    parameter_name = 'collection'
+
+    def lookups(self, request, model_admin):
+        roots = Category.objects.filter(parent__isnull=True).exclude(slug__icontains='test').order_by('order', 'id')
+        return [(c.slug, f'All {c.name}') for c in roots]
+
+    def queryset(self, request, queryset):
+        val = self.value()
+        if not val:
+            return queryset
+        return queryset.filter(
+            Q(category__slug=val)
+            | Q(category__parent__slug=val)
+            | Q(sub_categories__slug=val)
+            | Q(sub_categories__parent__slug=val)
+        ).distinct()
+
+
 class ProductAdminForm(forms.ModelForm):
     occasions_list = forms.MultipleChoiceField(
         choices=Product.OCCASION_CHOICES,
@@ -467,7 +488,7 @@ class ProductAdmin(admin.ModelAdmin):
     change_form_template = 'admin/store/product/change_form.html'
     save_on_top = True
     list_display = ['title', 'sku', 'category', 'brand', 'product_type', 'mrp', 'price', 'stock', 'stock_status', 'is_active', 'bogo_offer_names', 'created']
-    list_filter = [StockStatusFilter, 'category', 'brand', 'product_type', 'is_active']
+    list_filter = [MainCollectionFilter, StockStatusFilter, 'category', 'offer_type', 'brand', 'product_type', 'is_active']
     # Quick-edit prices and stock straight from the list page
     list_editable = ['mrp', 'price', 'stock', 'is_active']
     search_fields = ['title', 'sku', 'brand', 'product_type']
