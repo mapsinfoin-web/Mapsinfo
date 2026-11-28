@@ -1333,11 +1333,14 @@ class PaymentStatusFilter(admin.SimpleListFilter):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     ordering = ['-id']   # newest order first
+    save_on_top = True
+    list_per_page = 25
     list_display = [
-        'id', 'status', 'get_total_items', 'get_purchased_skus', 'full_name', 'mobile_number',
-        'email', 'shipping_address', 'city', 'postal_code', 'discount_amount', 'amount_paid',
-        'payment_status', 'screenshot_link', 'is_paid', 'tracking_number', 'whatsapp_customer_action',
+        'order_id_badge', 'customer_card', 'items_card', 'address_card',
+        'amount_card', 'payment_badge', 'is_paid', 'status', 'tracking_number',
+        'whatsapp_customer_action',
     ]
+    list_display_links = ['order_id_badge']
     list_editable = ['status', 'is_paid', 'tracking_number']
     date_hierarchy = 'date_ordered'
     list_filter = [PaymentStatusFilter, 'status', 'is_paid', 'city']
@@ -1345,6 +1348,86 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     readonly_fields = ['discount_amount', 'offers_applied', 'screenshot_preview', 'payment_submitted_at', 'whatsapp_customer_action']
     actions = ['mark_payment_verified', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'cancel_and_restore_stock']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('items__product')
+
+    @admin.display(description='Order ID', ordering='id')
+    def order_id_badge(self, obj):
+        dt = obj.date_ordered.strftime('%d %b') if obj.date_ordered else ''
+        return format_html(
+            '<div style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;">'
+            '<span style="background:#1E3A8A;color:#fff;padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px;width:fit-content;">#{}</span>'
+            '<span style="font-size:11px;color:#94a3b8;">{}</span>'
+            '</div>',
+            obj.id, dt
+        )
+
+    @admin.display(description='Customer', ordering='full_name')
+    def customer_card(self, obj):
+        return format_html(
+            '<div style="min-width:140px;line-height:1.35;">'
+            '<div style="font-weight:700;font-size:13px;">{}</div>'
+            '<div style="font-size:11.5px;color:#60a5fa;">📞 {}</div>'
+            '<div style="font-size:11px;color:#94a3b8;word-break:break-all;">{}</div>'
+            '</div>',
+            obj.full_name, obj.mobile_number or '—', obj.email or ''
+        )
+
+    @admin.display(description='Items')
+    def items_card(self, obj):
+        items = list(obj.items.all())
+        if not items:
+            return mark_safe('<span style="color:#94a3b8;">0 items</span>')
+        lines = []
+        for it in items[:3]:
+            col = format_html(' <span style="color:#38bdf8;">[{}]</span>', it.color) if it.color else ''
+            gift = mark_safe(' <span style="background:#16a34a;color:#fff;padding:1px 5px;border-radius:4px;font-size:10px;">FREE</span>') if it.is_free_gift else ''
+            lines.append(format_html('<div style="font-size:12px;line-height:1.35;"><b>{}&times;</b> {}{}{}</div>', it.quantity, it.product.title, col, gift))
+        if len(items) > 3:
+            lines.append(format_html('<div style="font-size:11px;color:#94a3b8;">+{} more item(s)</div>', len(items) - 3))
+        return format_html('<div style="max-width:230px;">{}</div>', mark_safe(''.join(str(x) for x in lines)))
+
+    @admin.display(description='Delivery Address', ordering='city')
+    def address_card(self, obj):
+        return format_html(
+            '<div style="max-width:190px;font-size:12px;line-height:1.35;">'
+            '<div>{}</div>'
+            '<div style="color:#94a3b8;font-size:11px;">{}, {}</div>'
+            '</div>',
+            obj.shipping_address, obj.city, obj.postal_code
+        )
+
+    @admin.display(description='Total', ordering='amount_paid')
+    def amount_card(self, obj):
+        disc = ''
+        if obj.discount_amount and obj.discount_amount > 0:
+            disc = f'<div style="font-size:11px;color:#22c55e;font-weight:600;">Saved ₹{obj.discount_amount}</div>'
+        return format_html(
+            '<div style="white-space:nowrap;">'
+            '<div style="font-weight:800;font-size:13.5px;">₹{}</div>'
+            '{}'
+            '</div>',
+            obj.amount_paid, mark_safe(disc)
+        )
+
+    @admin.display(description='Payment')
+    def payment_badge(self, obj):
+        if obj.status == 'CANCELLED':
+            badge = '<span style="background:#334155;color:#cbd5e1;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">Cancelled</span>'
+        elif obj.is_paid:
+            badge = '<span style="background:#166534;color:#dcfce7;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">✅ Paid</span>'
+        elif obj.payment_screenshot:
+            badge = '<span style="background:#92400e;color:#fef3c7;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">🔍 Verify</span>'
+        else:
+            badge = '<span style="background:#7f1d1d;color:#fee2e2;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;">⏳ Awaiting</span>'
+        shot = ''
+        if obj.payment_screenshot:
+            shot = format_html(
+                '<div style="margin-top:4px;"><a href="{}" target="_blank" style="font-size:11px;color:#38bdf8;text-decoration:underline;">📷 View Receipt</a></div>',
+                obj.payment_screenshot.url
+            )
+        return format_html('<div style="white-space:nowrap;">{}{}</div>', mark_safe(badge), mark_safe(shot))
 
     @admin.display(description='WhatsApp Customer')
     def whatsapp_customer_action(self, obj):

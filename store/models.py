@@ -1402,7 +1402,8 @@ class OrderItem(models.Model):
     def __str__(self):
         color_str = f" [{self.color}]" if self.color else ""
         sku_str = f" ({self.sku})" if self.sku else ""
-        return f'{self.quantity} x {self.product.title}{color_str}{sku_str}'
+        order_str = f"Order ID #{self.order_id}: " if self.order_id else ""
+        return f'{order_str}{self.quantity} x {self.product.title}{color_str}{sku_str}'
 
 
 class ContactInquiry(models.Model):
